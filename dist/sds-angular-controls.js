@@ -3,6 +3,20 @@
 * Copyright (c) 2014 Steve Gentile, David Benson; Licensed  */
 angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch']);
 
+(function (){
+  'use strict';
+
+  function camelCase (){
+    return function (input) {
+      return input.toLowerCase().replace(/ (\w)/g, function (match, letter) {
+        return letter.toUpperCase();
+      });
+    };
+  }
+
+  angular.module('sds-angular-controls').filter('camelCase', camelCase);
+})();
+
 (function () {
     'use strict';
     function formField (InputTypes, $filter, $log) {
