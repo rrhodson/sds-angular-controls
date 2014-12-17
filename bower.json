@@ -7,7 +7,7 @@
   ],
   "description": "Angular Directives used with sds-angular generator",
   "main": [
-    "sds-angular-controls.js"
+    "dist/sds-angular-controls.js"
   ],
   "keywords": [
     "angular",
