@@ -16,7 +16,9 @@
         maskInput: '@'
       },
       link: function (scope, element) {
-        $(element).mask(scope.maskInput);
+        if(scope.maskInput) {
+          $(element).mask(scope.maskInput);
+        }
       }
     };
   }
