@@ -1,4 +1,4 @@
-/*! sds-angular-controls - v0.0.1 - 2014-12-17
+/*! sds-angular-controls - v0.0.1 - 2014-12-18
 * https://github.com/SMARTDATASYSTEMSLLC/sds-angular-controls
 * Copyright (c) 2014 Steve Gentile, David Benson; Licensed  */
 angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch']);
@@ -194,6 +194,23 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch']);
   angular.module('sds-angular-controls').filter('labelCase', labelCase);
 })();
 
+(function () {
+  'use strict';
+  function maskInput (){
+    return {
+      restrict: 'A',
+      scope:{
+        maskInput: '@'
+      },
+      link: function (scope, element) {
+        $(element).mask(scope.maskInput);
+      }
+    };
+  }
+
+  angular.module('sds-angular-controls').directive('maskInput', maskInput);
+})();
+
 angular.module('sds-angular-controls').run(['$templateCache', function($templateCache) {
   'use strict';
 
@@ -203,7 +220,7 @@ angular.module('sds-angular-controls').run(['$templateCache', function($template
 
 
   $templateCache.put('sds-angular-controls/formFieldControls.html',
-    "<!-- input --> <div ng-if=\"::fieldType === 'input'\"> <input ng-readonly=\"isReadonly\" style=\"{{::style}}\" class=\"form-control inputField {{::inputLayoutCss}}\" ng-model=\"record[field]\" type=\"{{::type}}\" ng-required=\"isRequired\" max=\"{{::max}}\" min=\"{{::min}}\"> <div ng-if=\"::(rightLabel && rightLabel.length > 0)\" class=\"rightLabel\">{{::rightLabel}}</div> </div> <!-- numeric --> <input ng-if=\"::fieldType === 'autonumeric'\" style=\"{{::style}}\" ng-readonly=\"isReadonly\" type=\"text\" auto-numeric class=\"form-control inputField {{::inputLayoutCss}}\" ng-model=\"record[field]\" max=\"{{::max}}\" min=\"{{::min}}\" ng-required=\"isRequired\"> <!-- textarea --> <textarea ng-if=\"::fieldType == 'textarea'\" ng-readonly=\"isReadonly\" class=\"form-control fullscreen inputField {{::inputLayoutCss}}\" ng-model=\"record[field]\" type=\"{{::type}}\" style=\"{{::style}}\" ng-required=\"isRequired\"></textarea> <!-- toggle --> <div ng-if=\"::fieldType === 'toggle'\"> <toggle-switch style=\"{{::style}}\" class=\"{{::toggleSwitchType}}\" ng-model=\"record[field]\" on-label=\"{{::onLabel}}\" off-label=\"{{::offLabel}}\"> </toggle-switch> <!--<input ng-if=\"isReadonly\" style=\"{{::style}}\" ng-readonly=\"isReadonly\" type='text'--> <!--class=\"form-control inputField {{::inputLayoutCss}}\" ng-model='readOnlyModel'/>--> <div ng-if=\"isReadonly\" class=\"rightLabel\">{{record[field] ? onLabel : offLabel}}</div> </div> <!-- texttoggle --> <div ng-if=\"::fieldType === 'texttoggle'\" class=\"{{::inputLayoutCss}} text-toggle\"> <input type=\"text\" style=\"{{::style}}\" ng-readonly=\"isReadonly\" type=\"{{::type}}\" class=\"form-control inputField\" ng-model=\"record[field]\"> <toggle-switch ng-if=\"!isReadonly\" class=\"{{::toggleSwitchType}}\" ng-model=\"record[toggleField]\" on-label=\"{{::onLabel}}\" off-label=\"{{::offLabel}}\"> </toggle-switch> <div ng-if=\"isReadonly\" class=\"rightLabel\">{{record[field] ? onLabel : offLabel}}</div> </div> <div ng-if=\"::fieldType === 'select'\"> <select ng-if=\"!isReadonly && !hasFilter\" ng-readonly=\"isReadonly\" class=\"form-control\" name=\"{{::field}}\" ng-model=\"record[field]\" ng-options=\"convertType(key) as items[key] for key in orderHash(items)\" ng-required=\"isRequired\"></select> <!-- optionValue as optionLabel for arrayItem in array --> <input ng-if=\"isReadonly\" style=\"{{::style}}\" ng-readonly=\"isReadonly\" type=\"text\" class=\"form-control inputField {{::inputLayoutCss}}\" ng-model=\"readOnlyModel\"> </div> <!-- quickdatapicker --> <span class=\"input-group\" ng-if=\"::fieldType === 'quickdatepicker'\"> <input type=\"text\" style=\"{{::style}}\" class=\"form-control datepicker ng-if=\" isreadonly ng-readonly=\"isReadonly\" placeholder=\"{{placeholder}}\" ng-model=\"record[field]\" ng-required=\"::isRequired\" min-date=\"::min\" max-date=\"::max\" datepicker-popup=\"{{::dateFormat}}\" is-open=\"calender.opened\"> <span ng-if=\"!isReadonly\" class=\"input-group-btn\"> <button type=\"button\" class=\"btn btn-default\" ng-click=\"open($event)\"><i class=\"glyphicon glyphicon-calendar\"></i></button> </span> </span>"
+    "<!-- input --> <div ng-if=\"::fieldType === 'input'\"> <input ng-readonly=\"isReadonly\" style=\"{{::style}}\" class=\"form-control inputField {{::inputLayoutCss}}\" ng-model=\"record[field]\" type=\"{{::type}}\" mask-input=\"{{::mask}}\" ng-required=\"isRequired\" max=\"{{::max}}\" min=\"{{::min}}\"> <div ng-if=\"::(rightLabel && rightLabel.length > 0)\" class=\"rightLabel\">{{::rightLabel}}</div> </div> <!-- numeric --> <input ng-if=\"::fieldType === 'autonumeric'\" style=\"{{::style}}\" ng-readonly=\"isReadonly\" type=\"text\" auto-numeric class=\"form-control inputField {{::inputLayoutCss}}\" ng-model=\"record[field]\" max=\"{{::max}}\" min=\"{{::min}}\" ng-required=\"isRequired\"> <!-- textarea --> <textarea ng-if=\"::fieldType == 'textarea'\" ng-readonly=\"isReadonly\" class=\"form-control fullscreen inputField {{::inputLayoutCss}}\" ng-model=\"record[field]\" type=\"{{::type}}\" style=\"{{::style}}\" ng-required=\"isRequired\"></textarea> <!-- toggle --> <div ng-if=\"::fieldType === 'toggle'\"> <toggle-switch style=\"{{::style}}\" class=\"{{::toggleSwitchType}}\" ng-model=\"record[field]\" on-label=\"{{::onLabel}}\" off-label=\"{{::offLabel}}\"> </toggle-switch> <!--<input ng-if=\"isReadonly\" style=\"{{::style}}\" ng-readonly=\"isReadonly\" type='text'--> <!--class=\"form-control inputField {{::inputLayoutCss}}\" ng-model='readOnlyModel'/>--> <div ng-if=\"isReadonly\" class=\"rightLabel\">{{record[field] ? onLabel : offLabel}}</div> </div> <!-- texttoggle --> <div ng-if=\"::fieldType === 'texttoggle'\" class=\"{{::inputLayoutCss}} text-toggle\"> <input type=\"text\" style=\"{{::style}}\" ng-readonly=\"isReadonly\" type=\"{{::type}}\" class=\"form-control inputField\" ng-model=\"record[field]\"> <toggle-switch ng-if=\"!isReadonly\" class=\"{{::toggleSwitchType}}\" ng-model=\"record[toggleField]\" on-label=\"{{::onLabel}}\" off-label=\"{{::offLabel}}\"> </toggle-switch> <div ng-if=\"isReadonly\" class=\"rightLabel\">{{record[field] ? onLabel : offLabel}}</div> </div> <div ng-if=\"::fieldType === 'select'\"> <select ng-if=\"!isReadonly && !hasFilter\" ng-readonly=\"isReadonly\" class=\"form-control\" name=\"{{::field}}\" ng-model=\"record[field]\" ng-options=\"convertType(key) as items[key] for key in orderHash(items)\" ng-required=\"isRequired\"></select> <!-- optionValue as optionLabel for arrayItem in array --> <input ng-if=\"isReadonly\" style=\"{{::style}}\" ng-readonly=\"isReadonly\" type=\"text\" class=\"form-control inputField {{::inputLayoutCss}}\" ng-model=\"readOnlyModel\"> </div> <!-- quickdatapicker --> <span class=\"input-group\" ng-if=\"::fieldType === 'quickdatepicker'\"> <input type=\"text\" style=\"{{::style}}\" class=\"form-control datepicker ng-if=\" isreadonly ng-readonly=\"isReadonly\" placeholder=\"{{placeholder}}\" ng-model=\"record[field]\" ng-required=\"::isRequired\" min-date=\"::min\" max-date=\"::max\" datepicker-popup=\"{{::dateFormat}}\" is-open=\"calender.opened\"> <span ng-if=\"!isReadonly\" class=\"input-group-btn\"> <button type=\"button\" class=\"btn btn-default\" ng-click=\"open($event)\"><i class=\"glyphicon glyphicon-calendar\"></i></button> </span> </span>"
   );
 
 }]);
