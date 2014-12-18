@@ -28,12 +28,18 @@
 
     vm.testForm = angular.copy(vm.masterTestForm);
 
-    vm.states = {};
+    vm.states = [
+      {stateCode: "OH", stateName: "Ohio"},
+      {stateCode: "IN", stateName: "Indiana"},
+      {stateCode: "MI", stateName: "Michigan"}
+    ];
     vm.itemList = [];
 
     vm.save = function(testFrm){
       vm.itemList.push(vm.testForm);
       vm.testForm = angular.copy(vm.masterTestForm);
+      testFrm.$setPristine(true);
+      testFrm.$setDirty(false);
     };
 
     /* Grid */

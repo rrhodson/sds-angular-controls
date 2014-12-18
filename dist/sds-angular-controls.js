@@ -267,7 +267,9 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                 showLabel               : '=?',
                 dateFormat              : '@',
                 isReadonly                : '=?',  //expects boolean
-                style                   : '@?'
+                style                   : '@?',
+                itemKey                 : '@?',
+                itemValue               : '@?'
             },
             require: '^form', //^parent of our directive, a child form of form above it
             link: function ($scope, element, attr, form) {
@@ -298,6 +300,22 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                     $scope.label = $filter("labelCase")($scope.field);
                 }
                 var inputField = element.find('.inputField');
+
+                function convertToHash(items, itemKey, itemValue){
+                  var OrderedDictionary = function (){};
+                  OrderedDictionary.prototype.orderedKeys = [];
+                  return _.reduce(items, function (result, item) {
+                    result[item[itemKey]] = item[itemValue];
+
+                    // set the ordered keys value
+                    result.orderedKeys.push(item[itemKey]);
+                    return result;
+                  }, new OrderedDictionary());
+                }
+
+                if($scope.fieldType === "select" && ($scope.itemKey && $scope.itemValue)){
+                  $scope.items = convertToHash($scope.items, $scope.itemKey, $scope.itemValue);
+                }
 
                 $scope.orderHash = function(obj){
                     if (!obj) {
