@@ -38,7 +38,7 @@
 
     /* Grid */
 
-    self.cols = [
+    vm.cols = [
       {name: 'First Name', key:"FirstName", sortable: true},
       {name: 'Last Name', key:"LastName", sortable: true},
       {name: 'DOB', key:"DateOfBirth", sortable:false},

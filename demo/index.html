@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <title></title>
   <link rel="stylesheet" href="../bower_components/bootstrap/dist/css/bootstrap.min.css" type="text/css">
-  <link rel="stylesheet" href="../bower_components/angular-toggle-switch/angular-toggle-switch-bootstrap.css"
-        type="text/css">
+  <link rel="stylesheet" href="../bower_components/angular-toggle-switch/angular-toggle-switch-bootstrap.css" type="text/css">
+  <link rel="stylesheet" href="../dist/sds-angular-controls.css" type="text/css">
 </head>
 <body>
 
@@ -47,13 +47,14 @@
         <!--record="vm.testForm" toggle-field="weightUnit" field="LikesIceCream"-->
         <!--toggle-switch-type="inverse"></form-field>-->
 
-        <input type="submit" value="Submit">
+        <input type="submit" value="Submit" class="btn btn-primary">
       </form>
+
+        <client-grid cols="vm.cols" data="vm.itemList" label="awesome doodads"></client-grid>
     </div>
 
-    <div class="row">
-      <client-grid cols="vm.cols" data="vm.itemList" label="awesome doodads"></client-grid>
-    </div>
+
+
   </div>
 
   <script src="../bower_components/jquery/dist/jquery.min.js"></script>
