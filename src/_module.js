@@ -1,1 +1,1 @@
-angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch']);
+angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSanitize']);

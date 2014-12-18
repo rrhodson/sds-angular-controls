@@ -3,7 +3,7 @@
     function formField (InputTypes, $filter, $log) {
         return {
             restrict: 'EA',
-            templateUrl: 'sds-angular-controls/formField.html',
+            templateUrl: 'sds-angular-controls/form-field.html',
             //replace: true,
             scope: {
                 record                  : '=',  //two-way binding
