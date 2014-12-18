@@ -4,7 +4,7 @@
         <label ng-if="showLabel" class='control-label {{labelLayoutCss}}'> {{ label }} <span ng-if='isRequired && !isReadonly'>*</span></label>
 
         <div class="clearfix">
-            <ng-include src="'sds-angular-controls/formFieldControls.html'"></ng-include>
+            <ng-include src="'sds-angular-controls/form-field-controls.html'"></ng-include>
         </div>
 
         <!-- validation -->
@@ -24,7 +24,7 @@
         <label ng-if="showLabel" class='control-label {{labelLayoutCss}}'> {{ label }} <span ng-if='isRequired && !isReadonly'>*</span></label>
 
         <div class="{{inputLayoutCss}}">
-            <ng-include src="'directive/formField/formFieldControls.html'"></ng-include>
+            <ng-include src="'directive/formField/form-field-controls.html'"></ng-include>
         </div>
 
         <div ng-if="!hideValidationMessage" ng-show='showError({{field}})' class="popover right alert-danger"
@@ -52,7 +52,7 @@
                 <!--{{v[1]}}</p>-->
         <!--</div>-->
     </div>
-    <ng-include ng-if="layout === 'grid'" src="'directive/formField/formFieldControls.html'"></ng-include>
+    <ng-include ng-if="layout === 'grid'" src="'directive/formField/form-field-controls.html'"></ng-include>
 </div>
 
 

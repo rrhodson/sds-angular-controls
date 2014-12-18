@@ -1,0 +1,69 @@
+<div class="table-responsive">
+
+    <div class="btn-toolbar">
+        <a ng-if="vm.showAdvanced" href="" class="btn btn-default" ng-click="vm.clearFilters()">Clear All Filters <span class="big-x">&times;</span></a>
+        <div ng-if="!vm.showAdvanced" class="toolbar-input">
+            <div class="form-group has-feedback">
+                <input class="form-control" type="text" ng-model="vm.filterText"
+                       placeholder="Filter {{label || 'items'}}" on-enter="vm.onEnter()" />
+                <a href="" ng-click="vm.filterText = ''" class="form-control-feedback feedback-link">&times;</a>
+            </div>
+        </div>
+        <a href="" ng-if="!hideAdvanced" class="btn btn-default"  ng-class="{active: vm.showAdvanced}" ng-click="vm.showAdvanced = !vm.showAdvanced">Advanced Filtering</a>
+        <ng-transclude></ng-transclude>
+        <p ng-show="data"><i>{{vm.resultCount.length}} {{label || 'items'}}</i></p>
+    </div>
+<table class="table table-hover {{className}}" >
+    <thead>
+        <tr>
+            <th ng-repeat="col in cols">
+                <div ng-if="vm.showAdvanced && col.sortable">
+                    <input type="text" class="form-control filter-input" on-enter="vm.onEnter()" ng-model="col.filter" placeholder="Filter {{col.name}}"
+                           tooltip="{{col.type ? 'Use a dash (-) to specify a range' : ''}}"  tooltip-trigger="focus" tooltip-placement="top">
+                </div>
+                <a href="" ng-if="col.sortable"
+                   ng-click="vm.toggleSort($index)">{{::col.name}}
+                    <i class="fa" ng-class="{
+                     'fa-sort'     : vm.sort !== $index,
+                     'fa-sort-down': vm.sort === $index &&  vm.sortAsc,
+                     'fa-sort-up'  : vm.sort === $index && !vm.sortAsc
+                     }"></i>
+                </a>
+                <span ng-if="!col.sortable">
+                    {{::col.name}}
+                </span>
+
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr ng-repeat="row in (vm.resultCount = (data | complexFilter : (vm.showAdvanced ? cols : vm.filterText)))
+                                                      | orderBy       : cols[vm.sort].key       : vm.sortAsc
+                                                      | page          : (vm.currentPage - 1)    : vm.pageSize">
+            <td ng-repeat-start="col in cols" ng-if="col.callback && !col.fieldType"
+                ng-click="vm.onClick($event, col, row)"
+                ng-bind-html="::col.template(vm.extend(row)) | unsafe">
+            </td>
+            <td ng-if="!col.callback && !col.fieldType" ng-bind-html="::col.template(vm.extend(row)) | unsafe">
+            </td>
+            <td ng-repeat-end ng-if="col.fieldType">
+                <form-field layout="grid" record="row"
+                            items="col.items"
+                            field="{{col.key}}"
+                            type="{{col.type}}"
+                            mask="{{col.mask}}"
+                            on-label="{{col.onLabel}}"
+                            off-label="{{col.offLabel}}"
+                            is-required="col.isRequired"
+                            field-type="{{col.fieldType}}"
+                            date-format="{{col.dateFormat}}"
+                            input-layout-css="{{col.inputLayoutCss}}"
+                            disable-timepicker="col.disableTimepicker"
+                            toggle-switch-type="{{col.toggleSwitchType}}"
+                    ></form-field>
+            </td>
+        </tr>
+    </tbody>
+</table>
+    <pagination ng-if="vm.resultCount.length > vm.pageSize" total-items="vm.resultCount.length" items-per-page="vm.pageSize" ng-model="vm.currentPage"></pagination>
+</div>
