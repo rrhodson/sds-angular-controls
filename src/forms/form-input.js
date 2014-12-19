@@ -1,24 +1,19 @@
+/**
+ * Created by stevegentile on 12/19/14.
+ */
 (function () {
     'use strict';
-    function formField (InputTypes, $filter, $log) {
+    function formInput (InputTypes, $filter, $log) {
         return {
             restrict: 'EA',
             templateUrl: 'sds-angular-controls/form-field.html',
-            //replace: true,
             scope: {
                 record                  : '=',  //two-way binding
                 field                   : '@',  //one-way binding
-                toggleField             : '@?', //one-way binding
-                rightLabel              : '@',  //text to the right of the input box different than the label (ie. hands)
-                items                   : '=?', //for select - the array
                 placeholder             : '@',
                 max                     : '@?',
                 min                     : '@',
                 type                    : '@',  //text, email, number etc.. see the InputTypes below
-                fieldType               : '@', //pass in for special types - ie. 'textarea'  'autonumeric', 'quickdatepicker', 'toggle' 'select' - default is 'input'
-                onLabel                 : '@',
-                offLabel                : '@',
-                toggleSwitchType        : '@', //primary, success, info, danger, warning, inverse default is primary
                 mask                    : '@',
                 label                   : '@',
                 isRequired              : '=?',
@@ -27,13 +22,9 @@
                 inputLayoutCss          : '@', //default col-sm-5
                 errorLayoutCss          : '@',  //default col-sm-4
                 hideValidationMessage   : '=?', //default is false,
-                disableTimepicker       : '=?',
                 showLabel               : '=?',
-                dateFormat              : '@',
                 isReadonly                : '=?',  //expects boolean
-                style                   : '@?',
-                itemKey                 : '@?',
-                itemValue               : '@?'
+                style                   : '@?'
             },
             require: '^form', //^parent of our directive, a child form of form above it
             link: function ($scope, element, attr, form) {
@@ -66,17 +57,20 @@
                 var inputField = element.find('.inputField');
 
                 function convertToHash(items, itemKey, itemValue){
-                  var OrderedDictionary = function (){};
-                  OrderedDictionary.prototype.orderedKeys = [];
-                  return _.reduce(items, function (result, item) {
-                    result[item[itemKey]] = item[itemValue];
+                    var OrderedDictionary = function (){};
+                    OrderedDictionary.prototype.orderedKeys = [];
+                    return _.reduce(items, function (result, item) {
+                        result[item[itemKey]] = item[itemValue];
 
-                    // set the ordered keys value
-                    result.orderedKeys.push(item[itemKey]);
-                    return result;
-                  }, new OrderedDictionary());
+                        // set the ordered keys value
+                        result.orderedKeys.push(item[itemKey]);
+                        return result;
+                    }, new OrderedDictionary());
                 }
 
+                if($scope.fieldType === "select" && ($scope.itemKey && $scope.itemValue)){
+                    $scope.items = convertToHash($scope.items, $scope.itemKey, $scope.itemValue);
+                }
 
                 $scope.orderHash = function(obj){
                     if (!obj) {
@@ -95,7 +89,7 @@
                             return item.toString();
                         }
                     }
-                        //if it's a number - make sure the values are numbers
+                    //if it's a number - make sure the values are numbers
                     if (item && !isNaN(parseInt(item, 10))) {
                         return parseInt(item, 10);
                     } else {
@@ -121,14 +115,6 @@
                         }
                     }
                 }
-
-                $scope.$watch("items", function(newVal, oldVal){
-                    if($scope.items && _.isArray($scope.items)) {
-                        if ($scope.fieldType === "select" && ($scope.itemKey && $scope.itemValue)) {
-                            $scope.items = convertToHash($scope.items, $scope.itemKey, $scope.itemValue);
-                        }
-                    }
-                });
 
                 $scope.$watch("isReadonly", function(newVal, oldVal){
                     if(newVal !== oldVal){
