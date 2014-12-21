@@ -291,8 +291,8 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                 label                   : '@',
                 rowClass                : '@?',
                 layout                  : '@?',
-                labelLayoutCss          : '@?', //default col-sm-3
-                inputLayoutCss          : '@?',
+                labelCss          : '@?', //default col-sm-3
+                layoutCss          : '@?',
                 errorLayoutCss          : '@?',  //default col-sm-4
                 hideValidationMessage   : '=?' //default is false,
             },
@@ -311,15 +311,15 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                 $scope.hideValidationMessage = $scope.hideValidationMessage || false;
                 $scope.isRequired = $scope.isRequired || false;
                 $scope.isReadonly = $scope.isReadonly || false;
-                //$scope.labelLayoutCss = $scope.labelLayoutCss || "col-md-4";
-                $scope.inputLayoutCss = $scope.inputLayoutCss || "col-md-4";
+                //$scope.labelCss = $scope.labelCss || "col-md-4";
+                $scope.layoutCss = $scope.layoutCss || "col-md-4";
                 $scope.errorLayoutCss = $scope.errorLayoutCss || "col-md-4";
 
                 if($scope.layout === "horizontal"){
-                    $scope.labelLayoutCss = $scope.labelLayoutCss || "col-md-2";
+                    $scope.labelCss = $scope.labelCss || "col-md-2";
                 }
                 //if($scope.layout === 'inline') {
-                //    $scope.labelLayoutCss = $scope.labelLayoutCss || "col-md-4";
+                //    $scope.labelCss = $scope.labelCss || "col-md-4";
                 //    $scope.errorLayoutCss = $scope.errorLayoutCss || "col-md-4";
                 //}
 
@@ -660,7 +660,7 @@ angular.module('sds-angular-controls').run(['$templateCache', function($template
     "            <span class='control-label' ng-message='min'> {{ field | labelCase }} must be at least {{min}}. </span>\n" +
     "            <span class='control-label' ng-message='max'> {{ field | labelCase }} must not exceed {{max}} </span>\n" +
     "            <span class='control-label' ng-repeat='(k, v) in types' ng-message='{{k}}'> {{ field | labelCase }}{{v[1]}}</span>\n" +
-    "        </div></script> <div ng-if=\"layout === 'stacked'\" class=\"form-group clearfix\" ng-form=\"{{field}}\" ng-class=\"{ 'has-error': showError({{field}}) }\"> <div class=\"{{::inputLayoutCss}}\"> <label ng-if=\"showLabel\" class=\"control-label {{labelLayoutCss}}\"> {{ label }} <span ng-if=\"isRequired && !isReadonly\">*</span></label> <!--<div class=\"clearfix\">--> <div ng-transclude></div> <!--</div>--> <!-- validation --> <div class=\"pull-left\" ng-include=\"'validation.html'\"></div> </div> </div> <div ng-if=\"layout === 'horizontal'\" class=\"form-group\" ng-form=\"{{field}}\" ng-class=\"{ 'has-error': showError({{field}}) }\"> <label ng-if=\"showLabel\" class=\"control-label {{labelLayoutCss}}\"> {{ label }} <span ng-if=\"isRequired && !isReadonly\">*</span></label> <!--<div class=\"clearfix\">--> <div ng-transclude></div> <!--</div>--> <!-- validation --> <div class=\"pull-right\" ng-include=\"'validation.html'\"></div> </div> </div>"
+    "        </div></script> <div ng-if=\"layout === 'stacked'\" class=\"form-group clearfix\" ng-form=\"{{field}}\" ng-class=\"{ 'has-error': showError({{field}}) }\"> <div class=\"{{::layoutCss}}\"> <label ng-if=\"showLabel\" class=\"control-label {{labelCss}}\"> {{ label }} <span ng-if=\"isRequired && !isReadonly\">*</span></label> <!--<div class=\"clearfix\">--> <div ng-transclude></div> <!--</div>--> <!-- validation --> <div class=\"pull-left\" ng-include=\"'validation.html'\"></div> </div> </div> <div ng-if=\"layout === 'horizontal'\" class=\"form-group\" ng-form=\"{{field}}\" ng-class=\"{ 'has-error': showError({{field}}) }\"> <label ng-if=\"showLabel\" class=\"control-label {{labelCss}}\"> {{ label }} <span ng-if=\"isRequired && !isReadonly\">*</span></label> <!--<div class=\"clearfix\">--> <div ng-transclude></div> <!--</div>--> <!-- validation --> <div class=\"pull-right\" ng-include=\"'validation.html'\"></div> </div> </div>"
   );
 
 

@@ -23,9 +23,9 @@
     <div ng-if="layout === 'stacked'" class='form-group clearfix' ng-form="{{field}}"
          ng-class="{ 'has-error': showError({{field}}) }">
 
-        <div class="{{::inputLayoutCss}}">
+        <div class="{{::layoutCss}}">
 
-            <label ng-if="showLabel" class='control-label {{labelLayoutCss}}'> {{ label }} <span ng-if='isRequired && !isReadonly'>*</span></label>
+            <label ng-if="showLabel" class='control-label {{labelCss}}'> {{ label }} <span ng-if='isRequired && !isReadonly'>*</span></label>
 
             <!--<div class="clearfix">-->
                 <div ng-transclude></div>
@@ -38,7 +38,7 @@
     <div ng-if="layout === 'horizontal'" class='form-group' ng-form="{{field}}"
          ng-class="{ 'has-error': showError({{field}}) }">
 
-        <label ng-if="showLabel" class='control-label {{labelLayoutCss}}'> {{ label }} <span ng-if='isRequired && !isReadonly'>*</span></label>
+        <label ng-if="showLabel" class='control-label {{labelCss}}'> {{ label }} <span ng-if='isRequired && !isReadonly'>*</span></label>
 
         <!--<div class="clearfix">-->
         <div ng-transclude></div>

@@ -19,8 +19,8 @@
                 label                   : '@',
                 rowClass                : '@?',
                 layout                  : '@?',
-                labelLayoutCss          : '@?', //default col-sm-3
-                inputLayoutCss          : '@?',
+                labelCss          : '@?', //default col-sm-3
+                layoutCss          : '@?',
                 errorLayoutCss          : '@?',  //default col-sm-4
                 hideValidationMessage   : '=?' //default is false,
             },
@@ -39,15 +39,15 @@
                 $scope.hideValidationMessage = $scope.hideValidationMessage || false;
                 $scope.isRequired = $scope.isRequired || false;
                 $scope.isReadonly = $scope.isReadonly || false;
-                //$scope.labelLayoutCss = $scope.labelLayoutCss || "col-md-4";
-                $scope.inputLayoutCss = $scope.inputLayoutCss || "col-md-4";
+                //$scope.labelCss = $scope.labelCss || "col-md-4";
+                $scope.layoutCss = $scope.layoutCss || "col-md-4";
                 $scope.errorLayoutCss = $scope.errorLayoutCss || "col-md-4";
 
                 if($scope.layout === "horizontal"){
-                    $scope.labelLayoutCss = $scope.labelLayoutCss || "col-md-2";
+                    $scope.labelCss = $scope.labelCss || "col-md-2";
                 }
                 //if($scope.layout === 'inline') {
-                //    $scope.labelLayoutCss = $scope.labelLayoutCss || "col-md-4";
+                //    $scope.labelCss = $scope.labelCss || "col-md-4";
                 //    $scope.errorLayoutCss = $scope.errorLayoutCss || "col-md-4";
                 //}
 
