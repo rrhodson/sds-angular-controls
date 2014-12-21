@@ -59,7 +59,7 @@
                 }
 
                 switch(scope.layout){
-                    case "inline":
+                    case "horizontal":
                         scope.layoutCss = scope.layoutCss || "col-md-6";
                         break;
                     default: //stacked

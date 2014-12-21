@@ -300,6 +300,7 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
             require: '^form',
             controller: ["$scope", "$element", "$attrs", function($scope, $element, $attrs){
 
+
                 $scope.layout = $scope.layout || "stacked";
 
                 if(!$scope.label){
@@ -314,10 +315,13 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                 $scope.inputLayoutCss = $scope.inputLayoutCss || "col-md-4";
                 $scope.errorLayoutCss = $scope.errorLayoutCss || "col-md-4";
 
-                if($scope.layout === 'inline') {
-                    $scope.labelLayoutCss = $scope.labelLayoutCss || "col-md-4";
-                    $scope.errorLayoutCss = $scope.errorLayoutCss || "col-md-4";
+                if($scope.layout === "horizontal"){
+                    $scope.labelLayoutCss = $scope.labelLayoutCss || "col-md-2";
                 }
+                //if($scope.layout === 'inline') {
+                //    $scope.labelLayoutCss = $scope.labelLayoutCss || "col-md-4";
+                //    $scope.errorLayoutCss = $scope.errorLayoutCss || "col-md-4";
+                //}
 
                 this.getRecord = function(){
                     return $scope.record;
@@ -443,7 +447,7 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                 }
 
                 switch(scope.layout){
-                    case "inline":
+                    case "horizontal":
                         scope.layoutCss = scope.layoutCss || "col-md-6";
                         break;
                     default: //stacked
@@ -638,12 +642,30 @@ angular.module('sds-angular-controls').run(['$templateCache', function($template
 
 
   $templateCache.put('sds-angular-controls/form-field.html',
-    "<div class=\"row\"> <div ng-if=\"layout === 'stacked'\" class=\"form-group clearfix\" ng-form=\"{{field}}\" ng-class=\"{ 'has-error': showError({{field}}) }\"> <div class=\"{{::inputLayoutCss}}\"> <label ng-if=\"showLabel\" class=\"control-label {{labelLayoutCss}}\"> {{ label }} <span ng-if=\"isRequired && !isReadonly\">*</span></label> <!--<div class=\"clearfix\">--> <div ng-transclude></div> <!--</div>--> <!-- validation --> <div ng-if=\"!hideValidationMessage\" class=\"pull-left has-error\" ng-show=\"showError({{field}})\" ng-messages=\"{{field}}.$error\"> <span class=\"control-label\" ng-message=\"required\"> {{ field | labelCase }} is required. </span> <span class=\"control-label\" ng-message=\"text\"> {{ field | labelCase }} should be text. </span> <span class=\"control-label\" ng-message=\"email\"> {{ field | labelCase }} should be an email address. </span> <span class=\"control-label\" ng-message=\"date\"> {{ field | labelCase }} should be a date. </span> <span class=\"control-label\" ng-message=\"datetime\"> {{ field | labelCase }} should be a datetime. </span> <span class=\"control-label\" ng-message=\"time\"> {{ field | labelCase }} should be a time. </span> <span class=\"control-label\" ng-message=\"month\"> {{ field | labelCase }} should be a month. </span> <span class=\"control-label\" ng-message=\"week\"> {{ field | labelCase }} should be a week. </span> <span class=\"control-label\" ng-message=\"url\"> {{ field | labelCase }} should be an url. </span> <span class=\"control-label\" ng-message=\"zip\"> {{ field | labelCase }} should be a valid zipcode. </span> <span class=\"control-label\" ng-message=\"number\">{{ field | labelCase }} must be a number</span> <span class=\"control-label\" ng-message=\"tel\">{{ field | labelCase }} must be a phone number</span> <span class=\"control-label\" ng-message=\"color\">{{ field | labelCase }} must be a color</span> <span class=\"control-label\" ng-message=\"min\"> {{ field | labelCase }} must be at least {{min}}. </span> <span class=\"control-label\" ng-message=\"max\"> {{ field | labelCase }} must not exceed {{max}} </span> <span class=\"control-label\" ng-repeat=\"(k, v) in types\" ng-message=\"{{k}}\"> {{ field | labelCase }}{{v[1]}}</span> </div> </div> </div> </div>"
+    "<div class=\"row\"> <script type=\"text/ng-template\" id=\"validation.html\"><div ng-if=\"!hideValidationMessage\" class='has-error' ng-show='showError({{field}})'\n" +
+    "             ng-messages='{{field}}.$error'>\n" +
+    "            <span class='control-label' ng-message='required'> {{ field | labelCase }} is required. </span>\n" +
+    "            <span class='control-label' ng-message='text'> {{ field | labelCase }} should be text. </span>\n" +
+    "            <span class='control-label' ng-message='email'> {{ field | labelCase }} should be an email address. </span>\n" +
+    "            <span class='control-label' ng-message='date'> {{ field | labelCase }} should be a date. </span>\n" +
+    "            <span class='control-label' ng-message='datetime'> {{ field | labelCase }} should be a datetime. </span>\n" +
+    "            <span class='control-label' ng-message='time'> {{ field | labelCase }} should be a time. </span>\n" +
+    "            <span class='control-label' ng-message='month'> {{ field | labelCase }} should be a month. </span>\n" +
+    "            <span class='control-label' ng-message='week'> {{ field | labelCase }} should be a week. </span>\n" +
+    "            <span class='control-label' ng-message='url'> {{ field | labelCase }} should be an url. </span>\n" +
+    "            <span class='control-label' ng-message='zip'> {{ field | labelCase }} should be a valid zipcode. </span>\n" +
+    "            <span class='control-label' ng-message='number'>{{ field | labelCase }} must be a number</span>\n" +
+    "            <span class='control-label' ng-message='tel'>{{ field | labelCase }} must be a phone number</span>\n" +
+    "            <span class='control-label' ng-message='color'>{{ field | labelCase }} must be a color</span>\n" +
+    "            <span class='control-label' ng-message='min'> {{ field | labelCase }} must be at least {{min}}. </span>\n" +
+    "            <span class='control-label' ng-message='max'> {{ field | labelCase }} must not exceed {{max}} </span>\n" +
+    "            <span class='control-label' ng-repeat='(k, v) in types' ng-message='{{k}}'> {{ field | labelCase }}{{v[1]}}</span>\n" +
+    "        </div></script> <div ng-if=\"layout === 'stacked'\" class=\"form-group clearfix\" ng-form=\"{{field}}\" ng-class=\"{ 'has-error': showError({{field}}) }\"> <div class=\"{{::inputLayoutCss}}\"> <label ng-if=\"showLabel\" class=\"control-label {{labelLayoutCss}}\"> {{ label }} <span ng-if=\"isRequired && !isReadonly\">*</span></label> <!--<div class=\"clearfix\">--> <div ng-transclude></div> <!--</div>--> <!-- validation --> <div class=\"pull-left\" ng-include=\"'validation.html'\"></div> </div> </div> <div ng-if=\"layout === 'horizontal'\" class=\"form-group\" ng-form=\"{{field}}\" ng-class=\"{ 'has-error': showError({{field}}) }\"> <label ng-if=\"showLabel\" class=\"control-label {{labelLayoutCss}}\"> {{ label }} <span ng-if=\"isRequired && !isReadonly\">*</span></label> <!--<div class=\"clearfix\">--> <div ng-transclude></div> <!--</div>--> <!-- validation --> <div class=\"pull-right\" ng-include=\"'validation.html'\"></div> </div> </div>"
   );
 
 
   $templateCache.put('sds-angular-controls/form-input.html',
-    "<div> <input class=\"form-control inputField {{::layoutCss}}\" ng-model=\"record[field]\" type=\"{{::type}}\" ng-required=\"isRequired\" ng-disabled=\"isReadonly\" placeholder=\"{{::placeholder}}\" max=\"{{::max}}\" min=\"{{::min}}\" style=\"{{::style}}\" mask-input=\"{{::mask}}\"> <div ng-if=\"log\"> form-input value: {{record[field]}}<br> {{isRequired}} </div> </div>"
+    "<div> <div ng-if=\"layout === 'horizontal'\" class=\"{{::layoutCss}}\"> <input class=\"form-control inputField\" ng-model=\"record[field]\" type=\"{{::type}}\" ng-required=\"isRequired\" ng-disabled=\"isReadonly\" placeholder=\"{{::placeholder}}\" max=\"{{::max}}\" min=\"{{::min}}\" style=\"{{::style}}\" mask-input=\"{{::mask}}\"> </div> <div ng-if=\"layout === 'stacked'\"> <input class=\"form-control inputField {{::layoutCss}}\" ng-model=\"record[field]\" type=\"{{::type}}\" ng-required=\"isRequired\" ng-disabled=\"isReadonly\" placeholder=\"{{::placeholder}}\" max=\"{{::max}}\" min=\"{{::min}}\" style=\"{{::style}}\" mask-input=\"{{::mask}}\"> </div> <div ng-if=\"log\"> form-input value: {{record[field]}}<br> {{isRequired}} </div> </div>"
   );
 
 }]);

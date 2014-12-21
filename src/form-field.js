@@ -28,6 +28,7 @@
             require: '^form',
             controller: function($scope, $element, $attrs){
 
+
                 $scope.layout = $scope.layout || "stacked";
 
                 if(!$scope.label){
@@ -42,10 +43,13 @@
                 $scope.inputLayoutCss = $scope.inputLayoutCss || "col-md-4";
                 $scope.errorLayoutCss = $scope.errorLayoutCss || "col-md-4";
 
-                if($scope.layout === 'inline') {
-                    $scope.labelLayoutCss = $scope.labelLayoutCss || "col-md-4";
-                    $scope.errorLayoutCss = $scope.errorLayoutCss || "col-md-4";
+                if($scope.layout === "horizontal"){
+                    $scope.labelLayoutCss = $scope.labelLayoutCss || "col-md-2";
                 }
+                //if($scope.layout === 'inline') {
+                //    $scope.labelLayoutCss = $scope.labelLayoutCss || "col-md-4";
+                //    $scope.errorLayoutCss = $scope.errorLayoutCss || "col-md-4";
+                //}
 
                 this.getRecord = function(){
                     return $scope.record;
