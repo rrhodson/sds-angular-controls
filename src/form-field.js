@@ -1,160 +1,75 @@
+/**
+ * Created by stevegentile on 12/19/14.
+ */
+/**
+ * Created by stevegentile on 12/19/14.
+ */
 (function () {
     'use strict';
-    function formField (InputTypes, $filter, $log) {
-        return {
+    function formField ($filter, $rootScope) {
+        return{
             restrict: 'EA',
-            templateUrl: 'sds-angular-controls/form-field.html',
-            //replace: true,
+            transclude: true,
+            replace: true,
             scope: {
                 record                  : '=',  //two-way binding
-                field                   : '@',  //one-way binding
-                toggleField             : '@?', //one-way binding
-                rightLabel              : '@',  //text to the right of the input box different than the label (ie. hands)
-                items                   : '=?', //for select - the array
-                placeholder             : '@',
-                max                     : '@?',
-                min                     : '@',
-                type                    : '@',  //text, email, number etc.. see the InputTypes below
-                fieldType               : '@', //pass in for special types - ie. 'textarea'  'autonumeric', 'quickdatepicker', 'toggle' 'select' - default is 'input'
-                onLabel                 : '@',
-                offLabel                : '@',
-                toggleSwitchType        : '@', //primary, success, info, danger, warning, inverse default is primary
-                mask                    : '@',
-                label                   : '@',
                 isRequired              : '=?',
-                layout                  : '@', //stacked or inline - default is stacked
-                labelLayoutCss          : '@', //default col-sm-3
-                inputLayoutCss          : '@', //default col-sm-5
-                errorLayoutCss          : '@',  //default col-sm-4
-                hideValidationMessage   : '=?', //default is false,
-                disableTimepicker       : '=?',
-                showLabel               : '=?',
-                dateFormat              : '@',
-                isReadonly                : '=?',  //expects boolean
-                style                   : '@?',
-                itemKey                 : '@?',
-                itemValue               : '@?'
+                isReadonly              : '=?',
+                field                   : '@',  //one-way binding
+                label                   : '@',
+                rowClass                : '@?',
+                layout                  : '@?',
+                labelLayoutCss          : '@?', //default col-sm-3
+                inputLayoutCss          : '@?',
+                errorLayoutCss          : '@?',  //default col-sm-4
+                hideValidationMessage   : '=?' //default is false,
             },
-            require: '^form', //^parent of our directive, a child form of form above it
-            link: function ($scope, element, attr, form) {
-                $scope.calender = {opened: false};
-                $scope.types = InputTypes;
-                $scope.fieldType = $scope.fieldType || "input";
-                $scope.isReadonly = $scope.isReadonly || false;
-                $scope.layout = $scope.layout || 'stacked';
-                $scope.isRequired = $scope.isRequired || false;
-                $scope.showLabel = $scope.showLabel || true;
-                $scope.hideValidationMessage = $scope.hideValidationMessage || false;
-                if($scope.layout === 'inline') {
-                    $scope.labelLayoutCss = $scope.labelLayoutCss || "col-md-4";
-                    $scope.inputLayoutCss = $scope.inputLayoutCss || "col-md-6";
-                    $scope.errorLayoutCss = $scope.errorLayoutCss || "col-md-4";
-                }
+            templateUrl: 'sds-angular-controls/form-field.html',
+            require: '^form',
+            controller: function($scope, $element, $attrs){
 
-                //switch
-                $scope.toggleSwitchType = $scope.toggleSwitchType || "primary";
-                $scope.onLabel = $scope.onLabel   || "Yes";
-                $scope.offLabel = $scope.offLabel || "No";
-
-                //quick data picker
-                $scope.disableTimepicker = $scope.disableTimepicker || false;
-                $scope.dateFormat = $scope.dateFormat || "MM-dd-yyyy";
+                $scope.layout = $scope.layout || "stacked";
 
                 if(!$scope.label){
                     $scope.label = $filter("labelCase")($scope.field);
                 }
-                var inputField = element.find('.inputField');
 
-                function convertToHash(items, itemKey, itemValue){
-                  var OrderedDictionary = function (){};
-                  OrderedDictionary.prototype.orderedKeys = [];
-                  return _.reduce(items, function (result, item) {
-                    result[item[itemKey]] = item[itemValue];
+                $scope.showLabel = $scope.showLabel || true;
+                $scope.hideValidationMessage = $scope.hideValidationMessage || false;
+                $scope.isRequired = $scope.isRequired || false;
+                $scope.isReadonly = $scope.isReadonly || false;
+                //$scope.labelLayoutCss = $scope.labelLayoutCss || "col-md-4";
+                $scope.inputLayoutCss = $scope.inputLayoutCss || "col-md-4";
+                $scope.errorLayoutCss = $scope.errorLayoutCss || "col-md-4";
 
-                    // set the ordered keys value
-                    result.orderedKeys.push(item[itemKey]);
-                    return result;
-                  }, new OrderedDictionary());
+                if($scope.layout === 'inline') {
+                    $scope.labelLayoutCss = $scope.labelLayoutCss || "col-md-4";
+                    $scope.errorLayoutCss = $scope.errorLayoutCss || "col-md-4";
                 }
 
-
-                $scope.orderHash = function(obj){
-                    if (!obj) {
-                        return [];
-                    }
-                    return obj.orderedKeys || Object.keys(obj);
+                this.getRecord = function(){
+                    return $scope.record;
                 };
 
-
-                // If a key is numeric, javascript converts it to a string when using a foreach. This
-                // tests if the key is numeric, and if so converts it back.
-                $scope.convertType = function (item){
-                    //if the record is a string type then keep the item as a string
-                    if($scope.record && $scope.record[$scope.field]) {
-                        if (typeof $scope.record[$scope.field] === 'string') {
-                            return item.toString();
-                        }
-                    }
-                        //if it's a number - make sure the values are numbers
-                    if (item && !isNaN(parseInt(item, 10))) {
-                        return parseInt(item, 10);
-                    } else {
-                        return item;
-                    }
+                this.getField = function() {
+                    return $scope.field;
                 };
 
-                function checkIfReadonly(){
-                    if($scope.isReadonly) {
-                        if ($scope.record && $scope.record[$scope.field]) {
+                this.getRequired = function() {
+                    return $scope.isRequired;
+                };
 
-                            if ($scope.fieldType === 'select') {
-                                var value = $scope.items[$scope.record[$scope.field]];
-                                $scope.readOnlyModel = value;
-                            }
-                            if ($scope.fieldType === 'toggle') {
-                                $scope.readOnlyModel = $scope.record[$scope.field];
-                            }
-
-                            if ($scope.fieldType === 'quickdatepicker') {
-                                $scope.readOnlyModel = moment($scope.record[$scope.field]).format($scope.dateFormat);
-                            }
-                        }
-                    }
+                this.getLayout = function() {
+                    return $scope.layout;
                 }
 
-                $scope.$watch("items", function(newVal, oldVal){
-                    if($scope.items && _.isArray($scope.items)) {
-                        if ($scope.fieldType === "select" && ($scope.itemKey && $scope.itemValue)) {
-                            $scope.items = convertToHash($scope.items, $scope.itemKey, $scope.itemValue);
-                        }
-                    }
-                });
-
-                $scope.$watch("isReadonly", function(newVal, oldVal){
-                    if(newVal !== oldVal){
-                        checkIfReadonly();
-                    }
-                });
-
-                $scope.$watch("record", function(newVal, oldVal){
-                    if(newVal !== oldVal) {
-                        checkIfReadonly();
-                    }
-                });
-
-                if($scope.mask){
-                    inputField.mask($scope.mask);
-                }
-
-                $scope.open = function($event) {
-                    $event.preventDefault();
-                    $event.stopPropagation();
-
-                    $scope.calender.opened = true;
+                this.setValue = function(val){
+                    $scope.record[$scope.field] = val;
                 };
 
                 $scope.showError = function(field){
                     try{
+                        var form = $($element).closest("form");
                         if(form.$submitted){
                             return field.$invalid;
                         }else {
@@ -165,21 +80,34 @@
                         return false;
                     }
                 };
+
+                $rootScope.$on('input-min', function(event, args){
+                    if($scope.record[args.field]){
+                        $scope.min = args.min;
+                    }
+                });
+
+                $rootScope.$on('input-max', function(event, args){
+                    if($scope.record[args.field]){
+                        $scope.max = args.max;
+                    }
+                });
+
+
+                /*
+                 scope.$watch(
+                 function(){
+                 return parentCtrl.getRadius();
+                 },
+                 function(newVal){
+                 if (newVal){
+                 scope.area=2 * scope.pi * newVal
+                 }
+                 })
+                 */
             }
-        };
+        }
     }
 
-    angular.module('sds-angular-controls').value('InputTypes', {
-        text        : ['Text', 'should be text'],
-        email       : ['Email', 'should be an email address'],
-        number      : ['Number', 'should be a number'],
-        date        : ['Date', 'should be a date'],
-        datetime    : ['Datetime', 'should be a datetime'],
-        time        : ['Time', 'should be a time'],
-        month       : ['Month', 'should be a month'],
-        week        : ['Week', 'should be a week'],
-        url         : ['URL', 'should be a URL'],
-        tel         : ['Phone Number', 'should be a phone number'],
-        color       : ['Color', 'should be a color']
-    }).directive('formField', formField);
+    angular.module('sds-angular-controls').directive('formField', formField);
 })();

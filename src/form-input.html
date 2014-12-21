@@ -1,0 +1,19 @@
+<div>
+   <input class="form-control inputField {{::layoutCss}}"
+          ng-model='record[field]'
+          type='{{::type}}'
+          ng-required='isRequired'
+          ng-disabled="isReadonly"
+          placeholder='{{::placeholder}}'
+          max="{{::max}}"
+          min="{{::min}}"
+          style="{{::style}}"
+          mask-input="{{::mask}}"
+          />
+
+   <div ng-if="log">
+      form-input value: {{record[field]}}<br>
+      {{isRequired}}
+   </div>
+</div>
+

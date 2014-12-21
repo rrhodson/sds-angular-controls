@@ -16,9 +16,10 @@
 
     vm.masterTestForm = {
       FirstName: "",
-      LastName: "",
+      LastName: "Gentile",
       Email: "",
       PhoneNumber: "",
+      Age: 25,
       City: "",
       State: "",
       ZipCode: "",
@@ -28,6 +29,7 @@
 
     vm.testForm = angular.copy(vm.masterTestForm);
 
+
     vm.states = [
       {stateCode: "OH", stateName: "Ohio"},
       {stateCode: "IN", stateName: "Indiana"},
@@ -36,10 +38,13 @@
     vm.itemList = [];
 
     vm.save = function(testFrm){
-      vm.itemList.push(vm.testForm);
-      vm.testForm = angular.copy(vm.masterTestForm);
-      testFrm.$setPristine(true);
-      testFrm.$setDirty(false);
+      debugger;
+      if(!testFrm.$invalid) {
+        vm.itemList.push(vm.testForm);
+        vm.testForm = angular.copy(vm.masterTestForm);
+        testFrm.$setPristine(true);
+        testFrm.$setDirty(false);
+      }
     };
 
     /* Grid */
