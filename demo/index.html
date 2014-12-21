@@ -31,7 +31,10 @@
           <form-field record="vm.testForm" field="Age" is-required="true" input-layout-css="col-md-2">
               <form-input log="true" type="number" min="1" max="110"></form-input>
           </form-field>
-          <!--<input type="submit" value="Submit" class="btn btn-primary" ng-disabled="testFrm.$invalid">-->
+          <form-field record="vm.testForm" field="State" label="State" is-required=true>
+              <form-select items="vm.states" log="true" item-key="stateCode" item-value="stateName"></form-select>
+          </form-field>
+
           <input type="submit" value="Submit" class="btn btn-primary" ng-disabled="testFrm.$invalid">
       </form>
 
@@ -54,8 +57,11 @@
             <form-field layout="horizontal" layout="inline" record="vm.testForm" field="Age" is-required="true" input-layout-css="col-md-2">
                 <form-input type="number" min="1" max="110"></form-input>
             </form-field>
-            <!--<input type="submit" value="Submit" class="btn btn-primary" ng-disabled="testFrm.$invalid">-->
-            <input type="submit" value="Submit" class="btn btn-primary" ng-disabled="testFrm.$invalid">
+            <form-field layout="horizontal" record="vm.testForm" field="State" label="State" is-required=true>
+                <form-select items="vm.states" item-key="stateCode" item-value="stateName"></form-select>
+            </form-field>
+
+            <input type="submit" value="Submit" class="btn btn-primary" ng-disabled="testHorizontalFrm.$invalid">
         </form>
         <hr>
         {{vm.testForm | json}}

@@ -407,23 +407,6 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                 layoutCss       : '@?', //default col-md-6
                 isReadonly      : '=?'  //boolean
             },
-            //scope: {
-            //    placeholder             : '@',
-            //    max                     : '@?',
-            //    min                     : '@',
-            //    type                    : '@',  //text, email, number etc.. see the InputTypes below
-            //    mask                    : '@',
-            //    label                   : '@',
-            //    isRequired              : '=?',
-            //    layout                  : '@', //stacked or inline - default is stacked
-            //    labelLayoutCss          : '@', //default col-sm-3
-            //    inputLayoutCss          : '@', //default col-sm-5
-            //    errorLayoutCss          : '@',  //default col-sm-4
-            //    hideValidationMessage   : '=?', //default is false,
-            //    showLabel               : '=?',
-            //    isReadonly                : '=?',  //expects boolean
-            //    style                   : '@?'
-            //},
             templateUrl: 'sds-angular-controls/form-input.html',
 
             link: function (scope, element, attr, formField) {
@@ -468,6 +451,109 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
 })();
 
 
+(function () {
+    'use strict';
+    function formSelect ($filter, $rootScope) {
+        return{
+            restrict: 'EA',
+            require: '^formField',
+            replace: true,
+            scope: {
+                items           : '=',
+                itemKey         : '@?',
+                itemValue       : '@?',
+                log             : '@?',
+                style           : '@?',
+                layoutCss       : '@?', //default col-md-6
+                isReadonly      : '=?'  //boolean
+            },
+            templateUrl: 'sds-angular-controls/form-select.html',
+
+            link: function (scope, element, attr, formField) {
+                // defaults
+                scope.record     = formField.getRecord();
+                scope.field      = formField.getField();
+                scope.isRequired = formField.getRequired();
+                scope.layout     = formField.getLayout();
+
+                scope.isReadonly = scope.isReadonly || false;
+
+                scope.log = scope.log || false;
+
+
+                switch(scope.layout){
+                    case "horizontal":
+                        scope.layoutCss = scope.layoutCss || "col-md-6";
+                        break;
+                    default: //stacked
+                        scope.layoutCss = scope.layoutCss || "col-md-4";
+                }
+
+                scope.orderHash = function(obj){
+                    if (!obj) {
+                        return [];
+                    }
+                    return obj.orderedKeys || Object.keys(obj);
+                };
+
+                function convertToHash(items, itemKey, itemValue){
+                    var OrderedDictionary = function (){};
+                    OrderedDictionary.prototype.orderedKeys = [];
+                    return _.reduce(items, function (result, item) {
+                        result[item[itemKey]] = item[itemValue];
+
+                        // set the ordered keys value
+                        result.orderedKeys.push(item[itemKey]);
+                        return result;
+                    }, new OrderedDictionary());
+                }
+
+                function checkIfReadonly(){
+                    if(scope.isReadonly) {
+                        if (scope.record && scope.record[scope.field]) {
+
+                            var value = scope.items[scope.record[scope.field]];
+                            scope.readOnlyModel = value;
+                        }
+                    }
+                }
+
+                // If a key is numeric, javascript converts it to a string when using a foreach. This
+                // tests if the key is numeric, and if so converts it back.
+                scope.convertType = function (item){
+                    //if the record is a string type then keep the item as a string
+                    if(scope.record && scope.record[scope.field]) {
+                        if (typeof scope.record[scope.field] === 'string') {
+                            return item.toString();
+                        }
+                    }
+                    //if it's a number - make sure the values are numbers
+                    if (item && !isNaN(parseInt(item, 10))) {
+                        return parseInt(item, 10);
+                    } else {
+                        return item;
+                    }
+                };
+
+                scope.$watch("items", function(newVal, oldVal){
+                    if(scope.items && _.isArray(scope.items)) {
+                        if (scope.itemKey && scope.itemValue) {
+                            scope.items = convertToHash(scope.items, scope.itemKey, scope.itemValue);
+                        }
+                    }
+                });
+
+
+                scope.$watch("record", function(newVal, oldVal){
+                    formField.setValue(newVal[scope.field]);
+                });
+            }
+        }
+    }
+    formSelect.$inject = ["$filter", "$rootScope"];
+
+    angular.module('sds-angular-controls').directive('formSelect', formSelect);
+})();
 
 
 (function (){
@@ -666,6 +752,11 @@ angular.module('sds-angular-controls').run(['$templateCache', function($template
 
   $templateCache.put('sds-angular-controls/form-input.html',
     "<div> <div ng-if=\"layout === 'horizontal'\" class=\"{{::layoutCss}}\"> <input class=\"form-control inputField\" ng-model=\"record[field]\" type=\"{{::type}}\" ng-required=\"isRequired\" ng-disabled=\"isReadonly\" placeholder=\"{{::placeholder}}\" max=\"{{::max}}\" min=\"{{::min}}\" style=\"{{::style}}\" mask-input=\"{{::mask}}\"> </div> <div ng-if=\"layout === 'stacked'\"> <input class=\"form-control inputField {{::layoutCss}}\" ng-model=\"record[field]\" type=\"{{::type}}\" ng-required=\"isRequired\" ng-disabled=\"isReadonly\" placeholder=\"{{::placeholder}}\" max=\"{{::max}}\" min=\"{{::min}}\" style=\"{{::style}}\" mask-input=\"{{::mask}}\"> </div> <div ng-if=\"log\"> form-input value: {{record[field]}}<br> {{isRequired}} </div> </div>"
+  );
+
+
+  $templateCache.put('sds-angular-controls/form-select.html',
+    "<div> <select ng-if=\"!isReadonly && !hasFilter\" ng-readonly=\"isReadonly\" class=\"form-control\" name=\"{{::field}}\" ng-model=\"record[field]\" ng-options=\"convertType(key) as items[key] for key in orderHash(items)\" ng-required=\"isRequired\"></select> <!-- optionValue as optionLabel for arrayItem in array --> <input ng-if=\"isReadonly\" style=\"{{::style}}\" ng-readonly=\"isReadonly\" type=\"text\" class=\"form-control inputField {{::inputLayoutCss}}\" ng-model=\"readOnlyModel\"> <div ng-if=\"log\"> form-input value: {{record[field]}}<br> {{isRequired}} </div> </div>"
   );
 
 }]);

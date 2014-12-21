@@ -19,23 +19,6 @@
                 layoutCss       : '@?', //default col-md-6
                 isReadonly      : '=?'  //boolean
             },
-            //scope: {
-            //    placeholder             : '@',
-            //    max                     : '@?',
-            //    min                     : '@',
-            //    type                    : '@',  //text, email, number etc.. see the InputTypes below
-            //    mask                    : '@',
-            //    label                   : '@',
-            //    isRequired              : '=?',
-            //    layout                  : '@', //stacked or inline - default is stacked
-            //    labelLayoutCss          : '@', //default col-sm-3
-            //    inputLayoutCss          : '@', //default col-sm-5
-            //    errorLayoutCss          : '@',  //default col-sm-4
-            //    hideValidationMessage   : '=?', //default is false,
-            //    showLabel               : '=?',
-            //    isReadonly                : '=?',  //expects boolean
-            //    style                   : '@?'
-            //},
             templateUrl: 'sds-angular-controls/form-input.html',
 
             link: function (scope, element, attr, formField) {

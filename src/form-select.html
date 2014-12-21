@@ -1,0 +1,15 @@
+<div>
+    <select ng-if="!isReadonly && !hasFilter" ng-readonly="isReadonly"  class="form-control" name="{{::field}}"
+            ng-model="record[field]"
+            ng-options="convertType(key) as items[key] for key in orderHash(items)" ng-required="isRequired"></select>
+    <!-- optionValue as optionLabel for arrayItem in array -->
+
+    <input ng-if="isReadonly" style="{{::style}}" ng-readonly="isReadonly" type='text'
+           class="form-control inputField {{::inputLayoutCss}}" ng-model='readOnlyModel'/>
+
+    <div ng-if="log">
+        form-input value: {{record[field]}}<br>
+        {{isRequired}}
+    </div>
+
+</div>
