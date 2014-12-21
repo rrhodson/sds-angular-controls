@@ -1,0 +1,17 @@
+<span class="input-group">
+    <input type="text" style="{{::style}}" class="form-control datepicker"
+           ng-if="!isReadonly"
+           ng-readonly="isReadonly"
+           placeholder="{{placeholder}}"
+           ng-model="record[field]"
+           ng-required="::isRequired"
+           min-date="::min"
+           max-date="::max"
+           datepicker-popup="{{::dateFormat}}"
+           is-open="calendar.opened">
+
+    <span ng-if="!isReadonly" class="input-group-btn">
+        <button type="button" class="btn btn-default" ng-click="open($event)"><i class="glyphicon glyphicon-calendar"></i></button>
+      </span>
+
+</span>

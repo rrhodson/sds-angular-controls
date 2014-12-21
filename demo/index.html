@@ -34,6 +34,9 @@
           <form-field record="vm.testForm" field="State" label="State" is-required=true>
               <form-select items="vm.states" log="true" item-key="stateCode" item-value="stateName"></form-select>
           </form-field>
+          <form-field label="DOB" disable-timepicker="true" placeholder="Select Date" record="vm.testForm" field="DateOfBirth">
+              <form-date-picker></form-date-picker>
+          </form-field>
 
           <input type="submit" value="Submit" class="btn btn-primary" ng-disabled="testFrm.$invalid">
       </form>
@@ -57,9 +60,14 @@
             <form-field layout="horizontal" layout="inline" record="vm.testForm" field="Age" is-required="true" input-layout-css="col-md-2">
                 <form-input type="number" min="1" max="110"></form-input>
             </form-field>
-            <form-field layout="horizontal" record="vm.testForm" field="State" label="State" is-required=true>
-                <form-select items="vm.states" item-key="stateCode" item-value="stateName"></form-select>
-            </form-field>
+
+            <p>todo... inline select and datepicker</p>
+            <!--<form-field layout="horizontal" record="vm.testForm" field="State" label="State" is-required=true>-->
+                <!--<form-select items="vm.states" item-key="stateCode" item-value="stateName"></form-select>-->
+            <!--</form-field>-->
+            <!--<form-field label="DOB" disable-timepicker="true" placeholder="Select Date" record="vm.testForm" field="DateOfBirth">-->
+                <!--<form-date-picker></form-date-picker>-->
+            <!--</form-field>-->
 
             <input type="submit" value="Submit" class="btn btn-primary" ng-disabled="testHorizontalFrm.$invalid">
         </form>
@@ -136,6 +144,7 @@
   <script src="../bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js"></script>
   <script src="../bower_components/angular-toggle-switch/angular-toggle-switch.min.js"></script>
   <script src="../bower_components/jquery.maskedinput/dist/jquery.maskedinput.min.js"></script>
+  <script src="../bower_components/moment/min/moment.min.js"></script>
   <script src="../dist/sds-angular-controls.js"></script>
   <script src="app.js"></script>
 </body>

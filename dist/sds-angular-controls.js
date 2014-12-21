@@ -273,6 +273,71 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
     }).factory('formBase', FormBase);
 })();
 
+(function () {
+    'use strict';
+    function formDatePicker ($filter, $rootScope) {
+        return{
+            restrict: 'EA',
+            require: '^formField',
+            replace: true,
+            scope: {
+                dateFormat       : '@',
+                log              : '@?',
+                style            : '@?',
+                layoutCss        : '@?', //default col-md-6
+                isReadonly       : '=?',  //boolean
+                disableTimepicker: '=?'
+            },
+            templateUrl: 'sds-angular-controls/form-datepicker.html',
+
+            link: function (scope, element, attr, formField) {
+                // defaults
+                scope.record     = formField.getRecord();
+                scope.field      = formField.getField();
+                scope.isRequired = formField.getRequired();
+                scope.layout     = formField.getLayout();
+
+                scope.isReadonly = scope.isReadonly || false;
+
+                scope.log = scope.log || false;
+
+                scope.disableTimepicker = scope.disableTimepicker || false;
+                scope.dateFormat = scope.dateFormat || "MM-dd-yyyy";
+
+                scope.calendar = {opened: false};
+                scope.open = function($event) {
+                    $event.preventDefault();
+                    $event.stopPropagation();
+
+                    scope.calendar.opened = true;
+                };
+
+                switch(scope.layout){
+                    case "horizontal":
+                        scope.layoutCss = scope.layoutCss || "col-md-6";
+                        break;
+                    default: //stacked
+                        scope.layoutCss = scope.layoutCss || "col-md-4";
+                }
+
+                function checkIfReadonly(){
+                    scope.readOnlyModel = moment(scope.record[scope.field]).format(scope.dateFormat);
+                }
+
+
+
+
+                scope.$watch("record", function(newVal, oldVal){
+                    formField.setValue(newVal[scope.field]);
+                });
+            }
+        }
+    }
+    formDatePicker.$inject = ["$filter", "$rootScope"];
+
+    angular.module('sds-angular-controls').directive('formDatePicker', formDatePicker);
+})();
+
 /**
  * Created by stevegentile on 12/19/14.
  */
@@ -449,7 +514,6 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
 
     angular.module('sds-angular-controls').directive('formInput', formInput);
 })();
-
 
 (function () {
     'use strict';
@@ -724,6 +788,11 @@ angular.module('sds-angular-controls').run(['$templateCache', function($template
     "                     }\"></i> </a> <span ng-if=\"!col.sortable\"> {{::col.name}} </span>    <tbody> <tr ng-repeat=\"row in (vm.resultCount = (data | complexFilter : (vm.showAdvanced ? cols : vm.filterText)))\n" +
     "                                                      | orderBy       : cols[vm.sort].key       : vm.sortAsc\n" +
     "                                                      | page          : (vm.currentPage - 1)    : vm.pageSize\"> <td ng-repeat-start=\"col in cols\" ng-if=\"col.callback && !col.fieldType\" ng-click=\"vm.onClick($event, col, row)\" ng-bind-html=\"::col.template(vm.extend(row)) | unsafe\">  <td ng-if=\"!col.callback && !col.fieldType\" ng-bind-html=\"::col.template(vm.extend(row)) | unsafe\">  <td ng-repeat-end ng-if=\"col.fieldType\"> <form-field layout=\"grid\" record=\"row\" items=\"col.items\" field=\"{{col.key}}\" type=\"{{col.type}}\" mask=\"{{col.mask}}\" on-label=\"{{col.onLabel}}\" off-label=\"{{col.offLabel}}\" is-required=\"col.isRequired\" field-type=\"{{col.fieldType}}\" date-format=\"{{col.dateFormat}}\" input-layout-css=\"{{col.inputLayoutCss}}\" disable-timepicker=\"col.disableTimepicker\" toggle-switch-type=\"{{col.toggleSwitchType}}\"></form-field>    </table> <pagination ng-if=\"vm.resultCount.length > vm.pageSize\" total-items=\"vm.resultCount.length\" items-per-page=\"vm.pageSize\" ng-model=\"vm.currentPage\"></pagination> </div>"
+  );
+
+
+  $templateCache.put('sds-angular-controls/form-datepicker.html',
+    "<span class=\"input-group\"> <input type=\"text\" style=\"{{::style}}\" class=\"form-control datepicker\" ng-if=\"!isReadonly\" ng-readonly=\"isReadonly\" placeholder=\"{{placeholder}}\" ng-model=\"record[field]\" ng-required=\"::isRequired\" min-date=\"::min\" max-date=\"::max\" datepicker-popup=\"{{::dateFormat}}\" is-open=\"calendar.opened\"> <span ng-if=\"!isReadonly\" class=\"input-group-btn\"> <button type=\"button\" class=\"btn btn-default\" ng-click=\"open($event)\"><i class=\"glyphicon glyphicon-calendar\"></i></button> </span> </span>"
   );
 
 
