@@ -3,9 +3,11 @@
   "version": "0.1.4",
   "homepage": "https://github.com/SMARTDATASYSTEMSLLC/sds-angular-controls",
   "authors": [
-    "Steve Gentile <steven.gentile@gmail.com>"
+    "Steve Gentile <steven.gentile@gmail.com>",
+    "David Benson  <davidbenson86@gmail.com>"
   ],
   "description": "Angular Directives used with sds-angular generator",
+  "license": "MIT",
   "main": [
     "dist/sds-angular-controls.js"
   ],
