@@ -39,11 +39,11 @@
                 }
 
                 if(scope.min) {
-                    $rootScope.$broadcast("input-min", {field: scope.field, min: scope.min});
+                    formField.setMin(scope.min);
                 }
 
                 if(scope.max) {
-                    $rootScope.$broadcast("input-max", {field: scope.field, max: scope.max});
+                    formField.setMax(scope.max);
                 }
 
                 switch(scope.layout){

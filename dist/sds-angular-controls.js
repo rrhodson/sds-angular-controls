@@ -1,4 +1,4 @@
-/*! sds-angular-controls - v0.0.1 - 2014-12-22
+/*! sds-angular-controls - v0.1.4 - 2014-12-22
 * https://github.com/SMARTDATASYSTEMSLLC/sds-angular-controls
 * Copyright (c) 2014 Steve Gentile, David Benson; Licensed  */
 angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSanitize']);
@@ -307,23 +307,23 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
  */
 (function () {
     'use strict';
-    function formField ($filter, $rootScope) {
+    function formField ($filter) {
         return{
             restrict: 'EA',
             transclude: true,
             replace: true,
             scope: {
-                record                  : '=',  //two-way binding
+                record                  : '=' , //two-way binding
                 isRequired              : '=?',
                 isReadonly              : '=?',
-                field                   : '@',  //one-way binding
-                label                   : '@',
+                field                   : '@' , //one-way binding
+                label                   : '@' ,
                 rowClass                : '@?',
                 layout                  : '@?',
-                labelCss          : '@?', //default col-sm-3
-                layoutCss          : '@?',
-                errorLayoutCss          : '@?',  //default col-sm-4
-                hideValidationMessage   : '=?' //default is false,
+                labelCss                : '@?', //default col-sm-3
+                layoutCss               : '@?',
+                errorLayoutCss          : '@?', //default col-sm-4
+                hideValidationMessage   : '=?'  //default is false
             },
             templateUrl: 'sds-angular-controls/form-field.html',
             require: '^form',
@@ -336,21 +336,17 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                     $scope.label = $filter("labelCase")($scope.field);
                 }
 
-                $scope.showLabel = $scope.showLabel || true;
+
+                $scope.showLabel = $scope.showLabel !== false; // default to true
                 $scope.hideValidationMessage = $scope.hideValidationMessage || false;
                 $scope.isRequired = $scope.isRequired || false;
                 $scope.isReadonly = $scope.isReadonly || false;
-                //$scope.labelCss = $scope.labelCss || "col-md-4";
                 $scope.layoutCss = $scope.layoutCss || "col-md-4";
                 $scope.errorLayoutCss = $scope.errorLayoutCss || "col-md-4";
 
                 if($scope.layout === "horizontal"){
                     $scope.labelCss = $scope.labelCss || "col-md-2";
                 }
-                //if($scope.layout === 'inline') {
-                //    $scope.labelCss = $scope.labelCss || "col-md-4";
-                //    $scope.errorLayoutCss = $scope.errorLayoutCss || "col-md-4";
-                //}
 
                 this.getRecord = function(){
                     return $scope.record;
@@ -366,7 +362,7 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
 
                 this.getLayout = function() {
                     return $scope.layout;
-                }
+                };
 
                 this.setValue = function(val){
                     $scope.record[$scope.field] = val;
@@ -386,34 +382,18 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                     }
                 };
 
-                $rootScope.$on('input-min', function(event, args){
-                    if($scope.record[args.field]){
-                        $scope.min = args.min;
-                    }
-                });
+                this.setMin = function (min){
+                    $scope.min = min;
+                };
 
-                $rootScope.$on('input-max', function(event, args){
-                    if($scope.record[args.field]){
-                        $scope.max = args.max;
-                    }
-                });
+                this.setMax = function (max){
+                    $scope.max = max;
+                };
 
-
-                /*
-                 scope.$watch(
-                 function(){
-                 return parentCtrl.getRadius();
-                 },
-                 function(newVal){
-                 if (newVal){
-                 scope.area=2 * scope.pi * newVal
-                 }
-                 })
-                 */
             }]
         }
     }
-    formField.$inject = ["$filter", "$rootScope"];
+    formField.$inject = ["$filter"];
 
     angular.module('sds-angular-controls').directive('formField', formField);
 })();
@@ -456,11 +436,11 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                 }
 
                 if(scope.min) {
-                    $rootScope.$broadcast("input-min", {field: scope.field, min: scope.min});
+                    formField.setMin(scope.min);
                 }
 
                 if(scope.max) {
-                    $rootScope.$broadcast("input-max", {field: scope.field, max: scope.max});
+                    formField.setMax(scope.max);
                 }
 
                 switch(scope.layout){
