@@ -3,7 +3,7 @@
  */
 (function () {
     'use strict';
-    function formInput ($filter, $rootScope) {
+    function formInput ($, $filter, $rootScope) {
         return{
             restrict: 'EA',
             require: '^formField',
@@ -17,7 +17,8 @@
                 min             : '@?',
                 type            : '@',  //text, email, number etc.. see the InputTypes
                 layoutCss       : '@?', //default col-md-6
-                isReadonly      : '=?'  //boolean
+                isReadonly      : '=?',  //boolean
+                isNumeric       : '=?'
             },
             templateUrl: 'sds-angular-controls/form-input.html',
 
@@ -32,6 +33,10 @@
 
                 scope.log = scope.log || false;
                 scope.type = scope.type || "text";
+
+                if(scope.isNumeric){
+                    $(element).prop("auto-numeric", true);
+                }
 
                 if(scope.min) {
                     $rootScope.$broadcast("input-min", {field: scope.field, min: scope.min});

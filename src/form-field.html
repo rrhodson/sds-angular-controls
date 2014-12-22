@@ -20,11 +20,11 @@
             <span class='control-label' ng-repeat='(k, v) in types' ng-message='{{k}}'> {{ field | labelCase }}{{v[1]}}</span>
         </div>
     </script>
-    <div ng-if="layout === 'stacked'" class='form-group clearfix' ng-form="{{field}}"
+    <div ng-if="layout === 'stacked'"
+         class='form-group clearfix' ng-form="{{field}}"
          ng-class="{ 'has-error': showError({{field}}) }">
 
         <div class="{{::layoutCss}}">
-
             <label ng-if="showLabel" class='control-label {{labelCss}}'> {{ label }} <span ng-if='isRequired && !isReadonly'>*</span></label>
 
             <!--<div class="clearfix">-->
@@ -35,6 +35,7 @@
             <div class="pull-left" ng-include="'validation.html'"></div>
         </div>
     </div>
+
     <div ng-if="layout === 'horizontal'" class='form-group' ng-form="{{field}}"
          ng-class="{ 'has-error': showError({{field}}) }">
 

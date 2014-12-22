@@ -23,6 +23,7 @@
       City: "",
       State: "",
       ZipCode: "",
+      Price:  null,
       LikesIceCream: false,
       DateOfBirth : null
     };

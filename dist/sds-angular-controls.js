@@ -1,4 +1,4 @@
-/*! sds-angular-controls - v0.0.1 - 2014-12-21
+/*! sds-angular-controls - v0.0.1 - 2014-12-22
 * https://github.com/SMARTDATASYSTEMSLLC/sds-angular-controls
 * Copyright (c) 2014 Steve Gentile, David Benson; Licensed  */
 angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSanitize']);
@@ -235,44 +235,6 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
 })();
 
 
-(function(){
-    "use strict";
-    function FormBase($q, $scope, $rootScope, $compile, $timeout){
-
-        $scope.types = InputTypes;
-        $scope.isReadonly = $scope.isReadonly || false;
-        $scope.layout = $scope.layout || 'stacked';
-        $scope.isRequired = $scope.isRequired || false;
-        $scope.showLabel = $scope.showLabel || true;
-        $scope.hideValidationMessage = $scope.hideValidationMessage || false;
-        if($scope.layout === 'inline') {
-            $scope.labelLayoutCss = $scope.labelLayoutCss || "col-md-4";
-            $scope.inputLayoutCss = $scope.inputLayoutCss || "col-md-6";
-            $scope.errorLayoutCss = $scope.errorLayoutCss || "col-md-4";
-        }
-
-        if(!$scope.label){
-            $scope.label = $filter("labelCase")($scope.field);
-        }
-
-    }
-    FormBase.$inject = ["$q", "$scope", "$rootScope", "$compile", "$timeout"];
-
-    angular.module('sds-angular-controls').value('InputTypes', {
-        text        : ['Text', 'should be text'],
-        email       : ['Email', 'should be an email address'],
-        number      : ['Number', 'should be a number'],
-        date        : ['Date', 'should be a date'],
-        datetime    : ['Datetime', 'should be a datetime'],
-        time        : ['Time', 'should be a time'],
-        month       : ['Month', 'should be a month'],
-        week        : ['Week', 'should be a week'],
-        url         : ['URL', 'should be a URL'],
-        tel         : ['Phone Number', 'should be a phone number'],
-        color       : ['Color', 'should be a color']
-    }).factory('formBase', FormBase);
-})();
-
 (function () {
     'use strict';
     function formDatePicker ($filter, $rootScope) {
@@ -284,6 +246,8 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                 dateFormat       : '@',
                 log              : '@?',
                 style            : '@?',
+                max              : '@?',
+                min              : '@?',
                 layoutCss        : '@?', //default col-md-6
                 isReadonly       : '=?',  //boolean
                 disableTimepicker: '=?'
@@ -456,7 +420,7 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
 
 (function () {
     'use strict';
-    function formInput ($filter, $rootScope) {
+    function formInput ($, $filter, $rootScope) {
         return{
             restrict: 'EA',
             require: '^formField',
@@ -470,7 +434,8 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                 min             : '@?',
                 type            : '@',  //text, email, number etc.. see the InputTypes
                 layoutCss       : '@?', //default col-md-6
-                isReadonly      : '=?'  //boolean
+                isReadonly      : '=?',  //boolean
+                isNumeric       : '=?'
             },
             templateUrl: 'sds-angular-controls/form-input.html',
 
@@ -485,6 +450,10 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
 
                 scope.log = scope.log || false;
                 scope.type = scope.type || "text";
+
+                if(scope.isNumeric){
+                    $(element).prop("auto-numeric", true);
+                }
 
                 if(scope.min) {
                     $rootScope.$broadcast("input-min", {field: scope.field, min: scope.min});
@@ -510,7 +479,7 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
             }
         }
     }
-    formInput.$inject = ["$filter", "$rootScope"];
+    formInput.$inject = ["$", "$filter", "$rootScope"];
 
     angular.module('sds-angular-controls').directive('formInput', formInput);
 })();
