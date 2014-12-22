@@ -420,7 +420,7 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
 
 (function () {
     'use strict';
-    function formInput ($, $filter, $rootScope) {
+    function formInput ($filter, $rootScope) {
         return{
             restrict: 'EA',
             require: '^formField',
@@ -479,7 +479,7 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
             }
         }
     }
-    formInput.$inject = ["$", "$filter", "$rootScope"];
+    formInput.$inject = ["$filter", "$rootScope"];
 
     angular.module('sds-angular-controls').directive('formInput', formInput);
 })();

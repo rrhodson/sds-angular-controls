@@ -3,7 +3,7 @@
  */
 (function () {
     'use strict';
-    function formInput ($, $filter, $rootScope) {
+    function formInput ($filter, $rootScope) {
         return{
             restrict: 'EA',
             require: '^formField',
