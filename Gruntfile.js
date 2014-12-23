@@ -17,7 +17,7 @@ module.exports = function(grunt) {
         stripBanners: true
       },
       dist: {
-        src: ['.tmp/*.js'],
+        src: ['.tmp/**/*.js'],
         dest: 'dist/<%= pkg.name %>.js'
       }
     },
@@ -56,7 +56,7 @@ module.exports = function(grunt) {
         files: [{
           expand: true,
           cwd: 'src',
-          src: ['*.js'],
+          src: ['**/*.js'],
           dest: '.tmp'
         }]
       }

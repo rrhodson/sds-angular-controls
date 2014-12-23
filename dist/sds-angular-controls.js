@@ -66,46 +66,6 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
 })();
 
 (function (){
-    'use strict';
-    function $bootbox ($modal, $window) {
-        // NOTE: this is a workaround to make BootboxJS somewhat compatible with
-        // Angular UI Bootstrap in the absence of regular bootstrap.js
-        if ($.fn.modal === undefined) {
-            $.fn.modal = function (directive) {
-                var that = this;
-                if (directive === 'hide') {
-                    if (this.data('bs.modal')) {
-                        this.data('bs.modal').close();
-                        $(that).remove();
-                    }
-                    return;
-                } else if (directive === 'show') {
-                    return;
-                }
-
-                var modalInstance = $modal.open({
-                    template: $(this).find('.modal-content').html()
-                });
-                this.data('bs.modal', modalInstance);
-                setTimeout (function () {
-                    $('.modal.ng-isolate-scope').remove();
-                    $(that).css({
-                        opacity: 1,
-                        display: 'block'
-                    }).addClass('in');
-                }, 100);
-            };
-        }
-
-        return $window.bootbox;
-    }
-    $bootbox.$inject = ["$modal", "$window"];
-
-    angular.module('sds-angular-controls').factory('$bootbox',$bootbox);
-
-})();
-
-(function (){
   'use strict';
 
   function camelCase (){
@@ -117,103 +77,6 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
   }
 
   angular.module('sds-angular-controls').filter('camelCase', camelCase);
-})();
-
-(function () {
-    'use strict';
-    function clientGrid ($interpolate, $timeout) {
-        return {
-            restrict: 'E',
-            replace: true,
-            transclude:true,
-            scope: {
-                cols: '=',
-                data: '=',
-                label: '@',
-                hideAdvanced: '@',
-                className: '@',
-                pageSize: '@'
-            },
-            templateUrl: 'sds-angular-controls/client-grid.html',
-            link: function (scope, element, attrs, fn) {
-                scope.vm = {
-                    sortAsc: false,
-                    sort: _.findIndex(scope.cols, {sortable:true}),
-                    currentPage: 1,
-                    pageSize: scope.pageSize ? scope.pageSize : 25,
-                    showAdvanced: false,
-                    filterText: '',
-                    toggleSort: toggleSort,
-                    // if a callback is specified, and the user clicked on an anchor link or button, call the callback
-                    onClick: onClick,
-                    onEnter: onEnter,
-                    clearFilters: clearFilters,
-                    extend: function (col){
-                        return _.extend({}, element.parent().scope(), col);
-                    }
-                };
-
-                function toggleSort(index){
-                    if (scope.vm.sort === index)  {
-                        scope.vm.sortAsc = ! scope.vm.sortAsc;
-                    }else{
-                        scope.vm.sort = index;
-                    }
-                }
-                function onEnter(){
-                    console.log('enter');
-                    if (scope.vm.resultCount.length === 1){
-                        $timeout(function (){
-                            element.find('tbody tr a:first').click();
-                        });
-                    }
-
-                }
-
-                function onClick(e, col, row){
-                    if (angular.element(e.target).is('a, button, input[type=button]')) {
-                        e.preventDefault();
-                        col.callback(row);
-                    }
-                }
-                function clearFilters(){
-                    _.each(scope.cols, function (item){
-                       item.filter = '';
-                    });
-                }
-
-                if (!scope.cols) {
-                    return;
-                }
-
-                // generate template rows
-                var templateDefault = '';
-                // Add in templates per row
-                for(var i = 0; i < scope.cols.length; i++){
-                    // while the template is currently passed in through the cols array,
-                    // I would like to eventually pull these from a child directive of the grid
-                    if (typeof scope.cols[i].template !== 'function') {
-                        if (scope.cols[i].template) {
-                            templateDefault = scope.cols[i].template;
-                        }else if (scope.cols[i].key) {
-                            templateDefault = '{{' + scope.cols[i].key + '}}';
-                        } else {
-                            templateDefault = '';
-                        }
-
-                        // interpolate is angular's built in template generator.
-                        // we are creating a function that can be used to fill templates in the view
-                        scope.cols[i].template = $interpolate(templateDefault);
-                    }
-                }
-
-            }
-        };
-    }
-    clientGrid.$inject = ["$interpolate", "$timeout"];
-
-    angular.module('sds-angular-controls').directive('clientGrid', clientGrid);
-
 })();
 
 (function (){
@@ -295,6 +158,82 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
 
     angular.module('sds-angular-controls').filter('complexFilter', complexFilter);
 })();
+
+(function (){
+    'use strict';
+
+    function keyFilter (){
+        return function (obj, query) {
+            var result = {};
+            angular.forEach(obj, function (val, key) {
+                if (key !== query) {
+                    result[key] = val;
+                }
+            });
+            return result;
+        };
+    }
+
+    angular.module('sds-angular-controls').filter('keyFilter', keyFilter);
+})();
+
+(function (){
+  'use strict';
+
+  function labelCase (){
+    return function (input) {
+      input = input.replace(/([A-Z])/g, ' $1');
+      return input[0].toUpperCase() + input.slice(1);
+    };
+  }
+
+  angular.module('sds-angular-controls').filter('labelCase', labelCase);
+})();
+
+(function (){
+    'use strict';
+
+    function ordinal (){
+        var suffixes = ["th", "st", "nd", "rd"];
+        return function(input) {
+            var v=input%100;
+            return input+(suffixes[(v-20)%10]||suffixes[v]||suffixes[0]);
+        };
+    }
+
+    angular.module('sds-angular-controls').filter('ordinal', ordinal);
+})();
+
+(function (){
+    'use strict';
+
+    function page (){
+        return function(input, page, size) {
+            if (!input || !input.length){
+                return [];
+            }
+
+            page = parseInt(page || 0, 10) || 0;
+            size = parseInt(size || 0, 10);
+            if (!size){
+                size = 25;
+            }
+            return input.slice(page * size, (page+1) * size);
+        };
+    }
+
+    angular.module('sds-angular-controls').filter('page', page);
+})();
+
+(function (){
+    'use strict';
+
+    function unsafe ($sce) { return $sce.trustAsHtml; }
+    unsafe.$inject = ["$sce"];
+
+    angular.module('sds-angular-controls').filter('unsafe', unsafe);
+})();
+
 
 (function () {
     'use strict';
@@ -714,37 +653,6 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
     angular.module('sds-angular-controls').directive('formToggle', formToggle);
 })();
 
-(function (){
-    'use strict';
-
-    function keyFilter (){
-        return function (obj, query) {
-            var result = {};
-            angular.forEach(obj, function (val, key) {
-                if (key !== query) {
-                    result[key] = val;
-                }
-            });
-            return result;
-        };
-    }
-
-    angular.module('sds-angular-controls').filter('keyFilter', keyFilter);
-})();
-
-(function (){
-  'use strict';
-
-  function labelCase (){
-    return function (input) {
-      input = input.replace(/([A-Z])/g, ' $1');
-      return input[0].toUpperCase() + input.slice(1);
-    };
-  }
-
-  angular.module('sds-angular-controls').filter('labelCase', labelCase);
-})();
-
 (function () {
   'use strict';
   function maskInput (){
@@ -762,62 +670,6 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
   }
 
   angular.module('sds-angular-controls').directive('maskInput', maskInput);
-})();
-
-(function () {
-    'use strict';
-    function onEnter (){
-        return {
-            restrict: 'A',
-            link: function(scope,element,attrs) {
-                element.bind("keypress", function (event) {
-                    if (event.which === 13) {
-                        scope.$apply(function () {
-                            scope.$eval(attrs.onEnter);
-                        });
-                        event.preventDefault();
-                    }
-                });
-            }
-        };
-    }
-
-    angular.module('sds-angular-controls').directive('onEnter',onEnter);
-})();
-
-(function (){
-    'use strict';
-
-    function ordinal (){
-        var suffixes = ["th", "st", "nd", "rd"];
-        return function(input) {
-            var v=input%100;
-            return input+(suffixes[(v-20)%10]||suffixes[v]||suffixes[0]);
-        };
-    }
-
-    angular.module('sds-angular-controls').filter('ordinal', ordinal);
-})();
-
-(function (){
-    'use strict';
-
-    function page (){
-        return function(input, page, size) {
-            if (!input || !input.length){
-                return [];
-            }
-
-            page = parseInt(page || 0, 10) || 0;
-            size = parseInt(size || 0, 10);
-            if (!size){
-                size = 25;
-            }
-            return input.slice(page * size, (page+1) * size);
-        };
-    }
-
-    angular.module('sds-angular-controls').filter('page', page);
 })();
 
 (function (){
@@ -874,23 +726,12 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
 angular.module('sds-angular-controls').run(['$templateCache', function($templateCache) {
   'use strict';
 
-  $templateCache.put('sds-angular-controls/client-grid.html',
-    "<div class=\"table-responsive\"> <div class=\"btn-toolbar\"> <a ng-if=\"vm.showAdvanced\" href=\"\" class=\"btn btn-default\" ng-click=\"vm.clearFilters()\">Clear All Filters <span class=\"big-x\">&times;</span></a> <div ng-if=\"!vm.showAdvanced\" class=\"toolbar-input\"> <div class=\"form-group has-feedback\"> <input class=\"form-control\" type=\"text\" ng-model=\"vm.filterText\" placeholder=\"Filter {{label || 'items'}}\" on-enter=\"vm.onEnter()\"> <a href=\"\" ng-click=\"vm.filterText = ''\" class=\"form-control-feedback feedback-link\">&times;</a> </div> </div> <a href=\"\" ng-if=\"!hideAdvanced\" class=\"btn btn-default\" ng-class=\"{active: vm.showAdvanced}\" ng-click=\"vm.showAdvanced = !vm.showAdvanced\">Advanced Filtering</a> <ng-transclude></ng-transclude> <p ng-show=\"data\"><i>{{vm.resultCount.length}} {{label || 'items'}}</i></p> </div> <table class=\"table table-hover {{className}}\"> <thead> <tr> <th ng-repeat=\"col in cols\"> <div ng-if=\"vm.showAdvanced && col.sortable\"> <input type=\"text\" class=\"form-control filter-input\" on-enter=\"vm.onEnter()\" ng-model=\"col.filter\" placeholder=\"Filter {{col.name}}\" tooltip=\"{{col.type ? 'Use a dash (-) to specify a range' : ''}}\" tooltip-trigger=\"focus\" tooltip-placement=\"top\"> </div> <a href=\"\" ng-if=\"col.sortable\" ng-click=\"vm.toggleSort($index)\">{{::col.name}} <i class=\"fa\" ng-class=\"{\n" +
-    "                     'fa-sort'     : vm.sort !== $index,\n" +
-    "                     'fa-sort-down': vm.sort === $index &&  vm.sortAsc,\n" +
-    "                     'fa-sort-up'  : vm.sort === $index && !vm.sortAsc\n" +
-    "                     }\"></i> </a> <span ng-if=\"!col.sortable\"> {{::col.name}} </span>    <tbody> <tr ng-repeat=\"row in (vm.resultCount = (data | complexFilter : (vm.showAdvanced ? cols : vm.filterText)))\n" +
-    "                                                      | orderBy       : cols[vm.sort].key       : vm.sortAsc\n" +
-    "                                                      | page          : (vm.currentPage - 1)    : vm.pageSize\"> <td ng-repeat-start=\"col in cols\" ng-if=\"col.callback && !col.fieldType\" ng-click=\"vm.onClick($event, col, row)\" ng-bind-html=\"::col.template(vm.extend(row)) | unsafe\">  <td ng-if=\"!col.callback && !col.fieldType\" ng-bind-html=\"::col.template(vm.extend(row)) | unsafe\">  <td ng-repeat-end ng-if=\"col.fieldType\"> <form-field layout=\"grid\" record=\"row\" items=\"col.items\" field=\"{{col.key}}\" type=\"{{col.type}}\" mask=\"{{col.mask}}\" on-label=\"{{col.onLabel}}\" off-label=\"{{col.offLabel}}\" is-required=\"col.isRequired\" field-type=\"{{col.fieldType}}\" date-format=\"{{col.dateFormat}}\" input-layout-css=\"{{col.inputLayoutCss}}\" disable-timepicker=\"col.disableTimepicker\" toggle-switch-type=\"{{col.toggleSwitchType}}\"></form-field>    </table> <pagination ng-if=\"vm.resultCount.length > vm.pageSize\" total-items=\"vm.resultCount.length\" items-per-page=\"vm.pageSize\" ng-model=\"vm.currentPage\"></pagination> </div>"
-  );
-
-
-  $templateCache.put('sds-angular-controls/form-datepicker.html',
+  $templateCache.put('sds-angular-controls/form-directives/form-datepicker.html',
     "<span class=\"input-group\"> <input type=\"text\" style=\"{{::style}}\" class=\"form-control datepicker\" ng-if=\"!isReadonly\" ng-readonly=\"isReadonly\" placeholder=\"{{placeholder}}\" ng-model=\"record[field]\" ng-required=\"::isRequired\" min-date=\"::min\" max-date=\"::max\" datepicker-popup=\"{{::dateFormat}}\" is-open=\"calendar.opened\"> <span ng-if=\"!isReadonly\" class=\"input-group-btn\"> <button type=\"button\" class=\"btn btn-default\" ng-click=\"open($event)\"><i class=\"glyphicon glyphicon-calendar\"></i></button> </span> </span>"
   );
 
 
-  $templateCache.put('sds-angular-controls/form-field.html',
+  $templateCache.put('sds-angular-controls/form-directives/form-field.html',
     "<div class=\"row\"> <script type=\"text/ng-template\" id=\"validation.html\"><div ng-if=\"!hideValidationMessage\" class='has-error' ng-show='showError({{field}})'\n" +
     "             ng-messages='{{field}}.$error'>\n" +
     "            <span class='control-label' ng-message='required'> {{ validationFieldName }} is required. </span>\n" +
@@ -913,12 +754,12 @@ angular.module('sds-angular-controls').run(['$templateCache', function($template
   );
 
 
-  $templateCache.put('sds-angular-controls/form-input.html',
+  $templateCache.put('sds-angular-controls/form-directives/form-input.html',
     "<div> <div class=\"{{layout === 'horizontal' ? layoutCss : '' }}\"> <input ng-if=\"!isNumeric\" class=\"form-control inputField {{layout === 'stacked' ? layoutCss : ''}}\" ng-model=\"record[field]\" type=\"{{::type}}\" ng-required=\"isRequired\" ng-disabled=\"isReadonly\" placeholder=\"{{::placeholder}}\" max=\"{{::max}}\" min=\"{{::min}}\" style=\"{{::style}}\" mask-input=\"{{::mask}}\"> <input ng-if=\"isNumeric\" class=\"form-control inputField {{layout === 'stacked' ? layoutCss : ''}}\" ng-model=\"record[field]\" type=\"{{::type}}\" ng-required=\"isRequired\" ng-disabled=\"isReadonly\" placeholder=\"{{::placeholder}}\" max=\"{{::max}}\" min=\"{{::min}}\" style=\"{{::style}}\" mask-input=\"{{::mask}}\" auto-numeric> <div ng-if=\"log\"> form-input value: {{record[field]}}<br> {{isRequired}} </div> </div> </div>"
   );
 
 
-  $templateCache.put('sds-angular-controls/form-select.html',
+  $templateCache.put('sds-angular-controls/form-directives/form-select.html',
     "<div> <select ng-if=\"!isReadonly && !hasFilter\" ng-readonly=\"isReadonly\" class=\"form-control\" name=\"{{::field}}\" ng-model=\"record[field]\" ng-options=\"convertType(key) as items[key] for key in orderHash(items)\" ng-required=\"isRequired\"></select> <!-- optionValue as optionLabel for arrayItem in array --> <input ng-if=\"isReadonly\" style=\"{{::style}}\" ng-readonly=\"isReadonly\" type=\"text\" class=\"form-control inputField {{::inputLayoutCss}}\" ng-model=\"readOnlyModel\"> <div ng-if=\"log\"> form-input value: {{record[field]}}<br> {{isRequired}} </div> </div>"
   );
 
@@ -928,12 +769,3 @@ angular.module('sds-angular-controls').run(['$templateCache', function($template
   );
 
 }]);
-
-(function (){
-    'use strict';
-
-    function unsafe ($sce) { return $sce.trustAsHtml; }
-    unsafe.$inject = ["$sce"];
-
-    angular.module('sds-angular-controls').filter('unsafe', unsafe);
-})();
