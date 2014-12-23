@@ -1,0 +1,34 @@
+<div>
+    <div class="{{layout === 'horizontal' ? layoutCss : '' }}">
+        <input ng-if="!isNumeric" class="form-control inputField {{layout === 'stacked' ? layoutCss : ''}}"
+            ng-model='record[field]'
+            type='{{::type}}'
+            ng-required='isRequired'
+            ng-disabled="isReadonly"
+            placeholder='{{::placeholder}}'
+            max="{{::max}}"
+            min="{{::min}}"
+            style="{{::style}}"
+            mask-input="{{::mask}}"
+        />
+
+        <input ng-if="isNumeric" class="form-control inputField {{layout === 'stacked' ? layoutCss : ''}}"
+               ng-model='record[field]'
+               type='{{::type}}'
+               ng-required='isRequired'
+               ng-disabled="isReadonly"
+               placeholder='{{::placeholder}}'
+               max="{{::max}}"
+               min="{{::min}}"
+               style="{{::style}}"
+               mask-input="{{::mask}}"
+               auto-numeric
+                />
+
+        <div ng-if="log">
+            form-input value: {{record[field]}}<br>
+            {{isRequired}}
+        </div>
+
+    </div>
+</div>

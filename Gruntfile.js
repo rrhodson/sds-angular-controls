@@ -17,7 +17,7 @@ module.exports = function(grunt) {
         stripBanners: true
       },
       dist: {
-        src: ['.tmp/*.js'],
+        src: ['.tmp/**/*.js'],
         dest: 'dist/<%= pkg.name %>.js'
       }
     },
@@ -56,7 +56,7 @@ module.exports = function(grunt) {
         files: [{
           expand: true,
           cwd: 'src',
-          src: ['*.js'],
+          src: ['**/*.js'],
           dest: '.tmp'
         }]
       }
@@ -82,7 +82,40 @@ module.exports = function(grunt) {
         src: 'Gruntfile.js'
       }
     },
+      connect: {
+          options: {
+              port: 9900,
+              // Change this to '0.0.0.0' to access the server from outside.
+              hostname: 'localhost',
+              livereload: 35711
+          },
+          dev: {
+              options: {
+                  middleware: function (connect) {
+                      return [
+                          connect.static('.tmp'),
+                          connect().use(
+                              '/bower_components',
+                              connect.static('./bower_components')
+                          ),
+                          connect().use(
+                              '/dist',
+                              connect.static('./dist')
+                          ),
+                          connect.static('demo')
+                      ];
+                  }
+              }
+          }
+      },
     watch: {
+      dev: {
+        files: ['src/**/*.html', 'src/**/*.js'],
+        tasks: ['default'],
+          options: {
+              livereload: '<%= connect.options.livereload %>'
+          },
+      },
       gruntfile: {
         files: '<%= jshint.gruntfile.src %>',
         tasks: ['jshint:gruntfile']
@@ -91,6 +124,7 @@ module.exports = function(grunt) {
   });
 
   // These plugins provide necessary tasks.
+    grunt.loadNpmTasks('grunt-contrib-connect');
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-contrib-uglify');
@@ -98,6 +132,8 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-ng-annotate');
   grunt.loadNpmTasks('grunt-angular-templates');
+
+    grunt.registerTask('serve', ['default', 'connect', 'watch']);
 
   // Default task.
   grunt.registerTask('default', ['jshint', 'clean', 'ngAnnotate', 'ngtemplates', 'concat', 'uglify']);

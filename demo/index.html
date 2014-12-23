@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <title></title>
   <link rel="stylesheet" href="../bower_components/bootstrap/dist/css/bootstrap.min.css" type="text/css">
+    <link rel="stylesheet" href="../bower_components/angular-toggle-switch/angular-toggle-switch.css" type="text/css">
   <link rel="stylesheet" href="../bower_components/angular-toggle-switch/angular-toggle-switch-bootstrap.css" type="text/css">
   <link rel="stylesheet" href="../dist/sds-angular-controls.css" type="text/css">
 </head>
@@ -12,66 +13,75 @@
 <div class="container">
 
   <h1>Demo</h1>
-
-  <div class="row">
     <div ng-controller="DemoCtrl as vm">
+     <h3>Stacked Form</h3>
       <form name="testFrm" ng-submit="vm.save(testFrm)" novalidate>
+          <form-field record="vm.testForm" field="FirstName" label="First Name" is-required="true">
+              <form-input type="text" log="true"></form-input>
+          </form-field>
+          <form-field record="vm.testForm" field="LastName" is-required="true">
+              <form-input type="text" log="true" is-readonly="true"></form-input>
+          </form-field>
+          <form-field record="vm.testForm" field="PhoneNumber" is-required="true" input-layout-css="col-md-2">
+              <form-input type="tel" log="true" mask="(999)-999-9999"></form-input>
+          </form-field>
+          <form-field record="vm.testForm" field="Price" is-required="true" validation-field-name="The price">
+              <form-input log="true" is-numeric="true"></form-input>
+          </form-field>
+          <form-field record="vm.testForm" field="Email" is-required="true">
+              <form-input log="true" type="email"></form-input>
+          </form-field>
+          <form-field record="vm.testForm" field="Age" is-required="true" input-layout-css="col-md-2">
+              <form-input log="true" type="number" min="1" max="110"></form-input>
+          </form-field>
+          <form-field record="vm.testForm" field="State" label="State" is-required=true>
+              <form-select items="vm.states" log="true" item-key="stateCode" item-value="stateName"></form-select>
+          </form-field>
+          <form-field label="DOB" disable-timepicker="true" placeholder="Select Date" record="vm.testForm" field="DateOfBirth">
+              <form-date-picker></form-date-picker>
+          </form-field>
 
-        <div class="form-group">
-          <div class="row">
-            <div class="col-md-6">
-              <form-field type="text" record="vm.testForm" field="FirstName" label="First Name"></form-field>
-            </div>
-            <div class="col-md-6">
-              <form-field type="text" record="vm.testForm" field="LastName" is-required="true" label="First Name"></form-field>
-            </div>
-          </div>
-        </div>
+          <form-field label="Do you like ice cream?" record="vm.testForm" field="LikesIceCream">
+              <form-toggle log="true" on-label="Yes" off-label="No"></form-toggle>
+          </form-field>
 
-        <div class="form-group">
-          <div class="row">
-            <div class="col-md-6">
-              <form-field type="email" record="vm.testForm" field="Email" is-required="true" label="Email"></form-field>
-            </div>
-            <div class="col-md-6">
-              <form-field field-type="quickdatepicker" label="Date of Birth"
-                          disable-timepicker="true"
-                          placeholder="Select Date"
-                          record="vm.testForm"
-                          field="DateOfBirth"></form-field>
-            </div>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <div class="row">
-            <div class="col-md-6">
-              <form-field is-required=true
-                          field-type="select"
-                          placeholder="States"
-                          record="vm.testForm"
-                          field="State"
-                          item-key="stateCode"
-                          item-value="stateName"
-                          items="vm.states"
-                          label="State"></form-field>
-            </div>
-            <div class="col-md-6"></div>
-        </div>
-        <!--<form-field field-type="texttoggle" on-label="Yes" off-label="No"-->
-        <!--label="Weight"-->
-        <!--record="vm.testForm" toggle-field="weightUnit" field="LikesIceCream"-->
-        <!--toggle-switch-type="inverse"></form-field>-->
-
-        <input type="submit" value="Submit" class="btn btn-primary">
+          <input type="submit" value="Submit" class="btn btn-primary" ng-disabled="testFrm.$invalid">
       </form>
 
-        <client-grid cols="vm.cols" data="vm.itemList" label="awesome doodads"></client-grid>
+        <hr>
+
+     <h3>Horizontal Form</h3>
+        <form name="testHorizontalFrm" class="form-horizontal" ng-submit="vm.save(testHorizontalFrm)" novalidate>
+            <form-field layout="horizontal" record="vm.testForm" field="FirstName" label="First Name" is-required="true">
+                <form-input type="text"></form-input>
+            </form-field>
+            <form-field layout="horizontal" record="vm.testForm" field="LastName" is-required="true">
+                <form-input type="text" is-readonly="true"></form-input>
+            </form-field>
+            <form-field layout="horizontal" record="vm.testForm" field="PhoneNumber" is-required="true">
+                <form-input type="tel" mask="(999)-999-9999" layout-css="col-md-2"></form-input>
+            </form-field>
+            <form-field layout="horizontal" record="vm.testForm" field="Email" is-required="true">
+                <form-input type="email"></form-input>
+            </form-field>
+            <form-field layout="horizontal" layout="inline" record="vm.testForm" field="Age" is-required="true" input-layout-css="col-md-2">
+                <form-input type="number" min="1" max="110"></form-input>
+            </form-field>
+
+            <p>todo... inline select and datepicker</p>
+            <!--<form-field layout="horizontal" record="vm.testForm" field="State" label="State" is-required=true>-->
+                <!--<form-select items="vm.states" item-key="stateCode" item-value="stateName"></form-select>-->
+            <!--</form-field>-->
+            <!--<form-field label="DOB" disable-timepicker="true" placeholder="Select Date" record="vm.testForm" field="DateOfBirth">-->
+                <!--<form-date-picker></form-date-picker>-->
+            <!--</form-field>-->
+
+            <input type="submit" value="Submit" class="btn btn-primary" ng-disabled="testHorizontalFrm.$invalid">
+        </form>
+        <hr>
+        {{vm.testForm | json}}
     </div>
-
-
-
-  </div>
+</div>
 
   <script src="../bower_components/jquery/dist/jquery.min.js"></script>
   <script src="../bower_components/lodash/dist/lodash.min.js"></script>
@@ -80,6 +90,9 @@
   <script src="../bower_components/angular-messages/angular-messages.min.js"></script>
   <script src="../bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js"></script>
   <script src="../bower_components/angular-toggle-switch/angular-toggle-switch.min.js"></script>
+  <script src="../bower_components/jquery.maskedinput/dist/jquery.maskedinput.min.js"></script>
+  <script src="../bower_components/moment/min/moment.min.js"></script>
+  <script src="../bower_components/autoNumeric/autoNumeric.js"></script>
   <script src="../dist/sds-angular-controls.js"></script>
   <script src="app.js"></script>
 </body>
