@@ -252,7 +252,7 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                 isReadonly       : '=?',  //boolean
                 disableTimepicker: '=?'
             },
-            templateUrl: 'sds-angular-controls/form-datepicker.html',
+            templateUrl: 'sds-angular-controls/form-directives/form-datepicker.html',
 
             link: function (scope, element, attr, formField) {
                 // defaults
@@ -326,7 +326,7 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                 hideValidationMessage   : '=?',  //default is false
                 validationFieldName       : '@?'  //to override the default label   '[validationFieldName]' is required
             },
-            templateUrl: 'sds-angular-controls/form-field.html',
+            templateUrl: 'sds-angular-controls/form-directives/form-field.html',
             require: '^form',
             controller: ["$scope", "$element", "$attrs", function($scope, $element, $attrs){
 
@@ -420,7 +420,7 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                 isReadonly      : '=?',  //boolean
                 isNumeric       : '=?'
             },
-            templateUrl: 'sds-angular-controls/form-input.html',
+            templateUrl: 'sds-angular-controls/form-directives/form-input.html',
             link: function (scope, element, attr, formField) {
                 // defaults
                 scope.record     = formField.getRecord();
@@ -494,7 +494,7 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                 layoutCss       : '@?', //default col-md-6
                 isReadonly      : '=?'  //boolean
             },
-            templateUrl: 'sds-angular-controls/form-select.html',
+            templateUrl: 'sds-angular-controls/form-directives/form-select.html',
 
             link: function (scope, element, attr, formField) {
                 // defaults

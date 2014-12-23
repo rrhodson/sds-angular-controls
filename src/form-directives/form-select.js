@@ -17,7 +17,7 @@
                 layoutCss       : '@?', //default col-md-6
                 isReadonly      : '=?'  //boolean
             },
-            templateUrl: 'sds-angular-controls/form-select.html',
+            templateUrl: 'sds-angular-controls/form-directives/form-select.html',
 
             link: function (scope, element, attr, formField) {
                 // defaults

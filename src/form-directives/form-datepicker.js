@@ -18,7 +18,7 @@
                 isReadonly       : '=?',  //boolean
                 disableTimepicker: '=?'
             },
-            templateUrl: 'sds-angular-controls/form-datepicker.html',
+            templateUrl: 'sds-angular-controls/form-directives/form-datepicker.html',
 
             link: function (scope, element, attr, formField) {
                 // defaults

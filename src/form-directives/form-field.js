@@ -25,7 +25,7 @@
                 hideValidationMessage   : '=?',  //default is false
                 validationFieldName       : '@?'  //to override the default label   '[validationFieldName]' is required
             },
-            templateUrl: 'sds-angular-controls/form-field.html',
+            templateUrl: 'sds-angular-controls/form-directives/form-field.html',
             require: '^form',
             controller: function($scope, $element, $attrs){
 

@@ -20,7 +20,7 @@
                 isReadonly      : '=?',  //boolean
                 isNumeric       : '=?'
             },
-            templateUrl: 'sds-angular-controls/form-input.html',
+            templateUrl: 'sds-angular-controls/form-directives/form-input.html',
             link: function (scope, element, attr, formField) {
                 // defaults
                 scope.record     = formField.getRecord();
