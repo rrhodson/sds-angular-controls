@@ -22,7 +22,8 @@
                 labelCss                : '@?', //default col-sm-3
                 layoutCss               : '@?',
                 errorLayoutCss          : '@?', //default col-sm-4
-                hideValidationMessage   : '=?'  //default is false
+                hideValidationMessage   : '=?',  //default is false
+                validationFieldName       : '@?'  //to override the default label   '[validationFieldName]' is required
             },
             templateUrl: 'sds-angular-controls/form-field.html',
             require: '^form',
@@ -34,6 +35,8 @@
                 if(!$scope.label){
                     $scope.label = $filter("labelCase")($scope.field);
                 }
+
+                $scope.validationFieldName = $scope.validationFieldName || $filter("labelCase")($scope.field);
 
 
                 $scope.showLabel = $scope.showLabel !== false; // default to true

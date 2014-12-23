@@ -23,7 +23,7 @@
       City: "",
       State: "",
       ZipCode: "",
-      Price:  null,
+      Price:  5.983,
       LikesIceCream: false,
       DateOfBirth : null
     };

@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <title></title>
   <link rel="stylesheet" href="../bower_components/bootstrap/dist/css/bootstrap.min.css" type="text/css">
+    <link rel="stylesheet" href="../bower_components/angular-toggle-switch/angular-toggle-switch.css" type="text/css">
   <link rel="stylesheet" href="../bower_components/angular-toggle-switch/angular-toggle-switch-bootstrap.css" type="text/css">
   <link rel="stylesheet" href="../dist/sds-angular-controls.css" type="text/css">
 </head>
@@ -12,7 +13,6 @@
 <div class="container">
 
   <h1>Demo</h1>
-
     <div ng-controller="DemoCtrl as vm">
      <h3>Stacked Form</h3>
       <form name="testFrm" ng-submit="vm.save(testFrm)" novalidate>
@@ -25,7 +25,7 @@
           <form-field record="vm.testForm" field="PhoneNumber" is-required="true" input-layout-css="col-md-2">
               <form-input type="tel" log="true" mask="(999)-999-9999"></form-input>
           </form-field>
-          <form-field record="vm.testForm" field="Price" is-required="true">
+          <form-field record="vm.testForm" field="Price" is-required="true" validation-field-name="The price">
               <form-input log="true" is-numeric="true"></form-input>
           </form-field>
           <form-field record="vm.testForm" field="Email" is-required="true">
@@ -39,6 +39,10 @@
           </form-field>
           <form-field label="DOB" disable-timepicker="true" placeholder="Select Date" record="vm.testForm" field="DateOfBirth">
               <form-date-picker></form-date-picker>
+          </form-field>
+
+          <form-field label="Do you like ice cream?" record="vm.testForm" field="LikesIceCream">
+              <form-toggle log="true" on-label="Yes" off-label="No"></form-toggle>
           </form-field>
 
           <input type="submit" value="Submit" class="btn btn-primary" ng-disabled="testFrm.$invalid">
@@ -79,66 +83,6 @@
     </div>
 </div>
 
-  <!--<div class="row">-->
-    <!--<div ng-controller="DemoCtrl as vm">-->
-      <!--<form name="testFrm" ng-submit="vm.save(testFrm)" novalidate>-->
-
-        <!--<div class="form-group">-->
-          <!--<div class="row">-->
-            <!--<div class="col-md-6">-->
-              <!--<form-field type="text" record="vm.testForm" field="FirstName" label="First Name"></form-field>-->
-            <!--</div>-->
-            <!--<div class="col-md-6">-->
-              <!--<form-field type="text" record="vm.testForm" field="LastName" is-required="true" label="First Name"></form-field>-->
-            <!--</div>-->
-          <!--</div>-->
-        <!--</div>-->
-
-        <!--<div class="form-group">-->
-          <!--<div class="row">-->
-            <!--<div class="col-md-6">-->
-              <!--<form-field type="email" record="vm.testForm" field="Email" is-required="true" label="Email"></form-field>-->
-            <!--</div>-->
-            <!--<div class="col-md-6">-->
-              <!--<form-field field-type="quickdatepicker" label="Date of Birth"-->
-                          <!--disable-timepicker="true"-->
-                          <!--placeholder="Select Date"-->
-                          <!--record="vm.testForm"-->
-                          <!--field="DateOfBirth"></form-field>-->
-            <!--</div>-->
-          <!--</div>-->
-        <!--</div>-->
-
-        <!--<div class="form-group">-->
-          <!--<div class="row">-->
-            <!--<div class="col-md-6">-->
-              <!--<form-field is-required=true-->
-                          <!--field-type="select"-->
-                          <!--placeholder="States"-->
-                          <!--record="vm.testForm"-->
-                          <!--field="State"-->
-                          <!--item-key="stateCode"-->
-                          <!--item-value="stateName"-->
-                          <!--items="vm.states"-->
-                          <!--label="State"></form-field>-->
-            <!--</div>-->
-            <!--<div class="col-md-6"></div>-->
-        <!--</div>-->
-        <!--&lt;!&ndash;<form-field field-type="texttoggle" on-label="Yes" off-label="No"&ndash;&gt;-->
-        <!--&lt;!&ndash;label="Weight"&ndash;&gt;-->
-        <!--&lt;!&ndash;record="vm.testForm" toggle-field="weightUnit" field="LikesIceCream"&ndash;&gt;-->
-        <!--&lt;!&ndash;toggle-switch-type="inverse"></form-field>&ndash;&gt;-->
-
-        <!--<input type="submit" value="Submit" class="btn btn-primary">-->
-      <!--</form>-->
-
-        <!--<client-grid cols="vm.cols" data="vm.itemList" label="awesome doodads"></client-grid>-->
-    <!--</div>-->
-
-
-
-  <!--</div>-->
-
   <script src="../bower_components/jquery/dist/jquery.min.js"></script>
   <script src="../bower_components/lodash/dist/lodash.min.js"></script>
   <script src="../bower_components/angular/angular.js"></script>
@@ -148,6 +92,7 @@
   <script src="../bower_components/angular-toggle-switch/angular-toggle-switch.min.js"></script>
   <script src="../bower_components/jquery.maskedinput/dist/jquery.maskedinput.min.js"></script>
   <script src="../bower_components/moment/min/moment.min.js"></script>
+  <script src="../bower_components/autoNumeric/autoNumeric.js"></script>
   <script src="../dist/sds-angular-controls.js"></script>
   <script src="app.js"></script>
 </body>

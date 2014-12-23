@@ -3,7 +3,7 @@
  */
 (function () {
     'use strict';
-    function formInput ($filter, $rootScope) {
+    function formInput ($filter) {
         return{
             restrict: 'EA',
             require: '^formField',
@@ -21,7 +21,6 @@
                 isNumeric       : '=?'
             },
             templateUrl: 'sds-angular-controls/form-input.html',
-
             link: function (scope, element, attr, formField) {
                 // defaults
                 scope.record     = formField.getRecord();
@@ -34,9 +33,6 @@
                 scope.log = scope.log || false;
                 scope.type = scope.type || "text";
 
-                if(scope.isNumeric){
-                    $(element).prop("auto-numeric", true);
-                }
 
                 if(scope.min) {
                     formField.setMin(scope.min);
@@ -56,9 +52,24 @@
 
                 scope.placeholder = scope.placeholder ||  $filter("labelCase")(scope.field);
 
+                scope.$watch("isReadonly", function(newVal, oldVal){
+                    if(newVal !== oldVal){
+                        checkIfReadonly();
+                    }
+                });
+
                 scope.$watch("record", function(newVal, oldVal){
                     formField.setValue(newVal[scope.field]);
+                    checkIfReadonly();
                 });
+
+                function checkIfReadonly(){
+                    if(scope.isReadonly) {
+                        if (scope.fieldType === 'toggle') {
+                            scope.readOnlyModel = scope.record[scope.field];
+                        }
+                    }
+                }
             }
         }
     }
