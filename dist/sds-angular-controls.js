@@ -1,4 +1,4 @@
-/*! sds-angular-controls - v0.1.4 - 2015-01-04
+/*! sds-angular-controls - v0.1.4 - 2015-01-05
 * https://github.com/SMARTDATASYSTEMSLLC/sds-angular-controls
 * Copyright (c) 2015 Steve Gentile, David Benson; Licensed  */
 angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSanitize']);
@@ -727,44 +727,60 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
 (function () {
     'use strict';
 
-    // for internal use only
+    // For internal use only. Manually binds a template using a provided template function, with a fallback to $compile.
+    // Needs to be extremely lightweight.
 
-    function fancyBindCell ($compile) {
+    function dbBindCell ($compile) {
         return{
             restrict: 'A',
-            link: function (scope, element, attr) {
+            link: function (scope, element) {
+
                 if (typeof scope.col.template === 'function'){
                     element.append(scope.col.template(scope));
-                }else{
+
+                }else if(!angular.element.trim(element.html())){
                     var html = angular.element('<span>' + scope.col.template  + '</span>');
                     var compiled = $compile(html) ;
                     element.append(html);
                     compiled(scope);
                     element.data('compiled', compiled);
-                    scope.$watch('row', function (val, old){
-                        element.data('compiled')(scope);
-                    });
+
                 }
             }
         }
     }
-    fancyBindCell.$inject = ["$compile"];
+    dbBindCell.$inject = ["$compile"];
 
-    angular.module('sds-angular-controls').directive('fancyBindCell', fancyBindCell);
+    angular.module('sds-angular-controls').directive('dbBindCell', dbBindCell);
 })();
 
 
 (function () {
     'use strict';
-    function fancyColumn ($interpolate) {
+
+    /**
+     * A column definition for use in the db-grid
+     *
+     * <db-grid for="item in items">
+     *     <db-col key="name">{{item.name}} is my name.</db-col>
+     * </db-grid>
+     *
+     * @param {string} key      - The key to base sorting and filtering on.
+     * @param {string} label    - A custom label. Defaults to key name.
+     * @param {string} type     - 'string', 'number', or 'date'. Used for filtering and sorting. Defaults to 'string'.
+     * @param {bool}   sortable - Whether or not the column is sortable. Defaults to true.
+     * @param {bool}   bind     - Whether to use full binding on the column. True will use full binding, false will use
+     *                            once-bound interpolate templates. Defaults to false.
+     */
+    function dbCol ($interpolate) {
         return{
             restrict: 'E',
-            require: '^fancyGrid',
+            require: '^dbGrid',
             compile:function(tElement){
                 var templateText = tElement.html();
                 tElement.empty();
 
-                return function (scope, element, attr, fancyGrid) {
+                return function (scope, element, attr, dbGrid) {
                     var templateFunc = null;
                     if (!templateText && attr.key){
                         console.log(scope);
@@ -777,10 +793,11 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                         templateFunc = $interpolate(templateText);
                     }
 
-                    fancyGrid.addColumn({
+                    dbGrid.addColumn({
+                        width: attr.width,
                         key: attr.key,
                         label: attr.label,
-                        sortable: attr.sortable,
+                        sortable: attr.sortable !== 'false',
                         type: attr.type,
                         bind: attr.bind === 'true',
                         template: templateFunc
@@ -789,26 +806,38 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
             }
         }
     }
-    fancyColumn.$inject = ["$interpolate"];
+    dbCol.$inject = ["$interpolate"];
 
-    angular.module('sds-angular-controls').directive('fancyColumn', fancyColumn);
+    angular.module('sds-angular-controls').directive('dbCol', dbCol);
 })();
 
 (function () {
     'use strict';
-    function fancyGrid ($compile, $timeout, $filter) {
+
+    /**
+     * Creates a grid with sorting, paging, filtering, and the ability to add custom data sources.
+     * Can contain custom toolbar buttons, a custom data source element, and a list of db-cols.
+     *
+     * <db-grid for="items in item">
+     *     <db-column key="name"></db-column>
+     * </db-grid>
+     *
+     * @param {string}     format    - A label to put next to the count (TODO: make this customizable)
+     * @param {string}     layoutCss - A css class to add to the table
+     * @param {string}     filter    - One of the options 'none', 'simple' or 'advanced'. Defaults to 'advanced'. Bound once.
+     * @param {int}        pageSize  - The page size, defaults to 25. Bound once.
+     * @param {expression} for       - Required. Either 'item in items' or (when used with a custom data source) just 'item'
+     */
+    function dbGrid ($filter, $timeout) {
         return {
             restrict: 'E',
             replace: true,
             transclude:true,
             scope: {
-                //items: '=',
                 label: '@',
-                hideAdvanced: '@',
-                layoutCss: '@',
-                pageSize: '@'
+                layoutCss: '@'
             },
-            templateUrl: 'sds-angular-controls/table-directives/fancy-grid.html',
+            templateUrl: 'sds-angular-controls/table-directives/db-grid.html',
             compile: function (tElement, tAttrs){
                 var loop = tAttrs.for.split(' ');
                 if (loop.length !== 1 && loop[1] != 'in') {
@@ -816,127 +845,109 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                     return;
                 }
 
-                tElement.find('tbody > tr').attr('ng-repeat',
-                    loop[0] + ' in model.resultCount = model.getItems(' +
-                    'model.showAdvanced ? cols : model.filterText,' +
-                    'cols[model.sort].key,' +
-                    'model.sortAsc,' +
-                    'model.currentPage - 1,' +
-                    'model.pageSize)');
+                tElement.find('tbody > tr').attr('ng-repeat', loop[0] + ' in model.filteredItems');
 
             },
             controller: ["$scope", "$element", "$attrs", function ($scope, $element, $attrs){
-                var filter = $filter('complexFilter');
-                var orderBy = $filter('orderBy');
-                var page = $filter('page');
+                var complexFilter = $filter('complexFilter');
+                var orderByFilter = $filter('orderBy');
+                var pageFilter = $filter('page');
+
+                $scope.model = {
+                    currentPage: 1,
+                    total: 0,
+                    sortAsc: false,
+                    sort: null,
+                    filterText: '',
+                    showAdvancedFilter: false,
+                    pageSize: $attrs.pageSize ? parseInt($attrs.pageSize, 10) : 25,
+                    filterType: ($attrs.filter || 'advanced').toLowerCase(),
+                    cols: [],
+                    items: [],
+                    filteredItems: [],
+                    getItems: defaultGetItems,
+                    toggleSort: toggleSort,
+                    clearFilters: clearFilters,
+                    onEnter: onEnter,
+                    refresh: _.debounce(refresh, 250)
+                };
 
                 var loop = $attrs.for.split(' ');
                 $scope.rowName = loop[0];
-
-                $scope.model = {
-                    items: [],
-                    cols: [],
-                    getItems: function (filter, sortKey, sortAsc, page, pageSize){
-                        //return page(orderBy(filter($scope.items, filter), sortKey, sortAsc), page, pageSize);
-                        return $scope.model.items;
-                    },
-                    sortAsc: false,
-                    sort: null
-                };
-
                 if (loop[2]) {
                     $element.parent().scope().$watch(loop[2], function (items) {
                         $scope.model.items = items;
+                        refresh();
+                    });
+                }
+
+                function defaultGetItems (filter, sortKey, sortAsc, page, pageSize, cols){
+                    var items = orderByFilter(complexFilter($scope.model.items, filter), sortKey, sortAsc);
+                    $scope.model.total = items.length;
+                    return pageFilter(items, page, pageSize);
+                }
+
+                function toggleSort(index){
+                    console.log(index);
+                    if ($scope.model.sort === index)  {
+                        $scope.model.sortAsc = !$scope.model.sortAsc;
+                    }else{
+                        $scope.model.sort = index;
+                    }
+                }
+
+                function clearFilters(){
+                    _.each($scope.model.cols, function (item){
+                       item.filter = '';
+                    });
+                    refresh();
+                }
+
+                function onEnter(){
+                    console.log('enter');
+                    if ($scope.model.items.length === 1){
+                        $timeout(function (){
+                            $element.find('tbody tr a:first').click();
+                        });
+                    }
+                }
+
+                function refresh(val, old) {
+                    $timeout(function () {
+                        $scope.model.filteredItems = $scope.model.getItems(
+                            $scope.model.showAdvancedFilter ? $scope.model.cols : $scope.model.filterText,
+                            $scope.model.sort ? $scope.model.cols[$scope.model.sort].key : null,
+                            $scope.model.sortAsc,
+                            $scope.model.currentPage - 1,
+                            $scope.model.pageSize,
+                            $scope.model.cols
+                        );
                     });
                 }
 
                 this.addColumn = function (item){
-                    console.log('Added Column', item);
-                    // {template: func, key: string, has-bind: bool}
                     $scope.model.cols.push(item);
                 };
+
                 this.setDataSource = function (dataSource){
                     $scope.model.getItems = dataSource;
+                    refresh();
                 };
-            }]
-            //link: function ($scope, element, attrs, fn) {
-                //scope.vm = {
-                //    sortAsc: false,
-                //    sort: _.findIndex(scope.cols, {sortable:true}),
-                //    currentPage: 1,
-                //    pageSize: scope.pageSize ? scope.pageSize : 25,
-                //    showAdvanced: false,
-                //    filterText: '',
-                //    toggleSort: toggleSort,
-                //    // if a callback is specified, and the user clicked on an anchor link or button, call the callback
-                //    onClick: onClick,
-                //    onEnter: onEnter,
-                //    clearFilters: clearFilters,
-                //    extend: function (col){
-                //        return _.extend({}, element.parent().scope(), col);
-                //    }
-                //};
-                //
-                //function toggleSort(index){
-                //    if (scope.vm.sort === index)  {
-                //        scope.vm.sortAsc = ! scope.vm.sortAsc;
-                //    }else{
-                //        scope.vm.sort = index;
-                //    }
-                //}
-                //function onEnter(){
-                //    console.log('enter');
-                //    if (scope.vm.resultCount.length === 1){
-                //        $timeout(function (){
-                //            element.find('tbody tr a:first').click();
-                //        });
-                //    }
-                //
-                //}
-                //
-                //function onClick(e, col, row){
-                //    if (angular.element(e.target).is('a, button, input[type=button]')) {
-                //        e.preventDefault();
-                //        col.callback(row);
-                //    }
-                //}
-                //function clearFilters(){
-                //    _.each(scope.cols, function (item){
-                //       item.filter = '';
-                //    });
-                //}
-                //
-                //if (!scope.cols) {
-                //    return;
-                //}
-                //
-                //// generate template rows
-                //var templateDefault = '';
-                //// Add in templates per row
-                //for(var i = 0; i < scope.cols.length; i++){
-                //    // while the template is currently passed in through the cols array,
-                //    // I would like to eventually pull these from a child directive of the grid
-                //    if (typeof scope.cols[i].template !== 'function') {
-                //        if (scope.cols[i].template) {
-                //            templateDefault = scope.cols[i].template;
-                //        }else if (scope.cols[i].key) {
-                //            templateDefault = '{{' + scope.cols[i].key + '}}';
-                //        } else {
-                //            templateDefault = '';
-                //        }
-                //
-                //        // interpolate is angular's built in template generator.
-                //        // we are creating a function that can be used to fill templates in the view
-                //        scope.cols[i].template = $interpolate(templateDefault);
-                //    }
-                //}
 
-            //}
+                this.setTotal = function (total){
+                    $scope.model.total = total;
+                };
+
+                $scope.$watch('model.currentPage', $scope.model.refresh);
+                $scope.$watch('model.sort',        $scope.model.refresh);
+                $scope.$watch('model.sortAsc',     $scope.model.refresh);
+                $scope.$watch('model.filterText',  $scope.model.refresh);
+            }]
         };
     }
-    fancyGrid.$inject = ["$compile", "$timeout", "$filter"];
+    dbGrid.$inject = ["$filter", "$timeout"];
 
-    angular.module('sds-angular-controls').directive('fancyGrid', fancyGrid);
+    angular.module('sds-angular-controls').directive('dbGrid', dbGrid);
 
 })();
 
@@ -949,7 +960,7 @@ angular.module('sds-angular-controls').run(['$templateCache', function($template
 
 
   $templateCache.put('sds-angular-controls/form-directives/form-field.html',
-    "<div class=\"row\"> <script type=\"text/ng-template\" id=\"validation.html\"><div ng-if=\"!hideValidationMessage\" class='has-error' ng-show='showError({{field}})'\n" +
+    "<div> <script type=\"text/ng-template\" id=\"validation.html\"><div ng-if=\"!hideValidationMessage\" class='has-error' ng-show='showError({{field}})'\n" +
     "             ng-messages='{{field}}.$error'>\n" +
     "            <span class='control-label' ng-message='required'> {{ validationFieldName }} is required. </span>\n" +
     "            <span class='control-label' ng-message='text'> {{ validationFieldName }} should be text. </span>\n" +
@@ -967,7 +978,7 @@ angular.module('sds-angular-controls').run(['$templateCache', function($template
     "            <span class='control-label' ng-message='min'> {{ validationFieldName }} must be at least {{min}}. </span>\n" +
     "            <span class='control-label' ng-message='max'> {{ validationFieldName }} must not exceed {{max}} </span>\n" +
     "            <span class='control-label' ng-repeat='(k, v) in types' ng-message='{{k}}'> {{ validationFieldName }}{{v[1]}}</span>\n" +
-    "        </div></script> <div ng-if=\"layout === 'stacked'\" class=\"form-group clearfix\" ng-form=\"{{field}}\" ng-class=\"{ 'has-error': showError({{field}}) }\"> <div class=\"{{::layoutCss}}\"> <label ng-if=\"showLabel\" class=\"control-label {{labelCss}}\"> {{ label }} <span ng-if=\"isRequired && !isReadonly\">*</span></label> <!--<div class=\"clearfix\">--> <div ng-transclude></div> <!--</div>--> <!-- validation --> <div class=\"pull-left\" ng-include=\"'validation.html'\"></div> </div> </div> <div ng-if=\"layout === 'horizontal'\" class=\"form-group\" ng-form=\"{{field}}\" ng-class=\"{ 'has-error': showError({{field}}) }\"> <label ng-if=\"showLabel\" class=\"control-label {{labelCss}}\"> {{ label }} <span ng-if=\"isRequired && !isReadonly\">*</span></label> <!--<div class=\"clearfix\">--> <div ng-transclude></div> <!--</div>--> <!-- validation --> <div class=\"pull-right\" ng-include=\"'validation.html'\"></div> </div> </div>"
+    "        </div></script> <div ng-if=\"layout === 'stacked'\" class=\"row\"> <div class=\"form-group clearfix\" ng-form=\"{{field}}\" ng-class=\"{ 'has-error': showError({{field}}) }\"> <div class=\"{{::layoutCss}}\"> <label ng-if=\"showLabel\" class=\"control-label {{labelCss}}\"> {{ label }} <span ng-if=\"isRequired && !isReadonly\">*</span></label> <ng-transclude></ng-transclude> <!-- validation --> <div class=\"pull-left\" ng-include=\"'validation.html'\"></div> </div> </div> </div> <div ng-if=\"layout === 'horizontal'\" class=\"row\"> <div class=\"form-group\" ng-form=\"{{field}}\" ng-class=\"{ 'has-error': showError({{field}}) }\"> <label ng-if=\"showLabel\" class=\"control-label {{labelCss}}\"> {{ label }} <span ng-if=\"isRequired && !isReadonly\">*</span></label> <ng-transclude></ng-transclude> <!-- validation --> <div class=\"pull-right\" ng-include=\"'validation.html'\"></div> </div> </div> <div ng-if=\"layout === 'grid'\" ng-form=\"{{field}}\" ng-class=\"{ 'has-error': showError({{field}}) }\"> <ng-transclude></ng-transclude> </div> </div>"
   );
 
 
@@ -986,8 +997,12 @@ angular.module('sds-angular-controls').run(['$templateCache', function($template
   );
 
 
-  $templateCache.put('sds-angular-controls/table-directives/fancy-grid.html',
-    "<div class=\"table-responsive\"> <!--<div class=\"btn-toolbar\">--> <!--<a ng-if=\"model.showAdvanced\" href=\"\" class=\"btn btn-default\" ng-click=\"model.clearFilters()\">Clear All Filters <span class=\"big-x\">&times;</span></a>--> <!--<div ng-if=\"!model.showAdvanced\" class=\"toolbar-input\">--> <!--<div class=\"form-group has-feedback\">--> <!--<input class=\"form-control\" type=\"text\" ng-model=\"model.filterText\"--> <!--placeholder=\"Filter {{label || 'items'}}\" on-enter=\"model.onEnter()\" />--> <!--<a href=\"\" ng-click=\"model.filterText = ''\" class=\"form-control-feedback feedback-link\">&times;</a>--> <!--</div>--> <!--</div>--> <!--<a href=\"\" ng-if=\"!hideAdvanced\" class=\"btn btn-default\"  ng-class=\"{active: model.showAdvanced}\" ng-click=\"model.showAdvanced = !model.showAdvanced\">Advanced Filtering</a>--> <ng-transclude></ng-transclude> <!--<p ng-show=\"data\"><i>{{model.resultCount.length}} {{label || 'items'}}</i></p>--> <!--</div>--> <table class=\"table table-hover {{className}}\"> <thead> <tr> <th ng-repeat=\"col in model.cols\"> <!--<div ng-if=\"model.showAdvanced && col.sortable\">--> <!--<input type=\"text\" class=\"form-control filter-input\" on-enter=\"model.onEnter()\" ng-model=\"col.filter\" placeholder=\"Filter {{col.name}}\"--> <!--tooltip=\"{{col.type ? 'Use a dash (-) to specify a range' : ''}}\"  tooltip-trigger=\"focus\" tooltip-placement=\"top\">--> <!--</div>--> <!--<a href=\"\" ng-if=\"col.sortable\"--> <!--ng-click=\"model.toggleSort($index)\">{{::col.name}}--> <!--<i class=\"fa\" ng-class=\"{--> <!--'fa-sort'     : model.sort !== $index,--> <!--'fa-sort-down': model.sort === $index &&  model.sortAsc,--> <!--'fa-sort-up'  : model.sort === $index && !model.sortAsc--> <!--}\"></i>--> <!--</a>--> <!--<span ng-if=\"!col.sortable\">--> {{::col.name || col.key}} <!--</span>-->    <tbody> <tr> <td ng-repeat=\"col in model.cols\" fancy-bind-cell>    </table> <!--<pagination ng-if=\"model.resultCount.length > model.pageSize\" total-items=\"model.resultCount.length\" items-per-page=\"model.pageSize\" max-size=\"10\" rotate=\"false\" ng-model=\"model.currentPage\"></pagination>--> </div>"
+  $templateCache.put('sds-angular-controls/table-directives/db-grid.html',
+    "<div class=\"table-responsive\"> <div class=\"btn-toolbar\"> <a ng-if=\"model.showAdvancedFilter\" href=\"\" class=\"btn btn-default\" ng-click=\"model.clearFilters()\">Clear All Filters <span class=\"big-x\">&times;</span></a> <div ng-if=\"!model.showAdvancedFilter && model.filterType !== 'none'\" class=\"toolbar-input\"> <div class=\"form-group has-feedback\"> <input class=\"form-control\" type=\"text\" ng-model=\"model.filterText\" placeholder=\"Filter {{label || 'items'}}\" on-enter=\"model.onEnter()\"> <a href=\"\" ng-click=\"model.filterText = ''\" class=\"form-control-feedback feedback-link\">&times;</a> </div> </div> <a href=\"\" ng-if=\"model.filterType === 'advanced'\" class=\"btn btn-default\" ng-class=\"{active: model.showAdvancedFilter}\" ng-click=\"model.showAdvancedFilter = !model.showAdvancedFilter\">Advanced Filtering</a> <ng-transclude></ng-transclude> <p ng-if=\"data && label\"><i>{{model.total}} {{label}}</i></p> </div> <table class=\"table table-hover {{layoutCss}}\"> <thead> <tr> <th ng-repeat=\"col in model.cols\" ng-style=\"{width: col.width}\"> <div ng-if=\"model.showAdvancedFilter && col.sortable\"> <input type=\"text\" class=\"form-control filter-input\" on-enter=\"model.onEnter()\" ng-keyup=\"model.refresh();\" ng-model=\"col.filter\" placeholder=\"Filter {{::col.name || col.key}}\" tooltip=\"{{col.type ? 'Use a dash (-) to specify a range' : ''}}\" tooltip-trigger=\"focus\" tooltip-placement=\"top\"> </div> <a href=\"\" ng-if=\"::col.sortable\" ng-click=\"model.toggleSort($index)\">{{::col.name || (col.key | labelCase) }} <i class=\"fa\" ng-class=\"{\n" +
+    "                         'fa-sort'     : model.sort !== $index,\n" +
+    "                         'fa-sort-down': model.sort === $index &&  model.sortAsc,\n" +
+    "                         'fa-sort-up'  : model.sort === $index && !model.sortAsc\n" +
+    "                         }\"></i> </a> <span ng-if=\"::!col.sortable\"> {{::col.name || (col.key | labelCase)}} </span>    <tbody> <tr> <td ng-repeat=\"col in model.cols\" db-bind-cell>   </table> <pagination ng-if=\"model.total > model.pageSize\" total-items=\"model.total\" items-per-page=\"model.pageSize\" max-size=\"10\" rotate=\"false\" ng-model=\"model.currentPage\"></pagination> </div>"
   );
 
 }]);

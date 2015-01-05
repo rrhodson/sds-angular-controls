@@ -2,27 +2,28 @@
 (function () {
     'use strict';
 
-    // for internal use only
+    // For internal use only. Manually binds a template using a provided template function, with a fallback to $compile.
+    // Needs to be extremely lightweight.
 
-    function fancyBindCell ($compile) {
+    function dbBindCell ($compile) {
         return{
             restrict: 'A',
-            link: function (scope, element, attr) {
+            link: function (scope, element) {
+
                 if (typeof scope.col.template === 'function'){
                     element.append(scope.col.template(scope));
-                }else{
+
+                }else if(!angular.element.trim(element.html())){
                     var html = angular.element('<span>' + scope.col.template  + '</span>');
                     var compiled = $compile(html) ;
                     element.append(html);
                     compiled(scope);
                     element.data('compiled', compiled);
-                    scope.$watch('row', function (val, old){
-                        element.data('compiled')(scope);
-                    });
+
                 }
             }
         }
     }
 
-    angular.module('sds-angular-controls').directive('fancyBindCell', fancyBindCell);
+    angular.module('sds-angular-controls').directive('dbBindCell', dbBindCell);
 })();

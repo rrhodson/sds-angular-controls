@@ -13,27 +13,22 @@
 <div class="container">
 
   <h1>Demo</h1>
+
     <div ng-controller="DemoCtrl as vm">
         <h3>Grid</h3>
-        <fancy-grid for="field in vm.gridItems">
-            <fancy-column key="name" bind="true"><input type="text" ng-model="field.name" /></fancy-column>
-            <fancy-column key="name" bind="true"></fancy-column>
-            <fancy-column key="name"></fancy-column>
-            <fancy-column key="age"></fancy-column>
-        </fancy-grid>
+        <form>
 
-        <!--
-
-        <fancy-grid for="field">
-            <fancy-api url="/my/api"></fancy-api>
-            <fancy-column key="name" bind="true"><input type="text" ng-model="field.name" />{{field.name}}</fancy-column>
-            <fancy-column key="name" bind="true"></fancy-column>
-            <fancy-column key="name"></fancy-column>
-            <fancy-column key="age"></fancy-column>
-        </fancy-grid>
-
-        -->
-
+        <db-grid for="field in vm.gridItems" page-size="4">
+            <db-col key="name" bind="true">
+                <form-field record="field" field="name" label="Name" layout="grid">
+                    <form-input type="text"></form-input>
+                </form-field>
+            </db-col>
+            <db-col key="name" bind="true" width="200px">{{field.name}}</db-col>
+            <db-col key="name">{{field.name}}</db-col>
+            <db-col key="age"></db-col>
+        </db-grid>
+        </form>
 
 
      <h3>Stacked Form</h3>

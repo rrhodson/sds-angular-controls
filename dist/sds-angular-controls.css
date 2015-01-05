@@ -89,3 +89,7 @@ input.datepicker+ul {
     margin-left:10px;
     display: inline-block;
 }
+
+table.table tbody>tr>td{
+    vertical-align: middle;
+}

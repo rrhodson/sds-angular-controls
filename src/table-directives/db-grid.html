@@ -1,0 +1,53 @@
+<div class="table-responsive">
+
+    <div class="btn-toolbar">
+        <a ng-if="model.showAdvancedFilter" href="" class="btn btn-default" ng-click="model.clearFilters()">Clear All Filters <span class="big-x">&times;</span></a>
+
+        <div ng-if="!model.showAdvancedFilter && model.filterType !== 'none'" class="toolbar-input">
+            <div class="form-group has-feedback">
+                <input class="form-control" type="text" ng-model="model.filterText"
+                       placeholder="Filter {{label || 'items'}}" on-enter="model.onEnter()" />
+                <a href="" ng-click="model.filterText = ''" class="form-control-feedback feedback-link">&times;</a>
+            </div>
+        </div>
+
+        <a href="" ng-if="model.filterType === 'advanced'" class="btn btn-default" ng-class="{active: model.showAdvancedFilter}"
+           ng-click="model.showAdvancedFilter = !model.showAdvancedFilter">Advanced Filtering</a>
+
+        <ng-transclude></ng-transclude>
+
+        <p ng-if="data && label"><i>{{model.total}} {{label}}</i></p>
+    </div>
+
+    <table class="table table-hover {{layoutCss}}" >
+        <thead>
+            <tr>
+                <th ng-repeat="col in model.cols" ng-style="{width: col.width}">
+                    <div ng-if="model.showAdvancedFilter && col.sortable">
+                        <input type="text" class="form-control filter-input" on-enter="model.onEnter()"
+                               ng-keyup="model.refresh();" ng-model="col.filter" placeholder="Filter {{::col.name || col.key}}"
+                               tooltip="{{col.type ? 'Use a dash (-) to specify a range' : ''}}"  tooltip-trigger="focus"
+                               tooltip-placement="top">
+                    </div>
+                    <a href="" ng-if="::col.sortable"
+                       ng-click="model.toggleSort($index)">{{::col.name || (col.key | labelCase) }}
+                        <i class="fa" ng-class="{
+                         'fa-sort'     : model.sort !== $index,
+                         'fa-sort-down': model.sort === $index &&  model.sortAsc,
+                         'fa-sort-up'  : model.sort === $index && !model.sortAsc
+                         }"></i>
+                    </a>
+                    <span ng-if="::!col.sortable">
+                        {{::col.name || (col.key | labelCase)}}
+                    </span>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td ng-repeat="col in model.cols" db-bind-cell></td>
+            </tr>
+        </tbody>
+    </table>
+    <pagination ng-if="model.total > model.pageSize" total-items="model.total" items-per-page="model.pageSize" max-size="10" rotate="false" ng-model="model.currentPage"></pagination>
+</div>
