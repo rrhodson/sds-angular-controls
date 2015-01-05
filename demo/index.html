@@ -14,6 +14,28 @@
 
   <h1>Demo</h1>
     <div ng-controller="DemoCtrl as vm">
+        <h3>Grid</h3>
+        <fancy-grid for="field in vm.gridItems">
+            <fancy-column key="name" bind="true"><input type="text" ng-model="field.name" /></fancy-column>
+            <fancy-column key="name" bind="true"></fancy-column>
+            <fancy-column key="name"></fancy-column>
+            <fancy-column key="age"></fancy-column>
+        </fancy-grid>
+
+        <!--
+
+        <fancy-grid for="field">
+            <fancy-api url="/my/api"></fancy-api>
+            <fancy-column key="name" bind="true"><input type="text" ng-model="field.name" />{{field.name}}</fancy-column>
+            <fancy-column key="name" bind="true"></fancy-column>
+            <fancy-column key="name"></fancy-column>
+            <fancy-column key="age"></fancy-column>
+        </fancy-grid>
+
+        -->
+
+
+
      <h3>Stacked Form</h3>
       <form name="testFrm" ng-submit="vm.save(testFrm)" novalidate>
           <form-field record="vm.testForm" field="FirstName" label="First Name" is-required="true">
