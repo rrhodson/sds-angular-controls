@@ -5,7 +5,7 @@
     'use strict';
     function formInput ($filter) {
         return{
-            restrict: 'EA',
+            restrict: 'E',
             require: '^formField',
             replace: true,
             scope: {

@@ -6,7 +6,7 @@
  */
 (function () {
     'use strict';
-    function formField ($filter) {
+    function formField ($filter, $timeout) {
         return{
             restrict: 'EA',
             transclude: true,
@@ -27,8 +27,7 @@
             },
             templateUrl: 'sds-angular-controls/form-directives/form-field.html',
             require: '^form',
-            controller: function($scope){
-
+            controller: function($scope, $element){
                 $scope.layout = $scope.layout || "stacked";
 
                 if(!$scope.label){
@@ -69,6 +68,13 @@
 
             },
             link: function($scope, element, attrs, form){
+                $scope.showDefault = false;
+                $timeout(function(){
+                    if($(element).find('ng-transclude *').length === 0){
+                        $scope.showDefault = true;
+                    }
+                }, 0);
+
                 $scope.showError = function(field){
                     try{
                         if(form.$submitted){
@@ -80,8 +86,9 @@
                     catch(err){
                         return false;
                     }
-                };
+                }
             }
+
         }
     }
 

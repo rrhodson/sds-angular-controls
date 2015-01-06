@@ -318,7 +318,7 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
  */
 (function () {
     'use strict';
-    function formField ($filter) {
+    function formField ($filter, $timeout) {
         return{
             restrict: 'EA',
             transclude: true,
@@ -339,8 +339,7 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
             },
             templateUrl: 'sds-angular-controls/form-directives/form-field.html',
             require: '^form',
-            controller: ["$scope", function($scope){
-
+            controller: ["$scope", "$element", function($scope, $element){
                 $scope.layout = $scope.layout || "stacked";
 
                 if(!$scope.label){
@@ -381,6 +380,13 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
 
             }],
             link: function($scope, element, attrs, form){
+                $scope.showDefault = false;
+                $timeout(function(){
+                    if($(element).find('ng-transclude *').length === 0){
+                        $scope.showDefault = true;
+                    }
+                }, 0);
+
                 $scope.showError = function(field){
                     try{
                         if(form.$submitted){
@@ -392,11 +398,12 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                     catch(err){
                         return false;
                     }
-                };
+                }
             }
+
         }
     }
-    formField.$inject = ["$filter"];
+    formField.$inject = ["$filter", "$timeout"];
 
     angular.module('sds-angular-controls').directive('formField', formField);
 })();
@@ -405,7 +412,7 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
     'use strict';
     function formInput ($filter) {
         return{
-            restrict: 'EA',
+            restrict: 'E',
             require: '^formField',
             replace: true,
             scope: {
@@ -1416,7 +1423,7 @@ angular.module('sds-angular-controls').run(['$templateCache', function($template
     "            <span class='control-label' ng-message='min'> {{ validationFieldName }} must be at least {{min}}. </span>\n" +
     "            <span class='control-label' ng-message='max'> {{ validationFieldName }} must not exceed {{max}} </span>\n" +
     "            <span class='control-label' ng-repeat='(k, v) in types' ng-message='{{k}}'> {{ validationFieldName }}{{v[1]}}</span>\n" +
-    "        </div></script> <div ng-if=\"layout === 'stacked'\" class=\"row\"> <div class=\"form-group clearfix\" ng-form=\"{{field}}\" ng-class=\"{ 'has-error': showError({{field}}) }\"> <div class=\"{{::layoutCss}}\"> <label ng-if=\"showLabel\" class=\"control-label {{labelCss}}\"> {{ label }} <span ng-if=\"isRequired && !isReadonly\">*</span></label> <ng-transclude></ng-transclude> <!-- validation --> <div class=\"pull-left\" ng-include=\"'validation.html'\"></div> </div> </div> </div> <div ng-if=\"layout === 'horizontal'\" class=\"row\"> <div class=\"form-group\" ng-form=\"{{field}}\" ng-class=\"{ 'has-error': showError({{field}}) }\"> <label ng-if=\"showLabel\" class=\"control-label {{labelCss}}\"> {{ label }} <span ng-if=\"isRequired && !isReadonly\">*</span></label> <ng-transclude></ng-transclude> <!-- validation --> <div class=\"pull-right\" ng-include=\"'validation.html'\"></div> </div> </div> <div ng-if=\"layout === 'grid'\" ng-form=\"{{field}}\" ng-class=\"{ 'has-error': showError({{field}}) }\"> <ng-transclude></ng-transclude> </div> </div>"
+    "        </div></script> <div ng-if=\"layout === 'stacked'\" class=\"row\"> <div class=\"form-group clearfix\" ng-form=\"{{field}}\" ng-class=\"{ 'has-error': showError({{field}}) }\"> <div class=\"{{::layoutCss}}\"> <label ng-if=\"showLabel\" class=\"control-label {{labelCss}}\"> {{ label }} <span ng-if=\"isRequired && !isReadonly\">*</span></label> <ng-transclude></ng-transclude> <div ng-if=\"showDefault\"><form-input></form-input></div> <!-- validation --> <div class=\"pull-left\" ng-include=\"'validation.html'\"></div> </div> </div> </div> <div ng-if=\"layout === 'horizontal'\" class=\"row\"> <div class=\"form-group\" ng-form=\"{{field}}\" ng-class=\"{ 'has-error': showError({{field}}) }\"> <label ng-if=\"showLabel\" class=\"control-label {{labelCss}}\"> {{ label }} <span ng-if=\"isRequired && !isReadonly\">*</span></label> <ng-transclude></ng-transclude> <div ng-if=\"showDefault\"><form-input></form-input></div> <!-- validation --> <div class=\"pull-right\" ng-include=\"'validation.html'\"></div> </div> </div> <div ng-if=\"layout === 'grid'\" ng-form=\"{{field}}\" ng-class=\"{ 'has-error': showError({{field}}) }\"> <ng-transclude></ng-transclude> <div ng-if=\"showDefault\"><form-input></form-input></div> </div> </div>"
   );
 
 
