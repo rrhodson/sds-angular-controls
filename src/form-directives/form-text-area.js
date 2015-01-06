@@ -6,7 +6,6 @@
     function formTextArea () {
         return{
             restrict: 'EA',
-            require: '^formField',
             replace: true,
             scope: {
                 log             : '@?',
@@ -15,30 +14,30 @@
                 isReadonly      : '=?'  //boolean
             },
             templateUrl: 'sds-angular-controls/form-directives/form-text-area.html',
-            link: function (scope, element, attr, formField) {
+            link: function (scope, element) {
                 // defaults
-
-                element.parent().scope().$watch('record', function(newVal, oldVal){
+                var parentScope = element.parent().scope();
+                parentScope.$watch('record', function(newVal, oldVal){
                     //formField.setValue(newVal[scope.field]);
                     scope.record = newVal;
                 });
 
-                element.parent().scope().$watch('field', function(newVal, oldVal){
+                parentScope.$watch('field', function(newVal, oldVal){
                     //formField.setValue(newVal[scope.field]);
                     scope.field = newVal;
                 });
 
-                element.parent().scope().$watch('isRequired', function(newVal, oldVal){
+                parentScope.$watch('isRequired', function(newVal, oldVal){
                     //formField.setValue(newVal[scope.field]);
                     scope.isRequired = newVal;
                 });
 
-                element.parent().scope().$watch('layout', function(newVal, oldVal){
+                parentScope.$watch('layout', function(newVal, oldVal){
                     //formField.setValue(newVal[scope.field]);
                     scope.layout = newVal;
                 });
 
-                element.parent().scope().$watch('label', function(newVal, oldVal){
+                parentScope.$watch('label', function(newVal, oldVal){
                     //formField.setValue(newVal[scope.field]);
                     scope.label = newVal;
                     scope.placeholder = scope.placeholder || newVal;

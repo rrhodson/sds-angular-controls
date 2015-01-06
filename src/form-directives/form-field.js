@@ -21,13 +21,23 @@
                 layout                  : '@?',
                 labelCss                : '@?',
                 layoutCss               : '@?',
+                showLabel               : '=?',
                 errorLayoutCss          : '@?',
                 hideValidationMessage   : '=?',  //default is false
                 validationFieldName       : '@?'  //to override the default label   '[validationFieldName]' is required
             },
             templateUrl: 'sds-angular-controls/form-directives/form-field.html',
             require: '^form',
-            controller: function($scope, $element){
+            link: function($scope, element, attrs, form){
+                //include a default form-input if no transclude included
+                $scope.showDefault = false;
+                $timeout(function(){
+                    if($(element).find('ng-transclude *').length === 0){
+                        $scope.showDefault = true;
+                    }
+                }, 0);
+                //end include
+
                 $scope.layout = $scope.layout || "stacked";
 
                 if(!$scope.label){
@@ -53,28 +63,7 @@
                     $scope.labelCss = $scope.labelCss || "col-md-2";
                 }
 
-                this.setValue = function(val){
-                    $scope.record[$scope.field] = val;
-                };
-
-
-                this.setMin = function (min){
-                    $scope.min = min;
-                };
-
-                this.setMax = function (max){
-                    $scope.max = max;
-                };
-
-            },
-            link: function($scope, element, attrs, form){
-                $scope.showDefault = false;
-                $timeout(function(){
-                    if($(element).find('ng-transclude *').length === 0){
-                        $scope.showDefault = true;
-                    }
-                }, 0);
-
+                //validation ie. on submit
                 $scope.showError = function(field){
                     try{
                         if(form.$submitted){
