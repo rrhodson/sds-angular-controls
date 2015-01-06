@@ -1,4 +1,4 @@
-/*! sds-angular-controls - v0.1.4 - 2015-01-05
+/*! sds-angular-controls - v0.2.0 - 2015-01-06
 * https://github.com/SMARTDATASYSTEMSLLC/sds-angular-controls
 * Copyright (c) 2015 Steve Gentile, David Benson; Licensed  */
 angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSanitize']);
@@ -320,9 +320,9 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                 label                   : '@' ,
                 rowClass                : '@?',
                 layout                  : '@?',
-                labelCss                : '@?', //default col-sm-3
+                labelCss                : '@?',
                 layoutCss               : '@?',
-                errorLayoutCss          : '@?', //default col-sm-4
+                errorLayoutCss          : '@?',
                 hideValidationMessage   : '=?',  //default is false
                 validationFieldName       : '@?'  //to override the default label   '[validationFieldName]' is required
             },
@@ -337,15 +337,15 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                     $scope.label = $filter("labelCase")($scope.field);
                 }
 
-                $scope.validationFieldName = $scope.validationFieldName || $filter("labelCase")($scope.field);
+                $scope.validationFieldName = $scope.validationFieldName || $filter("labelCase")($scope.label);
 
 
                 $scope.showLabel = $scope.showLabel !== false; // default to true
                 $scope.hideValidationMessage = $scope.hideValidationMessage || false;
                 $scope.isRequired = $scope.isRequired || false;
                 $scope.isReadonly = $scope.isReadonly || false;
-                $scope.layoutCss = $scope.layoutCss || "col-md-4";
-                $scope.errorLayoutCss = $scope.errorLayoutCss || "col-md-4";
+                $scope.layoutCss = $scope.layoutCss || "col-md-12";
+                $scope.errorLayoutCss = $scope.errorLayoutCss || "col-md-12";
 
                 if($scope.layout === "horizontal"){
                     $scope.labelCss = $scope.labelCss || "col-md-2";

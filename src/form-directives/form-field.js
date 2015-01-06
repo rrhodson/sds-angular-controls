@@ -19,9 +19,9 @@
                 label                   : '@' ,
                 rowClass                : '@?',
                 layout                  : '@?',
-                labelCss                : '@?', //default col-sm-3
+                labelCss                : '@?',
                 layoutCss               : '@?',
-                errorLayoutCss          : '@?', //default col-sm-4
+                errorLayoutCss          : '@?',
                 hideValidationMessage   : '=?',  //default is false
                 validationFieldName       : '@?'  //to override the default label   '[validationFieldName]' is required
             },
@@ -36,15 +36,15 @@
                     $scope.label = $filter("labelCase")($scope.field);
                 }
 
-                $scope.validationFieldName = $scope.validationFieldName || $filter("labelCase")($scope.field);
+                $scope.validationFieldName = $scope.validationFieldName || $filter("labelCase")($scope.label);
 
 
                 $scope.showLabel = $scope.showLabel !== false; // default to true
                 $scope.hideValidationMessage = $scope.hideValidationMessage || false;
                 $scope.isRequired = $scope.isRequired || false;
                 $scope.isReadonly = $scope.isReadonly || false;
-                $scope.layoutCss = $scope.layoutCss || "col-md-4";
-                $scope.errorLayoutCss = $scope.errorLayoutCss || "col-md-4";
+                $scope.layoutCss = $scope.layoutCss || "col-md-12";
+                $scope.errorLayoutCss = $scope.errorLayoutCss || "col-md-12";
 
                 if($scope.layout === "horizontal"){
                     $scope.labelCss = $scope.labelCss || "col-md-2";
