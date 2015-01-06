@@ -62,7 +62,7 @@
                 var loop = $attrs.for.split(' ');
                 $scope.rowName = loop[0];
                 if (loop[2]) {
-                    $element.parent().scope().$watch(loop[2], function (items) {
+                    $element.parent().scope().$watch(loop.slice(2).join(' '), function (items) {
                         $scope.model.items = items;
                         refresh();
                     });

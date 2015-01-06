@@ -21,7 +21,7 @@
             restrict: 'E',
             require: '^dbGrid',
             compile:function(tElement){
-                var templateText = tElement.html();
+                var templateText = tElement.html().trim();
                 tElement.empty();
 
                 return function (scope, element, attr, dbGrid) {
@@ -41,7 +41,7 @@
                         width: attr.width,
                         key: attr.key,
                         label: attr.label,
-                        sortable: attr.sortable !== 'false',
+                        sortable:  attr.sortable === 'false' ? false : !!attr.key,
                         type: attr.type,
                         bind: attr.bind === 'true',
                         template: templateFunc
