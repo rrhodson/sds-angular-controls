@@ -23,10 +23,32 @@
             templateUrl: 'sds-angular-controls/form-directives/form-input.html',
             link: function (scope, element, attr, formField) {
                 // defaults
-                scope.record     = formField.getRecord();
-                scope.field      = formField.getField();
-                scope.isRequired = formField.getRequired();
-                scope.layout     = formField.getLayout();
+
+                element.parent().scope().$watch('record', function(newVal, oldVal){
+                    //formField.setValue(newVal[scope.field]);
+                    scope.record = newVal;
+                });
+
+                element.parent().scope().$watch('field', function(newVal, oldVal){
+                    //formField.setValue(newVal[scope.field]);
+                    scope.field = newVal;
+                });
+
+                element.parent().scope().$watch('isRequired', function(newVal, oldVal){
+                    //formField.setValue(newVal[scope.field]);
+                    scope.isRequired = newVal;
+                });
+
+                element.parent().scope().$watch('layout', function(newVal, oldVal){
+                    //formField.setValue(newVal[scope.field]);
+                    scope.layout = newVal;
+                });
+
+                element.parent().scope().$watch('label', function(newVal, oldVal){
+                    //formField.setValue(newVal[scope.field]);
+                    scope.label = newVal;
+                    scope.placeholder = scope.placeholder || newVal;
+                });
 
                 scope.isReadonly = scope.isReadonly || false;
 
@@ -50,17 +72,15 @@
                         scope.layoutCss = scope.layoutCss || "col-md-4";
                 }
 
-                scope.placeholder = scope.placeholder ||  $filter("labelCase")(scope.field);
+
+
 
                 scope.$watch("isReadonly", function(newVal, oldVal){
-                    if(newVal !== oldVal){
-                        checkIfReadonly();
+                    if(newVal && oldVal) {
+                        if (newVal !== oldVal) {
+                            checkIfReadonly();
+                        }
                     }
-                });
-
-                scope.$watch("record", function(newVal, oldVal){
-                    formField.setValue(newVal[scope.field]);
-                    checkIfReadonly();
                 });
 
                 function checkIfReadonly(){
