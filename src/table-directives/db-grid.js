@@ -15,7 +15,7 @@
      * @param {int}        pageSize  - The page size, defaults to 25. Bound once.
      * @param {expression} for       - Required. Either 'item in items' or (when used with a custom data source) just 'item'
      */
-    function dbGrid ($filter, $timeout) {
+    function dbGrid ($filter, $timeout, $q) {
         return {
             restrict: 'E',
             replace: true,
@@ -62,16 +62,18 @@
                 var loop = $attrs.for.split(' ');
                 $scope.rowName = loop[0];
                 if (loop[2]) {
-                    $element.parent().scope().$watch(loop[2], function (items) {
+                    $element.parent().scope().$watch(loop.slice(2).join(' '), function (items) {
                         $scope.model.items = items;
                         refresh();
                     });
                 }
 
                 function defaultGetItems (filter, sortKey, sortAsc, page, pageSize, cols){
+                    var deferred = $q.defer();
                     var items = orderByFilter(complexFilter($scope.model.items, filter), sortKey, sortAsc);
                     $scope.model.total = items.length;
-                    return pageFilter(items, page, pageSize);
+                    deferred.resolve(pageFilter(items, page, pageSize));
+                    return deferred.promise;
                 }
 
                 function toggleSort(index){
@@ -99,16 +101,18 @@
                     }
                 }
 
-                function refresh(val, old) {
+                function refresh() {
                     $timeout(function () {
-                        $scope.model.filteredItems = $scope.model.getItems(
+                        $scope.model.getItems(
                             $scope.model.showAdvancedFilter ? $scope.model.cols : $scope.model.filterText,
                             $scope.model.sort ? $scope.model.cols[$scope.model.sort].key : null,
                             $scope.model.sortAsc,
                             $scope.model.currentPage - 1,
                             $scope.model.pageSize,
                             $scope.model.cols
-                        );
+                        ).then(function (result){
+                            $scope.model.filteredItems = result;
+                        });
                     });
                 }
 

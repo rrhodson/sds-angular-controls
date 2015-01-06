@@ -19,7 +19,6 @@
                     element.append(html);
                     compiled(scope);
                     element.data('compiled', compiled);
-
                 }
             }
         }

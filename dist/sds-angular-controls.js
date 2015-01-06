@@ -1,4 +1,4 @@
-/*! sds-angular-controls - v0.2.0 - 2015-01-06
+/*! sds-angular-controls - v0.2.2 - 2015-01-06
 * https://github.com/SMARTDATASYSTEMSLLC/sds-angular-controls
 * Copyright (c) 2015 Steve Gentile, David Benson; Licensed  */
 angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSanitize']);
@@ -182,7 +182,11 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
 
   function labelCase (){
     return function (input) {
-      input = input.replace(/([A-Z])/g, ' $1');
+
+      if (input === null || input === undefined || input === ''){
+          input = ' ';
+      }
+      input = (input + '').replace(/([A-Z])/g, ' $1');
       return input[0].toUpperCase() + input.slice(1);
     };
   }
@@ -727,6 +731,168 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
 (function () {
     'use strict';
 
+    function dataSourceVelocity () {
+        return{
+            restrict: 'E',
+            require: '^dbGrid',
+            scope:{
+                api: '@',
+                postParams: '='
+            },
+            link: function (scope, element, attr, dbGrid) {
+
+                function capitalize (str){
+                    return str.charAt(0).toUpperCase() + str.slice(1);
+                }
+
+                function getData(filter, sortKey, sortAsc, currentPage, pageSize, cols){
+                    var query = {
+                        page: currentPage,
+                        pageSize: pageSize,
+                        sort: [
+                            {
+                                field: capitalize(sortKey),
+                                direction: sortAsc ? '' : 'desc'
+                            }
+                        ],
+                        filter: createFilters(filter, cols)
+                    };
+                    _.extend(query, scope.postParams);
+
+                    return $http.post(scope.api, query).then(function (response) {
+                        dbGrid.setTotal(response.data.total);
+                        return response.data.tableData;
+                    });
+
+                }
+
+                function createFilters (filter, cols){
+                    var result = {filters: []};
+                    var dateRangeRegex = /^(\s*(\d+[-/]){2}[^-]*)-(\s*(\d+[-/]){2}[^-]*)$/;
+
+                    if (typeof filter === 'object'){
+                        var n;
+                        result.logic = 'and';
+                        result.filters = _.reduce(cols, function (r, item){
+                            if (item.key && item.filter && item.type === 'number' && item.filter.indexOf('-') > 0){
+                                n = item.filter.split('-');
+                                if(!n[0] && n[1]){
+                                    n.slice(0,1);
+                                    n[0] *= -1;
+                                }
+                                if(!n[1] && n[2]){
+                                    n.slice(1,1);
+                                    n[1] *= -1;
+                                }
+                                if (_.isNumber(n[0]) && _.isNumber(n[1])) {
+                                    r.push({
+                                        fieldType: 'decimal',
+                                        fieldOperator: 'gte',
+                                        fieldValue: parseFloat(n[0]),
+                                        field: capitalize(item.key)
+                                    });
+                                    r.push({
+                                        fieldType: 'decimal',
+                                        fieldOperator: 'lte',
+                                        fieldValue: parseFloat(n[1]),
+                                        field: capitalize(item.key)
+                                    });
+                                }
+
+                            }else if (item.key && item.filter && item.type === 'date' && dateRangeRegex.test(item.filter)){
+                                n = dateRangeRegex.exec(item.filter);
+
+                                if (moment(n[1]).isValid() && moment(n[3]).isValid()) {
+                                    r.push({
+                                        fieldType: 'date',
+                                        fieldOperator: 'gte',
+                                        fieldValue: n[0],
+                                        field: capitalize(item.key)
+                                    });
+                                    r.push({
+                                        fieldType: 'date',
+                                        fieldOperator: 'lte',
+                                        fieldValue: n[1],
+                                        field: capitalize(item.key)
+                                    });
+                                }
+                            }else if (item.key && item.filter && item.type === 'number'){
+                                if (_.isNumber(item.filter)) {
+                                    r.push({
+                                        fieldType: 'decimal',
+                                        fieldOperator: 'eq',
+                                        fieldValue: parseFloat(item.filter),
+                                        field: capitalize(item.key)
+                                    });
+                                }
+                            }else if (item.key && item.filter && item.type === 'date'){
+                                if (moment(item.filter).isValid()) {
+                                    r.push({
+                                        fieldType: 'date',
+                                        fieldOperator: 'eq',
+                                        fieldValue: item.filter,
+                                        field: capitalize(item.key)
+                                    });
+                                }
+                            }else if (item.key && item.filter){
+                                r.push({
+                                    fieldType:'string',
+                                    fieldOperator:'contains',
+                                    fieldValue: item.filter,
+                                    field: capitalize(item.key)
+                                });
+                            }
+
+                            return r;
+                        }, []);
+                    }else if (typeof filter === 'string' && filter){
+                        result.logic = 'or';
+                        result.filters = _.reduce(cols, function (r, item){
+                            if (item.key && item.sortable && item.type === 'number'){
+                                if (_.isNumber(filter)) {
+                                    r.push({
+                                        fieldType: 'decimal',
+                                        fieldOperator: 'eq',
+                                        fieldValue: parseFloat(filter),
+                                        field: capitalize(item.key)
+                                    });
+                                }
+                            }else if (item.key && item.sortable && item.type === 'date'){
+                                if (moment(filter).isValid()) {
+                                    r.push({
+                                        fieldType: 'date',
+                                        fieldOperator: 'eq',
+                                        fieldValue: filter,
+                                        field: capitalize(item.key)
+                                    });
+                                }
+                            }else if (item.key && item.sortable){
+                                r.push({
+                                    fieldType:'string',
+                                    fieldOperator:'contains',
+                                    fieldValue: filter,
+                                    field: capitalize(item.key)
+                                });
+                            }
+                            return r;
+                        }, []);
+                    }
+                    return result;
+                }
+
+                dbGrid.setDataSource(getData);
+            }
+
+        }
+    }
+
+    angular.module('sds-angular-controls').directive('dataSourceVelocity', dataSourceVelocity);
+})();
+
+
+(function () {
+    'use strict';
+
     // For internal use only. Manually binds a template using a provided template function, with a fallback to $compile.
     // Needs to be extremely lightweight.
 
@@ -744,7 +910,6 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                     element.append(html);
                     compiled(scope);
                     element.data('compiled', compiled);
-
                 }
             }
         }
@@ -777,7 +942,7 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
             restrict: 'E',
             require: '^dbGrid',
             compile:function(tElement){
-                var templateText = tElement.html();
+                var templateText = tElement.html().trim();
                 tElement.empty();
 
                 return function (scope, element, attr, dbGrid) {
@@ -797,7 +962,7 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                         width: attr.width,
                         key: attr.key,
                         label: attr.label,
-                        sortable: attr.sortable !== 'false',
+                        sortable:  attr.sortable === 'false' ? false : !!attr.key,
                         type: attr.type,
                         bind: attr.bind === 'true',
                         template: templateFunc
@@ -828,7 +993,7 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
      * @param {int}        pageSize  - The page size, defaults to 25. Bound once.
      * @param {expression} for       - Required. Either 'item in items' or (when used with a custom data source) just 'item'
      */
-    function dbGrid ($filter, $timeout) {
+    function dbGrid ($filter, $timeout, $q) {
         return {
             restrict: 'E',
             replace: true,
@@ -875,16 +1040,18 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                 var loop = $attrs.for.split(' ');
                 $scope.rowName = loop[0];
                 if (loop[2]) {
-                    $element.parent().scope().$watch(loop[2], function (items) {
+                    $element.parent().scope().$watch(loop.slice(2).join(' '), function (items) {
                         $scope.model.items = items;
                         refresh();
                     });
                 }
 
                 function defaultGetItems (filter, sortKey, sortAsc, page, pageSize, cols){
+                    var deferred = $q.defer();
                     var items = orderByFilter(complexFilter($scope.model.items, filter), sortKey, sortAsc);
                     $scope.model.total = items.length;
-                    return pageFilter(items, page, pageSize);
+                    deferred.resolve(pageFilter(items, page, pageSize));
+                    return deferred.promise;
                 }
 
                 function toggleSort(index){
@@ -912,16 +1079,18 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                     }
                 }
 
-                function refresh(val, old) {
+                function refresh() {
                     $timeout(function () {
-                        $scope.model.filteredItems = $scope.model.getItems(
+                        $scope.model.getItems(
                             $scope.model.showAdvancedFilter ? $scope.model.cols : $scope.model.filterText,
                             $scope.model.sort ? $scope.model.cols[$scope.model.sort].key : null,
                             $scope.model.sortAsc,
                             $scope.model.currentPage - 1,
                             $scope.model.pageSize,
                             $scope.model.cols
-                        );
+                        ).then(function (result){
+                            $scope.model.filteredItems = result;
+                        });
                     });
                 }
 
@@ -945,7 +1114,7 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
             }]
         };
     }
-    dbGrid.$inject = ["$filter", "$timeout"];
+    dbGrid.$inject = ["$filter", "$timeout", "$q"];
 
     angular.module('sds-angular-controls').directive('dbGrid', dbGrid);
 
@@ -998,11 +1167,11 @@ angular.module('sds-angular-controls').run(['$templateCache', function($template
 
 
   $templateCache.put('sds-angular-controls/table-directives/db-grid.html',
-    "<div class=\"table-responsive\"> <div class=\"btn-toolbar\"> <a ng-if=\"model.showAdvancedFilter\" href=\"\" class=\"btn btn-default\" ng-click=\"model.clearFilters()\">Clear All Filters <span class=\"big-x\">&times;</span></a> <div ng-if=\"!model.showAdvancedFilter && model.filterType !== 'none'\" class=\"toolbar-input\"> <div class=\"form-group has-feedback\"> <input class=\"form-control\" type=\"text\" ng-model=\"model.filterText\" placeholder=\"Filter {{label || 'items'}}\" on-enter=\"model.onEnter()\"> <a href=\"\" ng-click=\"model.filterText = ''\" class=\"form-control-feedback feedback-link\">&times;</a> </div> </div> <a href=\"\" ng-if=\"model.filterType === 'advanced'\" class=\"btn btn-default\" ng-class=\"{active: model.showAdvancedFilter}\" ng-click=\"model.showAdvancedFilter = !model.showAdvancedFilter\">Advanced Filtering</a> <ng-transclude></ng-transclude> <p ng-if=\"data && label\"><i>{{model.total}} {{label}}</i></p> </div> <table class=\"table table-hover {{layoutCss}}\"> <thead> <tr> <th ng-repeat=\"col in model.cols\" ng-style=\"{width: col.width}\"> <div ng-if=\"model.showAdvancedFilter && col.sortable\"> <input type=\"text\" class=\"form-control filter-input\" on-enter=\"model.onEnter()\" ng-keyup=\"model.refresh();\" ng-model=\"col.filter\" placeholder=\"Filter {{::col.name || col.key}}\" tooltip=\"{{col.type ? 'Use a dash (-) to specify a range' : ''}}\" tooltip-trigger=\"focus\" tooltip-placement=\"top\"> </div> <a href=\"\" ng-if=\"::col.sortable\" ng-click=\"model.toggleSort($index)\">{{::col.name || (col.key | labelCase) }} <i class=\"fa\" ng-class=\"{\n" +
+    "<div class=\"table-responsive\"> <div class=\"btn-toolbar\"> <a ng-if=\"model.showAdvancedFilter\" href=\"\" class=\"btn btn-default\" ng-click=\"model.clearFilters()\">Clear All Filters <span class=\"big-x\">&times;</span></a> <div ng-if=\"!model.showAdvancedFilter && model.filterType !== 'none'\" class=\"toolbar-input\"> <div class=\"form-group has-feedback\"> <input class=\"form-control\" type=\"text\" ng-model=\"model.filterText\" placeholder=\"Filter {{label || 'items'}}\" on-enter=\"model.onEnter()\"> <a href=\"\" ng-click=\"model.filterText = ''\" class=\"form-control-feedback feedback-link\">&times;</a> </div> </div> <a href=\"\" ng-if=\"model.filterType === 'advanced'\" class=\"btn btn-default\" ng-class=\"{active: model.showAdvancedFilter}\" ng-click=\"model.showAdvancedFilter = !model.showAdvancedFilter\">Advanced Filtering</a> <ng-transclude></ng-transclude> <p ng-if=\"data && label\"><i>{{model.total}} {{label}}</i></p> </div> <table class=\"table table-hover {{layoutCss}}\"> <thead> <tr> <th ng-repeat=\"col in model.cols\" ng-style=\"{width: col.width}\"> <div ng-if=\"model.showAdvancedFilter && col.sortable\"> <input type=\"text\" class=\"form-control filter-input\" on-enter=\"model.onEnter()\" ng-keyup=\"model.refresh();\" ng-model=\"col.filter\" placeholder=\"Filter {{::col.label || col.key}}\" tooltip=\"{{col.type ? 'Use a dash (-) to specify a range' : ''}}\" tooltip-trigger=\"focus\" tooltip-placement=\"top\"> </div> <a href=\"\" ng-if=\"::col.sortable\" ng-click=\"model.toggleSort($index)\">{{::col.label || (col.key | labelCase) }} <i class=\"fa\" ng-class=\"{\n" +
     "                         'fa-sort'     : model.sort !== $index,\n" +
     "                         'fa-sort-down': model.sort === $index &&  model.sortAsc,\n" +
     "                         'fa-sort-up'  : model.sort === $index && !model.sortAsc\n" +
-    "                         }\"></i> </a> <span ng-if=\"::!col.sortable\"> {{::col.name || (col.key | labelCase)}} </span>    <tbody> <tr> <td ng-repeat=\"col in model.cols\" db-bind-cell>   </table> <pagination ng-if=\"model.total > model.pageSize\" total-items=\"model.total\" items-per-page=\"model.pageSize\" max-size=\"10\" rotate=\"false\" ng-model=\"model.currentPage\"></pagination> </div>"
+    "                         }\"></i> </a> <span ng-if=\"::!col.sortable\"> {{::col.label || (col.key | labelCase)}} </span>    <tbody> <tr> <td ng-repeat=\"col in model.cols\" db-bind-cell>   </table> <pagination ng-if=\"model.total > model.pageSize\" total-items=\"model.total\" items-per-page=\"model.pageSize\" max-size=\"10\" rotate=\"false\" ng-model=\"model.currentPage\"></pagination> </div>"
   );
 
 }]);
