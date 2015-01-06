@@ -3,68 +3,6 @@
 * Copyright (c) 2015 Steve Gentile, David Benson; Licensed  */
 angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSanitize']);
 
-(function () {
-    'use strict';
-    function autoNumeric (){
-        var options = {};
-        return {
-            require: '?ngModel', // Require ng-model in the element attribute for watching changes.
-            restrict: 'A',
-            compile: function (tElm, tAttrs) {
-                //ref: https://gist.github.com/kwokhou/5964296
-                //autonumeric: https://github.com/BobKnothe/autoNumeric
-
-                var isTextInput = tElm.is('input:text');
-
-                return function (scope, elm, attrs, controller) {
-                    // Get instance-specific options.
-                    var opts = angular.extend({}, options, scope.$eval(attrs.autoNumeric));
-
-                    // Helper method to update autoNumeric with new value.
-                    var updateElement = function (element, newVal) {
-                        // Only set value if value is numeric
-                        if ($.isNumeric(newVal)) {
-                            element.autoNumeric('set', newVal);
-                        }
-                    };
-
-                    // Initialize element as autoNumeric with options.
-                    elm.autoNumeric(opts);
-
-                    // if element has controller, wire it (only for <input type="text" />)
-                    if (controller && isTextInput) {
-                        // watch for external changes to model and re-render element
-                        scope.$watch(tAttrs.ngModel, function (current, old) {
-                            controller.$render();
-                        });
-                        // render element as autoNumeric
-                        controller.$render = function () {
-                            updateElement(elm, controller.$viewValue);
-                        };
-                        // Detect changes on element and update model.
-                        elm.on('change', function (e) {
-                            scope.$apply(function () {
-                                controller.$setViewValue(elm.autoNumeric('get'));
-                            });
-                        });
-                    }
-                    else {
-                        // Listen for changes to value changes and re-render element.
-                        // Useful when binding to a readonly input field.
-                        if (isTextInput) {
-                            attrs.$observe('value', function (val) {
-                                updateElement(elm, val);
-                            });
-                        }
-                    }
-                };
-            } // compile
-        };
-    }
-
-    angular.module('sds-angular-controls').directive('autoNumeric',autoNumeric);
-})();
-
 (function (){
   'use strict';
 
@@ -238,6 +176,67 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
     angular.module('sds-angular-controls').filter('unsafe', unsafe);
 })();
 
+(function () {
+    'use strict';
+    function autoNumeric (){
+        var options = {};
+        return {
+            require: '?ngModel', // Require ng-model in the element attribute for watching changes.
+            restrict: 'A',
+            compile: function (tElm, tAttrs) {
+                //ref: https://gist.github.com/kwokhou/5964296
+                //autonumeric: https://github.com/BobKnothe/autoNumeric
+
+                var isTextInput = tElm.is('input:text');
+
+                return function (scope, elm, attrs, controller) {
+                    // Get instance-specific options.
+                    var opts = angular.extend({}, options, scope.$eval(attrs.autoNumeric));
+
+                    // Helper method to update autoNumeric with new value.
+                    var updateElement = function (element, newVal) {
+                        // Only set value if value is numeric
+                        if ($.isNumeric(newVal)) {
+                            element.autoNumeric('set', newVal);
+                        }
+                    };
+
+                    // Initialize element as autoNumeric with options.
+                    elm.autoNumeric(opts);
+
+                    // if element has controller, wire it (only for <input type="text" />)
+                    if (controller && isTextInput) {
+                        // watch for external changes to model and re-render element
+                        scope.$watch(tAttrs.ngModel, function (current, old) {
+                            controller.$render();
+                        });
+                        // render element as autoNumeric
+                        controller.$render = function () {
+                            updateElement(elm, controller.$viewValue);
+                        };
+                        // Detect changes on element and update model.
+                        elm.on('change', function (e) {
+                            scope.$apply(function () {
+                                controller.$setViewValue(elm.autoNumeric('get'));
+                            });
+                        });
+                    }
+                    else {
+                        // Listen for changes to value changes and re-render element.
+                        // Useful when binding to a readonly input field.
+                        if (isTextInput) {
+                            attrs.$observe('value', function (val) {
+                                updateElement(elm, val);
+                            });
+                        }
+                    }
+                };
+            } // compile
+        };
+    }
+
+    angular.module('sds-angular-controls').directive('autoNumeric',autoNumeric);
+})();
 
 (function () {
     'use strict';
@@ -340,8 +339,7 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
             },
             templateUrl: 'sds-angular-controls/form-directives/form-field.html',
             require: '^form',
-            controller: ["$scope", "$element", "$attrs", function($scope, $element, $attrs){
-
+            controller: ["$scope", function($scope){
 
                 $scope.layout = $scope.layout || "stacked";
 
@@ -368,29 +366,23 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                     $scope.labelCss = $scope.labelCss || "col-md-2";
                 }
 
-                //this.getRecord = function(){
-                //    return $scope.record;
-                //};
-                //
-                //this.getField = function() {
-                //    return $scope.field;
-                //};
-                //
-                //this.getRequired = function() {
-                //    return $scope.isRequired;
-                //};
-                //
-                //this.getLayout = function() {
-                //    return $scope.layout;
-                //};
-
                 this.setValue = function(val){
                     $scope.record[$scope.field] = val;
                 };
 
+
+                this.setMin = function (min){
+                    $scope.min = min;
+                };
+
+                this.setMax = function (max){
+                    $scope.max = max;
+                };
+
+            }],
+            link: function($scope, element, attrs, form){
                 $scope.showError = function(field){
                     try{
-                        var form = $($element).closest("form");
                         if(form.$submitted){
                             return field.$invalid;
                         }else {
@@ -401,16 +393,7 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                         return false;
                     }
                 };
-
-                this.setMin = function (min){
-                    $scope.min = min;
-                };
-
-                this.setMax = function (max){
-                    $scope.max = max;
-                };
-
-            }]
+            }
         }
     }
     formField.$inject = ["$filter"];
@@ -434,8 +417,8 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                 min             : '@?',
                 type            : '@',  //text, email, number etc.. see the InputTypes
                 layoutCss       : '@?', //default col-md-6
-                isReadonly      : '=?',  //boolean
-                isNumeric       : '=?'
+                rightLabel      : '@?',
+                isReadonly      : '=?'  //boolean
             },
             templateUrl: 'sds-angular-controls/form-directives/form-input.html',
             link: function (scope, element, attr, formField) {
@@ -471,7 +454,6 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
 
                 scope.log = scope.log || false;
                 scope.type = scope.type || "text";
-
 
                 if(scope.min) {
                     formField.setMin(scope.min);
@@ -513,6 +495,89 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
     formInput.$inject = ["$filter"];
 
     angular.module('sds-angular-controls').directive('formInput', formInput);
+})();
+
+(function () {
+    'use strict';
+    function formNumericInput ($filter) {
+        return{
+            restrict: 'EA',
+            require: ['^formField'],
+            replace: true,
+            scope: {
+                log             : '@?',
+                placeholder     : '@?',
+                style           : '@?',
+                layoutCss       : '@?', //default col-md-6
+                rightLabel      : '@?',
+                isReadonly      : '=?'  //boolean
+            },
+            templateUrl: 'sds-angular-controls/form-directives/form-numeric-input.html',
+            link: function (scope, element, attr, formField) {
+                // defaults
+
+                element.parent().scope().$watch('record', function(newVal, oldVal){
+                    //formField.setValue(newVal[scope.field]);
+                    scope.record = newVal;
+                });
+
+                element.parent().scope().$watch('field', function(newVal, oldVal){
+                    //formField.setValue(newVal[scope.field]);
+                    scope.field = newVal;
+                });
+
+                element.parent().scope().$watch('isRequired', function(newVal, oldVal){
+                    //formField.setValue(newVal[scope.field]);
+                    scope.isRequired = newVal;
+                });
+
+                element.parent().scope().$watch('layout', function(newVal, oldVal){
+                    //formField.setValue(newVal[scope.field]);
+                    scope.layout = newVal;
+                });
+
+                element.parent().scope().$watch('label', function(newVal, oldVal){
+                    //formField.setValue(newVal[scope.field]);
+                    scope.label = newVal;
+                    scope.placeholder = scope.placeholder || newVal;
+                });
+
+                scope.isReadonly = scope.isReadonly || false;
+
+                scope.log = scope.log || false;
+
+                switch(scope.layout){
+                    case "horizontal":
+                        scope.layoutCss = scope.layoutCss || "col-md-6";
+                        break;
+                    default: //stacked
+                        scope.layoutCss = scope.layoutCss || "col-md-4";
+                }
+
+
+
+
+                scope.$watch("isReadonly", function(newVal, oldVal){
+                    if(newVal && oldVal) {
+                        if (newVal !== oldVal) {
+                            checkIfReadonly();
+                        }
+                    }
+                });
+
+                function checkIfReadonly(){
+                    if(scope.isReadonly) {
+                        if (scope.fieldType === 'toggle') {
+                            scope.readOnlyModel = scope.record[scope.field];
+                        }
+                    }
+                }
+            }
+        }
+    }
+    formNumericInput.$inject = ["$filter"];
+
+    angular.module('sds-angular-controls').directive('formNumericInput', formNumericInput);
 })();
 
 (function () {
@@ -631,6 +696,161 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
 
 (function () {
     'use strict';
+    function formTextArea () {
+        return{
+            restrict: 'EA',
+            require: '^formField',
+            replace: true,
+            scope: {
+                log             : '@?',
+                style           : '@?',
+                layoutCss       : '@?', //default col-md-6
+                isReadonly      : '=?'  //boolean
+            },
+            templateUrl: 'sds-angular-controls/form-directives/form-text-area.html',
+            link: function (scope, element, attr, formField) {
+                // defaults
+
+                element.parent().scope().$watch('record', function(newVal, oldVal){
+                    //formField.setValue(newVal[scope.field]);
+                    scope.record = newVal;
+                });
+
+                element.parent().scope().$watch('field', function(newVal, oldVal){
+                    //formField.setValue(newVal[scope.field]);
+                    scope.field = newVal;
+                });
+
+                element.parent().scope().$watch('isRequired', function(newVal, oldVal){
+                    //formField.setValue(newVal[scope.field]);
+                    scope.isRequired = newVal;
+                });
+
+                element.parent().scope().$watch('layout', function(newVal, oldVal){
+                    //formField.setValue(newVal[scope.field]);
+                    scope.layout = newVal;
+                });
+
+                element.parent().scope().$watch('label', function(newVal, oldVal){
+                    //formField.setValue(newVal[scope.field]);
+                    scope.label = newVal;
+                    scope.placeholder = scope.placeholder || newVal;
+                });
+
+                scope.isReadonly = scope.isReadonly || false;
+
+                scope.log = scope.log || false;
+                scope.type = scope.type || "text";
+
+                scope.layoutCss = scope.layoutCss || "col-md-6";
+
+
+
+                scope.$watch("isReadonly", function(newVal, oldVal){
+                    if(newVal && oldVal) {
+                        if (newVal !== oldVal) {
+                            checkIfReadonly();
+                        }
+                    }
+                });
+
+                function checkIfReadonly(){
+                    if(scope.isReadonly) {
+                        if (scope.fieldType === 'toggle') {
+                            scope.readOnlyModel = scope.record[scope.field];
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    angular.module('sds-angular-controls').directive('formTextArea', formTextArea);
+})();
+
+(function () {
+    'use strict';
+    function formTextToggle ($filter) {
+        return{
+            restrict: 'EA',
+            require: '^formField',
+            replace: true,
+            scope: {
+                log             : '@?',
+                placeholder     : '@?',
+                toggleField     : '@?', //one-way binding
+                toggleSwitchType: '@?',
+                onLabel         : '@?',
+                offLabel        : '@?',
+                style           : '@?',
+                type            : '@',  //text, email, number etc.. see the InputTypes
+                layoutCss       : '@?', //default col-md-6
+                isReadonly      : '=?'  //boolean
+            },
+            templateUrl: 'sds-angular-controls/form-directives/form-text-toggle.html',
+            link: function (scope, element, attr, formField) {
+                // defaults
+                element.parent().scope().$watch('record', function(newVal, oldVal){
+                    //formField.setValue(newVal[scope.field]);
+                    scope.record = newVal;
+                });
+
+                element.parent().scope().$watch('field', function(newVal, oldVal){
+                    //formField.setValue(newVal[scope.field]);
+                    scope.field = newVal;
+                });
+
+                element.parent().scope().$watch('isRequired', function(newVal, oldVal){
+                    //formField.setValue(newVal[scope.field]);
+                    scope.isRequired = newVal;
+                });
+
+                element.parent().scope().$watch('layout', function(newVal, oldVal){
+                    //formField.setValue(newVal[scope.field]);
+                    scope.layout = newVal;
+                });
+
+                scope.isReadonly = scope.isReadonly || false;
+
+                scope.log = scope.log || false;
+                scope.type = scope.type || "text";
+
+                scope.toggleSwitchType = scope.toggleSwitchType || "primary";
+                scope.onLabel = scope.onLabel   || "Yes";
+                scope.offLabel = scope.offLabel || "No";
+
+
+                switch(scope.layout){
+                    case "horizontal":
+                        scope.layoutCss = scope.layoutCss || "col-md-6";
+                        break;
+                    default: //stacked
+                        scope.layoutCss = scope.layoutCss || "col-md-4";
+                }
+
+                scope.$watch("isReadonly", function(newVal, oldVal){
+                    if(newVal !== oldVal){
+                        checkIfReadonly();
+                    }
+                });
+
+                function checkIfReadonly(){
+                    if(scope.isReadonly) {
+                        if (scope.fieldType === 'toggle') {
+                            scope.readOnlyModel = scope.record[scope.field];
+                        }
+                    }
+                }
+            }
+        }
+    }
+    formTextToggle.$inject = ["$filter"];
+
+    angular.module('sds-angular-controls').directive('formTextToggle', formTextToggle);
+})();
+
+(function () {
+    'use strict';
     function formToggle ($filter) {
         return{
             restrict: 'EA',
@@ -648,7 +868,7 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                 layoutCss       : '@?', //default col-md-6
                 isReadonly      : '=?'  //boolean
             },
-            templateUrl: 'sds-angular-controls/form-toggle.html',
+            templateUrl: 'sds-angular-controls/form-directives/form-toggle.html',
             link: function (scope, element, attr, formField) {
                 // defaults
                 element.parent().scope().$watch('record', function(newVal, oldVal){
@@ -1205,7 +1425,12 @@ angular.module('sds-angular-controls').run(['$templateCache', function($template
 
 
   $templateCache.put('sds-angular-controls/form-directives/form-input.html',
-    "<div> <div class=\"{{layout === 'horizontal' ? layoutCss : '' }}\"> <input ng-if=\"!isNumeric\" class=\"form-control inputField {{layout === 'stacked' ? layoutCss : ''}}\" ng-model=\"record[field]\" type=\"{{::type}}\" ng-required=\"isRequired\" ng-disabled=\"isReadonly\" placeholder=\"{{::placeholder}}\" max=\"{{::max}}\" min=\"{{::min}}\" style=\"{{::style}}\" mask-input=\"{{::mask}}\"> <input ng-if=\"isNumeric\" class=\"form-control inputField {{layout === 'stacked' ? layoutCss : ''}}\" ng-model=\"record[field]\" type=\"{{::type}}\" ng-required=\"isRequired\" ng-disabled=\"isReadonly\" placeholder=\"{{::placeholder}}\" max=\"{{::max}}\" min=\"{{::min}}\" style=\"{{::style}}\" mask-input=\"{{::mask}}\" auto-numeric> <div ng-if=\"log\"> form-input value: {{record[field]}}<br> {{isRequired}} </div> </div> </div>"
+    "<div> <div class=\"{{layout === 'horizontal' ? layoutCss : '' }}\"> <input class=\"form-control inputField {{layout === 'stacked' ? layoutCss : ''}}\" ng-model=\"record[field]\" type=\"{{::type}}\" ng-required=\"isRequired\" ng-disabled=\"isReadonly\" placeholder=\"{{::placeholder}}\" max=\"{{::max}}\" min=\"{{::min}}\" style=\"{{::style}}\" mask-input=\"{{mask}}\"> <div ng-if=\"::(rightLabel && rightLabel.length > 0)\" class=\"rightLabel\">{{::rightLabel}}</div> <div ng-if=\"log\"> form-input value: {{record[field]}}<br> {{isRequired}} </div> </div> </div>"
+  );
+
+
+  $templateCache.put('sds-angular-controls/form-directives/form-numeric-input.html',
+    "<div> <div class=\"{{layout === 'horizontal' ? layoutCss : '' }}\"> <input class=\"form-control inputField {{layout === 'stacked' ? layoutCss : ''}}\" ng-model=\"record[field]\" type=\"text\" ng-required=\"isRequired\" ng-disabled=\"isReadonly\" placeholder=\"{{::placeholder}}\" max=\"{{::max}}\" min=\"{{::min}}\" style=\"{{::style}}\" mask-input=\"{{::mask}}\" auto-numeric> <div ng-if=\"::(rightLabel && rightLabel.length > 0)\" class=\"rightLabel\">{{::rightLabel}}</div> <div ng-if=\"log\"> form-input value: {{record[field]}}<br> {{isRequired}} </div> </div> </div>"
   );
 
 
@@ -1214,7 +1439,25 @@ angular.module('sds-angular-controls').run(['$templateCache', function($template
   );
 
 
-  $templateCache.put('sds-angular-controls/form-toggle.html',
+  $templateCache.put('sds-angular-controls/form-directives/form-text-area.html',
+    "<div> <div class=\"{{layout === 'horizontal' ? layoutCss : '' }}\"> <textarea class=\"form-control inputField {{layout === 'stacked' ? layoutCss : ''}}\" ng-model=\"record[field]\" type=\"{{::type}}\" ng-required=\"isRequired\" ng-disabled=\"isReadonly\" style=\"{{::style}}\">\n" +
+    "\n" +
+    "        <div ng-if=\"log\">\n" +
+    "            form-input value: {{record[field]}}<br>\n" +
+    "            {{isRequired}}\n" +
+    "        </div>\n" +
+    "\n" +
+    "    </div>\n" +
+    "</div>"
+  );
+
+
+  $templateCache.put('sds-angular-controls/form-directives/form-text-toggle.html',
+    "<div class=\"{{::inputLayoutCss}} text-toggle\"> <input type=\"text\" ng-readonly=\"isReadonly\" type=\"{{::type}}\" class=\"form-control inputField\" ng-model=\"record[field]\"> <!-- bug in toggle where setting any disabled makes it disabled - so needing an if here --> <toggle-switch ng-if=\"isReadonly\" disabled class=\"{{::toggleSwitchType}}\" ng-model=\"record[toggleField]\" on-label=\"{{::onLabel}}\" off-label=\"{{::offLabel}}\"> </toggle-switch> <toggle-switch ng-if=\"!isReadonly\" class=\"{{::toggleSwitchType}}\" ng-model=\"record[toggleField]\" on-label=\"{{::onLabel}}\" off-label=\"{{::offLabel}}\"> </toggle-switch> <!--<div class=\"rightLabel\">{{record[toggleField] ? onLabel : offLabel}}</div>--> </div>"
+  );
+
+
+  $templateCache.put('sds-angular-controls/form-directives/form-toggle.html',
     "<div> <!-- bug in toggle where setting any disabled makes it disabled - so needing an if here --> <toggle-switch ng-if=\"isReadonly\" style=\"{{::style}}\" disabled class=\"{{::toggleSwitchType}}\" ng-model=\"record[field]\" on-label=\"{{::onLabel}}\" off-label=\"{{::offLabel}}\"> </toggle-switch> <toggle-switch ng-if=\"!isReadonly\" style=\"{{::style}}\" class=\"{{::toggleSwitchType}}\" ng-model=\"record[field]\" on-label=\"{{::onLabel}}\" off-label=\"{{::offLabel}}\"> </toggle-switch> <div ng-if=\"log\"> form-input value: {{record[field]}}<br> {{isRequired}} </div> </div>"
   );
 

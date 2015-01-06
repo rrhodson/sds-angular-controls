@@ -25,7 +25,9 @@
       ZipCode: "",
       Price:  5.983,
       LikesIceCream: false,
-      DateOfBirth : null
+      DateOfBirth : null,
+      weight: 100,
+      weightUnit: true
     };
 
     vm.testForm = angular.copy(vm.masterTestForm);

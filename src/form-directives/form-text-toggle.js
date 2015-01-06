@@ -3,7 +3,7 @@
  */
 (function () {
     'use strict';
-    function formToggle ($filter) {
+    function formTextToggle ($filter) {
         return{
             restrict: 'EA',
             require: '^formField',
@@ -20,7 +20,7 @@
                 layoutCss       : '@?', //default col-md-6
                 isReadonly      : '=?'  //boolean
             },
-            templateUrl: 'sds-angular-controls/form-directives/form-toggle.html',
+            templateUrl: 'sds-angular-controls/form-directives/form-text-toggle.html',
             link: function (scope, element, attr, formField) {
                 // defaults
                 element.parent().scope().$watch('record', function(newVal, oldVal){
@@ -78,5 +78,5 @@
         }
     }
 
-    angular.module('sds-angular-controls').directive('formToggle', formToggle);
+    angular.module('sds-angular-controls').directive('formTextToggle', formTextToggle);
 })();

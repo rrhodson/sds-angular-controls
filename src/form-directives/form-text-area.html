@@ -1,0 +1,17 @@
+<div>
+    <div class="{{layout === 'horizontal' ? layoutCss : '' }}">
+        <textarea class="form-control inputField {{layout === 'stacked' ? layoutCss : ''}}"
+               ng-model='record[field]'
+               type='{{::type}}'
+               ng-required='isRequired'
+               ng-disabled="isReadonly"
+               style="{{::style}}"
+                />
+
+        <div ng-if="log">
+            form-input value: {{record[field]}}<br>
+            {{isRequired}}
+        </div>
+
+    </div>
+</div>

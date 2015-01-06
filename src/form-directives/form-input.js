@@ -17,8 +17,8 @@
                 min             : '@?',
                 type            : '@',  //text, email, number etc.. see the InputTypes
                 layoutCss       : '@?', //default col-md-6
-                isReadonly      : '=?',  //boolean
-                isNumeric       : '=?'
+                rightLabel      : '@?',
+                isReadonly      : '=?'  //boolean
             },
             templateUrl: 'sds-angular-controls/form-directives/form-input.html',
             link: function (scope, element, attr, formField) {
@@ -54,7 +54,6 @@
 
                 scope.log = scope.log || false;
                 scope.type = scope.type || "text";
-
 
                 if(scope.min) {
                     formField.setMin(scope.min);

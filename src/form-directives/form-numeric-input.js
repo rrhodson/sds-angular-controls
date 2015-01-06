@@ -3,26 +3,23 @@
  */
 (function () {
     'use strict';
-    function formToggle ($filter) {
+    function formNumericInput ($filter) {
         return{
             restrict: 'EA',
-            require: '^formField',
+            require: ['^formField'],
             replace: true,
             scope: {
                 log             : '@?',
                 placeholder     : '@?',
-                toggleField     : '@?', //one-way binding
-                toggleSwitchType: '@?',
-                onLabel         : '@?',
-                offLabel        : '@?',
                 style           : '@?',
-                type            : '@',  //text, email, number etc.. see the InputTypes
                 layoutCss       : '@?', //default col-md-6
+                rightLabel      : '@?',
                 isReadonly      : '=?'  //boolean
             },
-            templateUrl: 'sds-angular-controls/form-directives/form-toggle.html',
+            templateUrl: 'sds-angular-controls/form-directives/form-numeric-input.html',
             link: function (scope, element, attr, formField) {
                 // defaults
+
                 element.parent().scope().$watch('record', function(newVal, oldVal){
                     //formField.setValue(newVal[scope.field]);
                     scope.record = newVal;
@@ -43,15 +40,15 @@
                     scope.layout = newVal;
                 });
 
+                element.parent().scope().$watch('label', function(newVal, oldVal){
+                    //formField.setValue(newVal[scope.field]);
+                    scope.label = newVal;
+                    scope.placeholder = scope.placeholder || newVal;
+                });
+
                 scope.isReadonly = scope.isReadonly || false;
 
                 scope.log = scope.log || false;
-                scope.type = scope.type || "text";
-
-                scope.toggleSwitchType = scope.toggleSwitchType || "primary";
-                scope.onLabel = scope.onLabel   || "Yes";
-                scope.offLabel = scope.offLabel || "No";
-
 
                 switch(scope.layout){
                     case "horizontal":
@@ -61,9 +58,14 @@
                         scope.layoutCss = scope.layoutCss || "col-md-4";
                 }
 
+
+
+
                 scope.$watch("isReadonly", function(newVal, oldVal){
-                    if(newVal !== oldVal){
-                        checkIfReadonly();
+                    if(newVal && oldVal) {
+                        if (newVal !== oldVal) {
+                            checkIfReadonly();
+                        }
                     }
                 });
 
@@ -78,5 +80,5 @@
         }
     }
 
-    angular.module('sds-angular-controls').directive('formToggle', formToggle);
+    angular.module('sds-angular-controls').directive('formNumericInput', formNumericInput);
 })();

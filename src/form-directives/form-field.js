@@ -27,8 +27,7 @@
             },
             templateUrl: 'sds-angular-controls/form-directives/form-field.html',
             require: '^form',
-            controller: function($scope, $element, $attrs){
-
+            controller: function($scope){
 
                 $scope.layout = $scope.layout || "stacked";
 
@@ -55,29 +54,23 @@
                     $scope.labelCss = $scope.labelCss || "col-md-2";
                 }
 
-                //this.getRecord = function(){
-                //    return $scope.record;
-                //};
-                //
-                //this.getField = function() {
-                //    return $scope.field;
-                //};
-                //
-                //this.getRequired = function() {
-                //    return $scope.isRequired;
-                //};
-                //
-                //this.getLayout = function() {
-                //    return $scope.layout;
-                //};
-
                 this.setValue = function(val){
                     $scope.record[$scope.field] = val;
                 };
 
+
+                this.setMin = function (min){
+                    $scope.min = min;
+                };
+
+                this.setMax = function (max){
+                    $scope.max = max;
+                };
+
+            },
+            link: function($scope, element, attrs, form){
                 $scope.showError = function(field){
                     try{
-                        var form = $($element).closest("form");
                         if(form.$submitted){
                             return field.$invalid;
                         }else {
@@ -88,15 +81,6 @@
                         return false;
                     }
                 };
-
-                this.setMin = function (min){
-                    $scope.min = min;
-                };
-
-                this.setMax = function (max){
-                    $scope.max = max;
-                };
-
             }
         }
     }

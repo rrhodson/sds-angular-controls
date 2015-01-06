@@ -1,17 +1,19 @@
 <div>
     <div class="{{layout === 'horizontal' ? layoutCss : '' }}">
         <input class="form-control inputField {{layout === 'stacked' ? layoutCss : ''}}"
-            ng-model='record[field]'
-            type='{{::type}}'
-            ng-required='isRequired'
-            ng-disabled="isReadonly"
-            placeholder='{{::placeholder}}'
-            max="{{::max}}"
-            min="{{::min}}"
-            style="{{::style}}"
-            mask-input="{{mask}}"
-        />
+               ng-model='record[field]'
+               type='text'
+               ng-required='isRequired'
+               ng-disabled="isReadonly"
+               placeholder='{{::placeholder}}'
+               max="{{::max}}"
+               min="{{::min}}"
+               style="{{::style}}"
+               mask-input="{{::mask}}"
+               auto-numeric
+                />
         <div ng-if="::(rightLabel && rightLabel.length > 0)" class="rightLabel">{{::rightLabel}}</div>
+
         <div ng-if="log">
             form-input value: {{record[field]}}<br>
             {{isRequired}}
