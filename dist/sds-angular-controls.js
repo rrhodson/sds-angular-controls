@@ -461,6 +461,12 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                     scope.layout = newVal;
                 });
 
+                element.parent().scope().$watch('label', function(newVal, oldVal){
+                    //formField.setValue(newVal[scope.field]);
+                    scope.label = newVal;
+                    scope.placeholder = scope.placeholder || newVal;
+                });
+
                 scope.isReadonly = scope.isReadonly || false;
 
                 scope.log = scope.log || false;
@@ -483,7 +489,8 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                         scope.layoutCss = scope.layoutCss || "col-md-4";
                 }
 
-                scope.placeholder = scope.placeholder ||  $filter("labelCase")(scope.field);
+
+
 
                 scope.$watch("isReadonly", function(newVal, oldVal){
                     if(newVal && oldVal) {

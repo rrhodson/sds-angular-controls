@@ -44,6 +44,12 @@
                     scope.layout = newVal;
                 });
 
+                element.parent().scope().$watch('label', function(newVal, oldVal){
+                    //formField.setValue(newVal[scope.field]);
+                    scope.label = newVal;
+                    scope.placeholder = scope.placeholder || newVal;
+                });
+
                 scope.isReadonly = scope.isReadonly || false;
 
                 scope.log = scope.log || false;
@@ -66,7 +72,8 @@
                         scope.layoutCss = scope.layoutCss || "col-md-4";
                 }
 
-                scope.placeholder = scope.placeholder ||  $filter("labelCase")(scope.field);
+
+
 
                 scope.$watch("isReadonly", function(newVal, oldVal){
                     if(newVal && oldVal) {
