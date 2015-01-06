@@ -9,12 +9,11 @@
         return{
             restrict: 'A',
             link: function (scope, element) {
-
-                if (typeof scope.col.template === 'function'){
-                    element.append(scope.col.template(scope));
+                if (typeof scope._col.template === 'function'){
+                    element.append(scope._col.template(scope));
 
                 }else if(!angular.element.trim(element.html())){
-                    var html = angular.element('<span>' + scope.col.template  + '</span>');
+                    var html = angular.element('<span>' + scope._col.template  + '</span>');
                     var compiled = $compile(html) ;
                     element.append(html);
                     compiled(scope);
