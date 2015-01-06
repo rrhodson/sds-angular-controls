@@ -20,10 +20,6 @@
             restrict: 'E',
             replace: true,
             transclude:true,
-            scope: {
-                label: '@',
-                layoutCss: '@'
-            },
             templateUrl: 'sds-angular-controls/table-directives/db-grid.html',
             compile: function (tElement, tAttrs){
                 var loop = tAttrs.for.split(' ');
@@ -32,7 +28,7 @@
                     return;
                 }
 
-                tElement.find('tbody > tr').attr('ng-repeat', loop[0] + ' in model.filteredItems');
+                tElement.find('tbody > tr').attr('ng-repeat', loop[0] + ' in _model.filteredItems');
 
             },
             controller: function ($scope, $element, $attrs){
@@ -40,7 +36,9 @@
                 var orderByFilter = $filter('orderBy');
                 var pageFilter = $filter('page');
 
-                $scope.model = {
+                $scope._model = {
+                    label: $attrs.label,
+                    layoutCss: $attrs.layoutCss,
                     currentPage: 1,
                     total: 0,
                     sortAsc: false,
@@ -63,30 +61,30 @@
                 $scope.rowName = loop[0];
                 if (loop[2]) {
                     $element.parent().scope().$watch(loop.slice(2).join(' '), function (items) {
-                        $scope.model.items = items;
+                        $scope._model.items = items;
                         refresh();
                     });
                 }
 
                 function defaultGetItems (filter, sortKey, sortAsc, page, pageSize, cols){
                     var deferred = $q.defer();
-                    var items = orderByFilter(complexFilter($scope.model.items, filter), sortKey, sortAsc);
-                    $scope.model.total = items.length;
+                    var items = orderByFilter(complexFilter($scope._model.items, filter), sortKey, sortAsc);
+                    $scope._model.total = items ? items.length : 0;
                     deferred.resolve(pageFilter(items, page, pageSize));
                     return deferred.promise;
                 }
 
                 function toggleSort(index){
                     console.log(index);
-                    if ($scope.model.sort === index)  {
-                        $scope.model.sortAsc = !$scope.model.sortAsc;
+                    if ($scope._model.sort === index)  {
+                        $scope._model.sortAsc = !$scope._model.sortAsc;
                     }else{
-                        $scope.model.sort = index;
+                        $scope._model.sort = index;
                     }
                 }
 
                 function clearFilters(){
-                    _.each($scope.model.cols, function (item){
+                    _.each($scope._model.cols, function (item){
                        item.filter = '';
                     });
                     refresh();
@@ -94,7 +92,7 @@
 
                 function onEnter(){
                     console.log('enter');
-                    if ($scope.model.items.length === 1){
+                    if ($scope._model.items.length === 1){
                         $timeout(function (){
                             $element.find('tbody tr a:first').click();
                         });
@@ -103,36 +101,36 @@
 
                 function refresh() {
                     $timeout(function () {
-                        $scope.model.getItems(
-                            $scope.model.showAdvancedFilter ? $scope.model.cols : $scope.model.filterText,
-                            $scope.model.sort ? $scope.model.cols[$scope.model.sort].key : null,
-                            $scope.model.sortAsc,
-                            $scope.model.currentPage - 1,
-                            $scope.model.pageSize,
-                            $scope.model.cols
+                        $scope._model.getItems(
+                            $scope._model.showAdvancedFilter ? $scope._model.cols : $scope._model.filterText,
+                            $scope._model.sort ? $scope._model.cols[$scope._model.sort].key : null,
+                            $scope._model.sortAsc,
+                            $scope._model.currentPage - 1,
+                            $scope._model.pageSize,
+                            $scope._model.cols
                         ).then(function (result){
-                            $scope.model.filteredItems = result;
+                            $scope._model.filteredItems = result;
                         });
                     });
                 }
 
                 this.addColumn = function (item){
-                    $scope.model.cols.push(item);
+                    $scope._model.cols.push(item);
                 };
 
                 this.setDataSource = function (dataSource){
-                    $scope.model.getItems = dataSource;
+                    $scope._model.getItems = dataSource;
                     refresh();
                 };
 
                 this.setTotal = function (total){
-                    $scope.model.total = total;
+                    $scope._model.total = total;
                 };
 
-                $scope.$watch('model.currentPage', $scope.model.refresh);
-                $scope.$watch('model.sort',        $scope.model.refresh);
-                $scope.$watch('model.sortAsc',     $scope.model.refresh);
-                $scope.$watch('model.filterText',  $scope.model.refresh);
+                $scope.$watch('_model.currentPage', $scope._model.refresh);
+                $scope.$watch('_model.sort',        $scope._model.refresh);
+                $scope.$watch('_model.sortAsc',     $scope._model.refresh);
+                $scope.$watch('_model.filterText',  $scope._model.refresh);
             }
         };
     }

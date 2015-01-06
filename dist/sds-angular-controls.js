@@ -1173,12 +1173,11 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
         return{
             restrict: 'A',
             link: function (scope, element) {
-
-                if (typeof scope.col.template === 'function'){
-                    element.append(scope.col.template(scope));
+                if (typeof scope._col.template === 'function'){
+                    element.append(scope._col.template(scope));
 
                 }else if(!angular.element.trim(element.html())){
-                    var html = angular.element('<span>' + scope.col.template  + '</span>');
+                    var html = angular.element('<span>' + scope._col.template  + '</span>');
                     var compiled = $compile(html) ;
                     element.append(html);
                     compiled(scope);
@@ -1221,7 +1220,6 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                 return function (scope, element, attr, dbGrid) {
                     var templateFunc = null;
                     if (!templateText && attr.key){
-                        console.log(scope);
                         templateText = '{{' + scope.$parent.rowName + '.' + attr.key + '}}'
                     }
 
@@ -1271,10 +1269,6 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
             restrict: 'E',
             replace: true,
             transclude:true,
-            scope: {
-                label: '@',
-                layoutCss: '@'
-            },
             templateUrl: 'sds-angular-controls/table-directives/db-grid.html',
             compile: function (tElement, tAttrs){
                 var loop = tAttrs.for.split(' ');
@@ -1283,7 +1277,7 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                     return;
                 }
 
-                tElement.find('tbody > tr').attr('ng-repeat', loop[0] + ' in model.filteredItems');
+                tElement.find('tbody > tr').attr('ng-repeat', loop[0] + ' in _model.filteredItems');
 
             },
             controller: ["$scope", "$element", "$attrs", function ($scope, $element, $attrs){
@@ -1291,7 +1285,9 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                 var orderByFilter = $filter('orderBy');
                 var pageFilter = $filter('page');
 
-                $scope.model = {
+                $scope._model = {
+                    label: $attrs.label,
+                    layoutCss: $attrs.layoutCss,
                     currentPage: 1,
                     total: 0,
                     sortAsc: false,
@@ -1314,30 +1310,30 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                 $scope.rowName = loop[0];
                 if (loop[2]) {
                     $element.parent().scope().$watch(loop.slice(2).join(' '), function (items) {
-                        $scope.model.items = items;
+                        $scope._model.items = items;
                         refresh();
                     });
                 }
 
                 function defaultGetItems (filter, sortKey, sortAsc, page, pageSize, cols){
                     var deferred = $q.defer();
-                    var items = orderByFilter(complexFilter($scope.model.items, filter), sortKey, sortAsc);
-                    $scope.model.total = items.length;
+                    var items = orderByFilter(complexFilter($scope._model.items, filter), sortKey, sortAsc);
+                    $scope._model.total = items ? items.length : 0;
                     deferred.resolve(pageFilter(items, page, pageSize));
                     return deferred.promise;
                 }
 
                 function toggleSort(index){
                     console.log(index);
-                    if ($scope.model.sort === index)  {
-                        $scope.model.sortAsc = !$scope.model.sortAsc;
+                    if ($scope._model.sort === index)  {
+                        $scope._model.sortAsc = !$scope._model.sortAsc;
                     }else{
-                        $scope.model.sort = index;
+                        $scope._model.sort = index;
                     }
                 }
 
                 function clearFilters(){
-                    _.each($scope.model.cols, function (item){
+                    _.each($scope._model.cols, function (item){
                        item.filter = '';
                     });
                     refresh();
@@ -1345,7 +1341,7 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
 
                 function onEnter(){
                     console.log('enter');
-                    if ($scope.model.items.length === 1){
+                    if ($scope._model.items.length === 1){
                         $timeout(function (){
                             $element.find('tbody tr a:first').click();
                         });
@@ -1354,36 +1350,36 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
 
                 function refresh() {
                     $timeout(function () {
-                        $scope.model.getItems(
-                            $scope.model.showAdvancedFilter ? $scope.model.cols : $scope.model.filterText,
-                            $scope.model.sort ? $scope.model.cols[$scope.model.sort].key : null,
-                            $scope.model.sortAsc,
-                            $scope.model.currentPage - 1,
-                            $scope.model.pageSize,
-                            $scope.model.cols
+                        $scope._model.getItems(
+                            $scope._model.showAdvancedFilter ? $scope._model.cols : $scope._model.filterText,
+                            $scope._model.sort ? $scope._model.cols[$scope._model.sort].key : null,
+                            $scope._model.sortAsc,
+                            $scope._model.currentPage - 1,
+                            $scope._model.pageSize,
+                            $scope._model.cols
                         ).then(function (result){
-                            $scope.model.filteredItems = result;
+                            $scope._model.filteredItems = result;
                         });
                     });
                 }
 
                 this.addColumn = function (item){
-                    $scope.model.cols.push(item);
+                    $scope._model.cols.push(item);
                 };
 
                 this.setDataSource = function (dataSource){
-                    $scope.model.getItems = dataSource;
+                    $scope._model.getItems = dataSource;
                     refresh();
                 };
 
                 this.setTotal = function (total){
-                    $scope.model.total = total;
+                    $scope._model.total = total;
                 };
 
-                $scope.$watch('model.currentPage', $scope.model.refresh);
-                $scope.$watch('model.sort',        $scope.model.refresh);
-                $scope.$watch('model.sortAsc',     $scope.model.refresh);
-                $scope.$watch('model.filterText',  $scope.model.refresh);
+                $scope.$watch('_model.currentPage', $scope._model.refresh);
+                $scope.$watch('_model.sort',        $scope._model.refresh);
+                $scope.$watch('_model.sortAsc',     $scope._model.refresh);
+                $scope.$watch('_model.filterText',  $scope._model.refresh);
             }]
         };
     }
@@ -1463,11 +1459,11 @@ angular.module('sds-angular-controls').run(['$templateCache', function($template
 
 
   $templateCache.put('sds-angular-controls/table-directives/db-grid.html',
-    "<div class=\"table-responsive\"> <div class=\"btn-toolbar\"> <a ng-if=\"model.showAdvancedFilter\" href=\"\" class=\"btn btn-default\" ng-click=\"model.clearFilters()\">Clear All Filters <span class=\"big-x\">&times;</span></a> <div ng-if=\"!model.showAdvancedFilter && model.filterType !== 'none'\" class=\"toolbar-input\"> <div class=\"form-group has-feedback\"> <input class=\"form-control\" type=\"text\" ng-model=\"model.filterText\" placeholder=\"Filter {{label || 'items'}}\" on-enter=\"model.onEnter()\"> <a href=\"\" ng-click=\"model.filterText = ''\" class=\"form-control-feedback feedback-link\">&times;</a> </div> </div> <a href=\"\" ng-if=\"model.filterType === 'advanced'\" class=\"btn btn-default\" ng-class=\"{active: model.showAdvancedFilter}\" ng-click=\"model.showAdvancedFilter = !model.showAdvancedFilter\">Advanced Filtering</a> <ng-transclude></ng-transclude> <p ng-if=\"data && label\"><i>{{model.total}} {{label}}</i></p> </div> <table class=\"table table-hover {{layoutCss}}\"> <thead> <tr> <th ng-repeat=\"col in model.cols\" ng-style=\"{width: col.width}\"> <div ng-if=\"model.showAdvancedFilter && col.sortable\"> <input type=\"text\" class=\"form-control filter-input\" on-enter=\"model.onEnter()\" ng-keyup=\"model.refresh();\" ng-model=\"col.filter\" placeholder=\"Filter {{::col.label || col.key}}\" tooltip=\"{{col.type ? 'Use a dash (-) to specify a range' : ''}}\" tooltip-trigger=\"focus\" tooltip-placement=\"top\"> </div> <a href=\"\" ng-if=\"::col.sortable\" ng-click=\"model.toggleSort($index)\">{{::col.label || (col.key | labelCase) }} <i class=\"fa\" ng-class=\"{\n" +
-    "                         'fa-sort'     : model.sort !== $index,\n" +
-    "                         'fa-sort-down': model.sort === $index &&  model.sortAsc,\n" +
-    "                         'fa-sort-up'  : model.sort === $index && !model.sortAsc\n" +
-    "                         }\"></i> </a> <span ng-if=\"::!col.sortable\"> {{::col.label || (col.key | labelCase)}} </span>    <tbody> <tr> <td ng-repeat=\"col in model.cols\" db-bind-cell>   </table> <pagination ng-if=\"model.total > model.pageSize\" total-items=\"model.total\" items-per-page=\"model.pageSize\" max-size=\"10\" rotate=\"false\" ng-model=\"model.currentPage\"></pagination> </div>"
+    "<div class=\"table-responsive\"> <div class=\"btn-toolbar\"> <a ng-if=\"_model.showAdvancedFilter\" href=\"\" class=\"btn btn-default\" ng-click=\"_model.clearFilters()\">Clear All Filters <span class=\"big-x\">&times;</span></a> <div ng-if=\"!_model.showAdvancedFilter && _model.filterType !== 'none'\" class=\"toolbar-input\"> <div class=\"form-group has-feedback\"> <input class=\"form-control\" type=\"text\" ng-model=\"_model.filterText\" placeholder=\"Filter {{_model.label || 'items'}}\" on-enter=\"_model.onEnter()\"> <a href=\"\" ng-click=\"_model.filterText = ''\" class=\"form-control-feedback feedback-link\">&times;</a> </div> </div> <a href=\"\" ng-if=\"_model.filterType === 'advanced'\" class=\"btn btn-default\" ng-class=\"{active: _model.showAdvancedFilter}\" ng-click=\"_model.showAdvancedFilter = !_model.showAdvancedFilter\">Advanced Filtering</a> <ng-transclude></ng-transclude> <p ng-if=\"data && label\"><i>{{_model.total}} {{_model.label}}</i></p> </div> <table class=\"table table-hover {{_model.layoutCss}}\"> <thead> <tr> <th ng-repeat=\"_col in _model.cols\" ng-style=\"{width: _col.width}\"> <div ng-if=\"_model.showAdvancedFilter && _col.sortable\"> <input type=\"text\" class=\"form-control filter-input\" on-enter=\"_model.onEnter()\" ng-keyup=\"_model.refresh();\" ng-model=\"_col.filter\" placeholder=\"Filter {{::_col.label || _col.key}}\" tooltip=\"{{_col.type ? 'Use a dash (-) to specify a range' : ''}}\" tooltip-trigger=\"focus\" tooltip-placement=\"top\"> </div> <a href=\"\" ng-if=\"::_col.sortable\" ng-click=\"_model.toggleSort($index)\">{{::_col.label || (_col.key | labelCase) }} <i class=\"fa\" ng-class=\"{\n" +
+    "                         'fa-sort'     : _model.sort !== $index,\n" +
+    "                         'fa-sort-down': _model.sort === $index &&  _model.sortAsc,\n" +
+    "                         'fa-sort-up'  : _model.sort === $index && !_model.sortAsc\n" +
+    "                         }\"></i> </a> <span ng-if=\"::!_col.sortable\"> {{::_col.label || (_col.key | labelCase)}} </span>    <tbody> <tr> <td ng-repeat=\"_col in _model.cols\" db-bind-cell>   </table> <pagination ng-if=\"_model.total > _model.pageSize\" total-items=\"_model.total\" items-per-page=\"_model.pageSize\" max-size=\"10\" rotate=\"false\" ng-model=\"_model.currentPage\"></pagination> </div>"
   );
 
 }]);
