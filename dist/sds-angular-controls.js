@@ -260,10 +260,25 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
 
             link: function (scope, element, attr, formField) {
                 // defaults
-                scope.record     = formField.getRecord();
-                scope.field      = formField.getField();
-                scope.isRequired = formField.getRequired();
-                scope.layout     = formField.getLayout();
+                element.parent().scope().$watch('record', function(newVal, oldVal){
+                    //formField.setValue(newVal[scope.field]);
+                    scope.record = newVal;
+                });
+
+                element.parent().scope().$watch('field', function(newVal, oldVal){
+                    //formField.setValue(newVal[scope.field]);
+                    scope.field = newVal;
+                });
+
+                element.parent().scope().$watch('isRequired', function(newVal, oldVal){
+                    //formField.setValue(newVal[scope.field]);
+                    scope.isRequired = newVal;
+                });
+
+                element.parent().scope().$watch('layout', function(newVal, oldVal){
+                    //formField.setValue(newVal[scope.field]);
+                    scope.layout = newVal;
+                });
 
                 scope.isReadonly = scope.isReadonly || false;
 
@@ -291,13 +306,6 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                 function checkIfReadonly(){
                     scope.readOnlyModel = moment(scope.record[scope.field]).format(scope.dateFormat);
                 }
-
-
-
-
-                scope.$watch("record", function(newVal, oldVal){
-                    formField.setValue(newVal[scope.field]);
-                });
             }
         }
     }
@@ -343,6 +351,11 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
 
                 $scope.validationFieldName = $scope.validationFieldName || $filter("labelCase")($scope.label);
 
+                $scope.$watch("record", function(newVal, oldVal){
+                    if(newVal) {
+                        $scope.record = newVal;
+                    }
+                });
 
                 $scope.showLabel = $scope.showLabel !== false; // default to true
                 $scope.hideValidationMessage = $scope.hideValidationMessage || false;
@@ -355,21 +368,21 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                     $scope.labelCss = $scope.labelCss || "col-md-2";
                 }
 
-                this.getRecord = function(){
-                    return $scope.record;
-                };
-
-                this.getField = function() {
-                    return $scope.field;
-                };
-
-                this.getRequired = function() {
-                    return $scope.isRequired;
-                };
-
-                this.getLayout = function() {
-                    return $scope.layout;
-                };
+                //this.getRecord = function(){
+                //    return $scope.record;
+                //};
+                //
+                //this.getField = function() {
+                //    return $scope.field;
+                //};
+                //
+                //this.getRequired = function() {
+                //    return $scope.isRequired;
+                //};
+                //
+                //this.getLayout = function() {
+                //    return $scope.layout;
+                //};
 
                 this.setValue = function(val){
                     $scope.record[$scope.field] = val;
@@ -427,10 +440,26 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
             templateUrl: 'sds-angular-controls/form-directives/form-input.html',
             link: function (scope, element, attr, formField) {
                 // defaults
-                scope.record     = formField.getRecord();
-                scope.field      = formField.getField();
-                scope.isRequired = formField.getRequired();
-                scope.layout     = formField.getLayout();
+
+                element.parent().scope().$watch('record', function(newVal, oldVal){
+                    //formField.setValue(newVal[scope.field]);
+                    scope.record = newVal;
+                });
+
+                element.parent().scope().$watch('field', function(newVal, oldVal){
+                    //formField.setValue(newVal[scope.field]);
+                    scope.field = newVal;
+                });
+
+                element.parent().scope().$watch('isRequired', function(newVal, oldVal){
+                    //formField.setValue(newVal[scope.field]);
+                    scope.isRequired = newVal;
+                });
+
+                element.parent().scope().$watch('layout', function(newVal, oldVal){
+                    //formField.setValue(newVal[scope.field]);
+                    scope.layout = newVal;
+                });
 
                 scope.isReadonly = scope.isReadonly || false;
 
@@ -457,14 +486,11 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                 scope.placeholder = scope.placeholder ||  $filter("labelCase")(scope.field);
 
                 scope.$watch("isReadonly", function(newVal, oldVal){
-                    if(newVal !== oldVal){
-                        checkIfReadonly();
+                    if(newVal && oldVal) {
+                        if (newVal !== oldVal) {
+                            checkIfReadonly();
+                        }
                     }
-                });
-
-                scope.$watch("record", function(newVal, oldVal){
-                    formField.setValue(newVal[scope.field]);
-                    checkIfReadonly();
                 });
 
                 function checkIfReadonly(){
@@ -502,10 +528,25 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
 
             link: function (scope, element, attr, formField) {
                 // defaults
-                scope.record     = formField.getRecord();
-                scope.field      = formField.getField();
-                scope.isRequired = formField.getRequired();
-                scope.layout     = formField.getLayout();
+                element.parent().scope().$watch('record', function(newVal, oldVal){
+                    //formField.setValue(newVal[scope.field]);
+                    scope.record = newVal;
+                });
+
+                element.parent().scope().$watch('field', function(newVal, oldVal){
+                    //formField.setValue(newVal[scope.field]);
+                    scope.field = newVal;
+                });
+
+                element.parent().scope().$watch('isRequired', function(newVal, oldVal){
+                    //formField.setValue(newVal[scope.field]);
+                    scope.isRequired = newVal;
+                });
+
+                element.parent().scope().$watch('layout', function(newVal, oldVal){
+                    //formField.setValue(newVal[scope.field]);
+                    scope.layout = newVal;
+                });
 
                 scope.isReadonly = scope.isReadonly || false;
 
@@ -573,11 +614,6 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                         }
                     }
                 });
-
-
-                scope.$watch("record", function(newVal, oldVal){
-                    formField.setValue(newVal[scope.field]);
-                });
             }
         }
     }
@@ -608,10 +644,25 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
             templateUrl: 'sds-angular-controls/form-toggle.html',
             link: function (scope, element, attr, formField) {
                 // defaults
-                scope.record     = formField.getRecord();
-                scope.field      = formField.getField();
-                scope.isRequired = formField.getRequired();
-                scope.layout     = formField.getLayout();
+                element.parent().scope().$watch('record', function(newVal, oldVal){
+                    //formField.setValue(newVal[scope.field]);
+                    scope.record = newVal;
+                });
+
+                element.parent().scope().$watch('field', function(newVal, oldVal){
+                    //formField.setValue(newVal[scope.field]);
+                    scope.field = newVal;
+                });
+
+                element.parent().scope().$watch('isRequired', function(newVal, oldVal){
+                    //formField.setValue(newVal[scope.field]);
+                    scope.isRequired = newVal;
+                });
+
+                element.parent().scope().$watch('layout', function(newVal, oldVal){
+                    //formField.setValue(newVal[scope.field]);
+                    scope.layout = newVal;
+                });
 
                 scope.isReadonly = scope.isReadonly || false;
 
@@ -635,11 +686,6 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                     if(newVal !== oldVal){
                         checkIfReadonly();
                     }
-                });
-
-                scope.$watch("record", function(newVal, oldVal){
-                    formField.setValue(newVal[scope.field]);
-                    checkIfReadonly();
                 });
 
                 function checkIfReadonly(){

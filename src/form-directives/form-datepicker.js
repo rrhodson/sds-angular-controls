@@ -22,10 +22,25 @@
 
             link: function (scope, element, attr, formField) {
                 // defaults
-                scope.record     = formField.getRecord();
-                scope.field      = formField.getField();
-                scope.isRequired = formField.getRequired();
-                scope.layout     = formField.getLayout();
+                element.parent().scope().$watch('record', function(newVal, oldVal){
+                    //formField.setValue(newVal[scope.field]);
+                    scope.record = newVal;
+                });
+
+                element.parent().scope().$watch('field', function(newVal, oldVal){
+                    //formField.setValue(newVal[scope.field]);
+                    scope.field = newVal;
+                });
+
+                element.parent().scope().$watch('isRequired', function(newVal, oldVal){
+                    //formField.setValue(newVal[scope.field]);
+                    scope.isRequired = newVal;
+                });
+
+                element.parent().scope().$watch('layout', function(newVal, oldVal){
+                    //formField.setValue(newVal[scope.field]);
+                    scope.layout = newVal;
+                });
 
                 scope.isReadonly = scope.isReadonly || false;
 
@@ -53,13 +68,6 @@
                 function checkIfReadonly(){
                     scope.readOnlyModel = moment(scope.record[scope.field]).format(scope.dateFormat);
                 }
-
-
-
-
-                scope.$watch("record", function(newVal, oldVal){
-                    formField.setValue(newVal[scope.field]);
-                });
             }
         }
     }

@@ -38,6 +38,11 @@
 
                 $scope.validationFieldName = $scope.validationFieldName || $filter("labelCase")($scope.label);
 
+                $scope.$watch("record", function(newVal, oldVal){
+                    if(newVal) {
+                        $scope.record = newVal;
+                    }
+                });
 
                 $scope.showLabel = $scope.showLabel !== false; // default to true
                 $scope.hideValidationMessage = $scope.hideValidationMessage || false;
@@ -50,21 +55,21 @@
                     $scope.labelCss = $scope.labelCss || "col-md-2";
                 }
 
-                this.getRecord = function(){
-                    return $scope.record;
-                };
-
-                this.getField = function() {
-                    return $scope.field;
-                };
-
-                this.getRequired = function() {
-                    return $scope.isRequired;
-                };
-
-                this.getLayout = function() {
-                    return $scope.layout;
-                };
+                //this.getRecord = function(){
+                //    return $scope.record;
+                //};
+                //
+                //this.getField = function() {
+                //    return $scope.field;
+                //};
+                //
+                //this.getRequired = function() {
+                //    return $scope.isRequired;
+                //};
+                //
+                //this.getLayout = function() {
+                //    return $scope.layout;
+                //};
 
                 this.setValue = function(val){
                     $scope.record[$scope.field] = val;
