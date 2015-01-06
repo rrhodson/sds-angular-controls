@@ -25,12 +25,12 @@
                 <th ng-repeat="col in model.cols" ng-style="{width: col.width}">
                     <div ng-if="model.showAdvancedFilter && col.sortable">
                         <input type="text" class="form-control filter-input" on-enter="model.onEnter()"
-                               ng-keyup="model.refresh();" ng-model="col.filter" placeholder="Filter {{::col.name || col.key}}"
+                               ng-keyup="model.refresh();" ng-model="col.filter" placeholder="Filter {{::col.label || col.key}}"
                                tooltip="{{col.type ? 'Use a dash (-) to specify a range' : ''}}"  tooltip-trigger="focus"
                                tooltip-placement="top">
                     </div>
                     <a href="" ng-if="::col.sortable"
-                       ng-click="model.toggleSort($index)">{{::col.name || (col.key | labelCase) }}
+                       ng-click="model.toggleSort($index)">{{::col.label || (col.key | labelCase) }}
                         <i class="fa" ng-class="{
                          'fa-sort'     : model.sort !== $index,
                          'fa-sort-down': model.sort === $index &&  model.sortAsc,
@@ -38,7 +38,7 @@
                          }"></i>
                     </a>
                     <span ng-if="::!col.sortable">
-                        {{::col.name || (col.key | labelCase)}}
+                        {{::col.label || (col.key | labelCase)}}
                     </span>
                 </th>
             </tr>
