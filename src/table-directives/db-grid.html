@@ -19,7 +19,7 @@
         <p ng-if="data && label"><i>{{_model.total}} {{_model.label}}</i></p>
     </div>
 
-    <table class="table table-hover {{_model.layoutCss}}" >
+    <table class="table db-grid table-hover {{_model.layoutCss}}" >
         <thead>
             <tr>
                 <th ng-repeat="_col in _model.cols" ng-style="{width: _col.width}">

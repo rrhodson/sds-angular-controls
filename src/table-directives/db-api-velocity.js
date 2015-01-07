@@ -2,7 +2,7 @@
 (function () {
     'use strict';
 
-    function dataSourceVelocity () {
+    function dbApiVelocity ($http) {
         return{
             restrict: 'E',
             require: '^dbGrid',
@@ -20,14 +20,16 @@
                     var query = {
                         page: currentPage,
                         pageSize: pageSize,
-                        sort: [
-                            {
-                                field: capitalize(sortKey),
-                                direction: sortAsc ? '' : 'desc'
-                            }
-                        ],
+                        sort: [],
                         filter: createFilters(filter, cols)
                     };
+                    if (sortKey !== null){
+                        query.sort.push({
+                            field: capitalize(sortKey),
+                            direction: sortAsc ? '' : 'desc'
+                        });
+                    }
+
                     _.extend(query, scope.postParams);
 
                     return $http.post(scope.api, query).then(function (response) {
@@ -157,5 +159,5 @@
         }
     }
 
-    angular.module('sds-angular-controls').directive('dataSourceVelocity', dataSourceVelocity);
+    angular.module('sds-angular-controls').directive('dbApiVelocity', dbApiVelocity);
 })();

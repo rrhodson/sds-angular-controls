@@ -90,6 +90,9 @@ input.datepicker+ul {
     display: inline-block;
 }
 
-table.table tbody>tr>td{
+db-grid.table tbody>tr>td{
     vertical-align: middle;
+}
+db-grid.table thead>tr>td{
+    vertical-align: bottom;
 }
