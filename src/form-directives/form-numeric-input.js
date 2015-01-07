@@ -3,24 +3,23 @@
  */
 (function () {
     'use strict';
-    function formDatePicker ($filter, $rootScope) {
+    function formNumericInput ($filter) {
         return{
             restrict: 'EA',
             replace: true,
             scope: {
-                dateFormat       : '@',
-                log              : '@?',
-                style            : '@?',
-                max              : '@?',
-                min              : '@?',
-                layoutCss        : '@?', //default col-md-6
-                isReadonly       : '=?',  //boolean
-                disableTimepicker: '=?'
+                log             : '@?',
+                placeholder     : '@?',
+                style           : '@?',
+                layoutCss       : '@?', //default col-md-6
+                rightLabel      : '@?',
+                isReadonly      : '=?'  //boolean
             },
-            templateUrl: 'sds-angular-controls/form-directives/form-datepicker.html',
-
+            templateUrl: 'sds-angular-controls/form-directives/form-numeric-input.html',
             link: function (scope, element) {
+
                 var parentScope = element.parent().scope();
+
                 parentScope.$watch('record', function(newVal, oldVal){
                     //formField.setValue(newVal[scope.field]);
                     scope.record = newVal;
@@ -41,20 +40,15 @@
                     scope.layout = newVal;
                 });
 
+                parentScope.$watch('label', function(newVal, oldVal){
+                    //formField.setValue(newVal[scope.field]);
+                    scope.label = newVal;
+                    scope.placeholder = scope.placeholder || newVal;
+                });
+
                 scope.isReadonly = scope.isReadonly || false;
 
                 scope.log = scope.log || false;
-
-                scope.disableTimepicker = scope.disableTimepicker || false;
-                scope.dateFormat = scope.dateFormat || "MM-dd-yyyy";
-
-                scope.calendar = {opened: false};
-                scope.open = function($event) {
-                    $event.preventDefault();
-                    $event.stopPropagation();
-
-                    scope.calendar.opened = true;
-                };
 
                 switch(scope.layout){
                     case "horizontal":
@@ -64,12 +58,27 @@
                         scope.layoutCss = scope.layoutCss || "col-md-4";
                 }
 
+
+
+
+                scope.$watch("isReadonly", function(newVal, oldVal){
+                    if(newVal && oldVal) {
+                        if (newVal !== oldVal) {
+                            checkIfReadonly();
+                        }
+                    }
+                });
+
                 function checkIfReadonly(){
-                    scope.readOnlyModel = moment(scope.record[scope.field]).format(scope.dateFormat);
+                    if(scope.isReadonly) {
+                        if (scope.fieldType === 'toggle') {
+                            scope.readOnlyModel = scope.record[scope.field];
+                        }
+                    }
                 }
             }
         }
     }
 
-    angular.module('sds-angular-controls').directive('formDatePicker', formDatePicker);
+    angular.module('sds-angular-controls').directive('formNumericInput', formNumericInput);
 })();

@@ -6,7 +6,7 @@
  */
 (function () {
     'use strict';
-    function formField ($filter) {
+    function formField ($filter, $timeout) {
         return{
             restrict: 'EA',
             transclude: true,
@@ -21,14 +21,22 @@
                 layout                  : '@?',
                 labelCss                : '@?',
                 layoutCss               : '@?',
+                showLabel               : '=?',
                 errorLayoutCss          : '@?',
                 hideValidationMessage   : '=?',  //default is false
                 validationFieldName       : '@?'  //to override the default label   '[validationFieldName]' is required
             },
             templateUrl: 'sds-angular-controls/form-directives/form-field.html',
             require: '^form',
-            controller: function($scope, $element, $attrs){
-
+            link: function($scope, element, attrs, form){
+                //include a default form-input if no transclude included
+                $scope.showDefault = false;
+                $timeout(function(){
+                    if($(element).find('ng-transclude *').length === 0){
+                        $scope.showDefault = true;
+                    }
+                }, 0);
+                //end include
 
                 $scope.layout = $scope.layout || "stacked";
 
@@ -52,32 +60,12 @@
                 $scope.errorLayoutCss = $scope.errorLayoutCss || "col-md-12";
 
                 if($scope.layout === "horizontal"){
-                    $scope.labelCss = $scope.labelCss || "col-md-2";
+                    $scope.labelCss = $scope.labelCss || "col-md-4";
                 }
 
-                //this.getRecord = function(){
-                //    return $scope.record;
-                //};
-                //
-                //this.getField = function() {
-                //    return $scope.field;
-                //};
-                //
-                //this.getRequired = function() {
-                //    return $scope.isRequired;
-                //};
-                //
-                //this.getLayout = function() {
-                //    return $scope.layout;
-                //};
-
-                this.setValue = function(val){
-                    $scope.record[$scope.field] = val;
-                };
-
+                //validation ie. on submit
                 $scope.showError = function(field){
                     try{
-                        var form = $($element).closest("form");
                         if(form.$submitted){
                             return field.$invalid;
                         }else {
@@ -87,17 +75,9 @@
                     catch(err){
                         return false;
                     }
-                };
-
-                this.setMin = function (min){
-                    $scope.min = min;
-                };
-
-                this.setMax = function (max){
-                    $scope.max = max;
-                };
-
+                }
             }
+
         }
     }
 

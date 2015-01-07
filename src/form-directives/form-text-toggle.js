@@ -3,23 +3,25 @@
  */
 (function () {
     'use strict';
-    function formDatePicker ($filter, $rootScope) {
+    function formTextToggle ($filter) {
         return{
             restrict: 'EA',
             replace: true,
             scope: {
-                dateFormat       : '@',
-                log              : '@?',
-                style            : '@?',
-                max              : '@?',
-                min              : '@?',
-                layoutCss        : '@?', //default col-md-6
-                isReadonly       : '=?',  //boolean
-                disableTimepicker: '=?'
+                log             : '@?',
+                placeholder     : '@?',
+                toggleField     : '@?', //one-way binding
+                toggleSwitchType: '@?',
+                onLabel         : '@?',
+                offLabel        : '@?',
+                style           : '@?',
+                type            : '@',  //text, email, number etc.. see the InputTypes
+                layoutCss       : '@?', //default col-md-6
+                isReadonly      : '=?'  //boolean
             },
-            templateUrl: 'sds-angular-controls/form-directives/form-datepicker.html',
-
+            templateUrl: 'sds-angular-controls/form-directives/form-text-toggle.html',
             link: function (scope, element) {
+                // defaults
                 var parentScope = element.parent().scope();
                 parentScope.$watch('record', function(newVal, oldVal){
                     //formField.setValue(newVal[scope.field]);
@@ -44,17 +46,12 @@
                 scope.isReadonly = scope.isReadonly || false;
 
                 scope.log = scope.log || false;
+                scope.type = scope.type || "text";
 
-                scope.disableTimepicker = scope.disableTimepicker || false;
-                scope.dateFormat = scope.dateFormat || "MM-dd-yyyy";
+                scope.toggleSwitchType = scope.toggleSwitchType || "primary";
+                scope.onLabel = scope.onLabel   || "Yes";
+                scope.offLabel = scope.offLabel || "No";
 
-                scope.calendar = {opened: false};
-                scope.open = function($event) {
-                    $event.preventDefault();
-                    $event.stopPropagation();
-
-                    scope.calendar.opened = true;
-                };
 
                 switch(scope.layout){
                     case "horizontal":
@@ -64,12 +61,22 @@
                         scope.layoutCss = scope.layoutCss || "col-md-4";
                 }
 
+                scope.$watch("isReadonly", function(newVal, oldVal){
+                    if(newVal !== oldVal){
+                        checkIfReadonly();
+                    }
+                });
+
                 function checkIfReadonly(){
-                    scope.readOnlyModel = moment(scope.record[scope.field]).format(scope.dateFormat);
+                    if(scope.isReadonly) {
+                        if (scope.fieldType === 'toggle') {
+                            scope.readOnlyModel = scope.record[scope.field];
+                        }
+                    }
                 }
             }
         }
     }
 
-    angular.module('sds-angular-controls').directive('formDatePicker', formDatePicker);
+    angular.module('sds-angular-controls').directive('formTextToggle', formTextToggle);
 })();
