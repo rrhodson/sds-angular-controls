@@ -1,6 +1,6 @@
 <div class="{{::inputLayoutCss}} text-toggle">
     <input type='text' ng-readonly="isReadonly" type='{{::type}}'
-           class="form-control inputField " ng-model='record[field]'/>
+           class="form-control inputField" ng-required='isRequired' ng-model='record[field]'/>
 
     <!-- bug in toggle where setting any disabled makes it disabled - so needing an if here -->
     <toggle-switch ng-if="isReadonly" disabled="true" class="{{::toggleSwitchType}}" ng-model="record[toggleField]"
@@ -10,4 +10,9 @@
                    on-label="{{::onLabel}}" off-label="{{::offLabel}}">
     </toggle-switch>
     <!--<div class="rightLabel">{{record[toggleField] ? onLabel : offLabel}}</div>-->
+    <div ng-if="log">
+        form-input value: {{record[field]}}<br>
+        togglefield: {{record[toggleField]}}<br>
+        isRequired: {{isRequired | json}}
+    </div>
 </div>
