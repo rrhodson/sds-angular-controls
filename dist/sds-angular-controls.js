@@ -1,4 +1,4 @@
-/*! sds-angular-controls - v0.2.2 - 2015-01-06
+/*! sds-angular-controls - v0.2.2 - 2015-01-07
 * https://github.com/SMARTDATASYSTEMSLLC/sds-angular-controls
 * Copyright (c) 2015 Steve Gentile, David Benson; Licensed  */
 angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSanitize']);
@@ -371,7 +371,7 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                 $scope.errorLayoutCss = $scope.errorLayoutCss || "col-md-12";
 
                 if($scope.layout === "horizontal"){
-                    $scope.labelCss = $scope.labelCss || "col-md-2";
+                    $scope.labelCss = $scope.labelCss || "col-md-4";
                 }
 
                 //validation ie. on submit
@@ -411,6 +411,7 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                 min             : '@?',
                 type            : '@',  //text, email, number etc.. see the InputTypes
                 layoutCss       : '@?', //default col-md-6
+                inputLayout     : '@?',
                 rightLabel      : '@?',
                 isReadonly      : '=?'  //boolean
             },
@@ -436,8 +437,14 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                 });
 
                 parentScope.$watch('layout', function(newVal, oldVal){
-                    //formField.setValue(newVal[scope.field]);
                     scope.layout = newVal;
+                    switch(scope.layout){
+                        case "horizontal":
+                            scope.inputLayout = scope.inputLayout || "col-md-6";
+                            break;
+                        default: //stacked
+                            scope.inputLayout = scope.inputLayout || "col-md-4";
+                    }
                 });
 
                 parentScope.$watch('label', function(newVal, oldVal){
@@ -455,14 +462,13 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                 scope.max = parentScope.max;
 
 
-                switch(scope.layout){
-                    case "horizontal":
-                        scope.layoutCss = scope.layoutCss || "col-md-6";
-                        break;
-                    default: //stacked
-                        scope.layoutCss = scope.layoutCss || "col-md-4";
-                }
-
+                //switch(scope.layout){
+                //    case "horizontal":
+                //        scope.layoutCss = scope.inputLayout || "col-md-6";
+                //        break;
+                //    default: //stacked
+                //        scope.layoutCss = scope.inputLayout || "col-md-4";
+                //}
 
 
 
@@ -1458,7 +1464,7 @@ angular.module('sds-angular-controls').run(['$templateCache', function($template
 
 
   $templateCache.put('sds-angular-controls/form-directives/form-input.html',
-    "<div> <div class=\"{{layout === 'horizontal' ? layoutCss : '' }}\"> <input class=\"form-control inputField {{layout === 'stacked' ? layoutCss : ''}}\" ng-model=\"record[field]\" type=\"{{::type}}\" ng-required=\"isRequired\" ng-disabled=\"isReadonly\" placeholder=\"{{::placeholder}}\" max=\"{{::max}}\" min=\"{{::min}}\" style=\"{{::style}}\" mask-input=\"{{mask}}\"> <div ng-if=\"::(rightLabel && rightLabel.length > 0)\" class=\"rightLabel\">{{::rightLabel}}</div> <div ng-if=\"log\"> form-input value: {{record[field]}}<br> {{isRequired}} </div> </div> </div>"
+    "<div> <div class=\"{{layout === 'horizontal' ? inputLayout : '' }}\"> <input class=\"form-control inputField {{layout === 'stacked' ? layoutCss : ''}}\" ng-model=\"record[field]\" type=\"{{::type}}\" ng-required=\"isRequired\" ng-disabled=\"isReadonly\" placeholder=\"{{::placeholder}}\" max=\"{{::max}}\" min=\"{{::min}}\" style=\"{{::style}}\" mask-input=\"{{mask}}\"> <div ng-if=\"::(rightLabel && rightLabel.length > 0)\" class=\"rightLabel\">{{::rightLabel}}</div> <div ng-if=\"log\"> form-input value: {{record[field]}}<br> {{isRequired}} </div> </div> </div>"
   );
 
 

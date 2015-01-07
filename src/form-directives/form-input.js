@@ -16,6 +16,7 @@
                 min             : '@?',
                 type            : '@',  //text, email, number etc.. see the InputTypes
                 layoutCss       : '@?', //default col-md-6
+                inputLayout     : '@?',
                 rightLabel      : '@?',
                 isReadonly      : '=?'  //boolean
             },
@@ -41,8 +42,14 @@
                 });
 
                 parentScope.$watch('layout', function(newVal, oldVal){
-                    //formField.setValue(newVal[scope.field]);
                     scope.layout = newVal;
+                    switch(scope.layout){
+                        case "horizontal":
+                            scope.inputLayout = scope.inputLayout || "col-md-6";
+                            break;
+                        default: //stacked
+                            scope.inputLayout = scope.inputLayout || "col-md-4";
+                    }
                 });
 
                 parentScope.$watch('label', function(newVal, oldVal){
@@ -60,14 +67,13 @@
                 scope.max = parentScope.max;
 
 
-                switch(scope.layout){
-                    case "horizontal":
-                        scope.layoutCss = scope.layoutCss || "col-md-6";
-                        break;
-                    default: //stacked
-                        scope.layoutCss = scope.layoutCss || "col-md-4";
-                }
-
+                //switch(scope.layout){
+                //    case "horizontal":
+                //        scope.layoutCss = scope.inputLayout || "col-md-6";
+                //        break;
+                //    default: //stacked
+                //        scope.layoutCss = scope.inputLayout || "col-md-4";
+                //}
 
 
 

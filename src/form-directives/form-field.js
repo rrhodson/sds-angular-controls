@@ -60,7 +60,7 @@
                 $scope.errorLayoutCss = $scope.errorLayoutCss || "col-md-12";
 
                 if($scope.layout === "horizontal"){
-                    $scope.labelCss = $scope.labelCss || "col-md-2";
+                    $scope.labelCss = $scope.labelCss || "col-md-4";
                 }
 
                 //validation ie. on submit
