@@ -8,7 +8,6 @@
             restrict: 'EA',
             replace: true,
             scope: {
-                log             : '@?',
                 placeholder     : '@?',
                 toggleField     : '@?', //one-way binding
                 toggleSwitchType: '@?',
@@ -16,7 +15,6 @@
                 offLabel        : '@?',
                 style           : '@?',
                 type            : '@',  //text, email, number etc.. see the InputTypes
-                layoutCss       : '@?', //default col-md-6
                 isReadonly      : '=?'  //boolean
             },
             templateUrl: 'sds-angular-controls/form-directives/form-text-toggle.html',
@@ -38,11 +36,6 @@
                     scope.isRequired = newVal;
                 });
 
-                parentScope.$watch('layout', function(newVal, oldVal){
-                    //formField.setValue(newVal[scope.field]);
-                    scope.layout = newVal;
-                });
-
                 scope.isReadonly = scope.isReadonly || false;
 
                 scope.log = scope.log || false;
@@ -52,14 +45,6 @@
                 scope.onLabel = scope.onLabel   || "Yes";
                 scope.offLabel = scope.offLabel || "No";
 
-
-                switch(scope.layout){
-                    case "horizontal":
-                        scope.layoutCss = scope.layoutCss || "col-md-6";
-                        break;
-                    default: //stacked
-                        scope.layoutCss = scope.layoutCss || "col-md-4";
-                }
 
                 scope.$watch("isReadonly", function(newVal, oldVal){
                     if(newVal !== oldVal){

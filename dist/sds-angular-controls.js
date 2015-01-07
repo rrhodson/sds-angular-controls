@@ -1,4 +1,4 @@
-/*! sds-angular-controls - v0.2.3 - 2015-01-07
+/*! sds-angular-controls - v0.2.4 - 2015-01-07
 * https://github.com/SMARTDATASYSTEMSLLC/sds-angular-controls
 * Copyright (c) 2015 Steve Gentile, David Benson; Licensed MIT */
 angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSanitize']);
@@ -773,7 +773,6 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
             restrict: 'EA',
             replace: true,
             scope: {
-                log             : '@?',
                 placeholder     : '@?',
                 toggleField     : '@?', //one-way binding
                 toggleSwitchType: '@?',
@@ -781,7 +780,6 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                 offLabel        : '@?',
                 style           : '@?',
                 type            : '@',  //text, email, number etc.. see the InputTypes
-                layoutCss       : '@?', //default col-md-6
                 isReadonly      : '=?'  //boolean
             },
             templateUrl: 'sds-angular-controls/form-directives/form-text-toggle.html',
@@ -803,11 +801,6 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                     scope.isRequired = newVal;
                 });
 
-                parentScope.$watch('layout', function(newVal, oldVal){
-                    //formField.setValue(newVal[scope.field]);
-                    scope.layout = newVal;
-                });
-
                 scope.isReadonly = scope.isReadonly || false;
 
                 scope.log = scope.log || false;
@@ -817,14 +810,6 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                 scope.onLabel = scope.onLabel   || "Yes";
                 scope.offLabel = scope.offLabel || "No";
 
-
-                switch(scope.layout){
-                    case "horizontal":
-                        scope.layoutCss = scope.layoutCss || "col-md-6";
-                        break;
-                    default: //stacked
-                        scope.layoutCss = scope.layoutCss || "col-md-4";
-                }
 
                 scope.$watch("isReadonly", function(newVal, oldVal){
                     if(newVal !== oldVal){
@@ -1495,7 +1480,7 @@ angular.module('sds-angular-controls').run(['$templateCache', function($template
 
 
   $templateCache.put('sds-angular-controls/form-directives/form-text-toggle.html',
-    "<div class=\"{{::inputLayoutCss}} text-toggle\"> <input type=\"text\" ng-readonly=\"isReadonly\" type=\"{{::type}}\" class=\"form-control inputField\" ng-required=\"isRequired\" ng-model=\"record[field]\"> <!-- bug in toggle where setting any disabled makes it disabled - so needing an if here --> <toggle-switch ng-if=\"isReadonly\" disabled class=\"{{::toggleSwitchType}}\" ng-model=\"record[toggleField]\" on-label=\"{{::onLabel}}\" off-label=\"{{::offLabel}}\"> </toggle-switch> <toggle-switch ng-if=\"!isReadonly\" class=\"{{::toggleSwitchType}}\" ng-model=\"record[toggleField]\" on-label=\"{{::onLabel}}\" off-label=\"{{::offLabel}}\"> </toggle-switch> <!--<div class=\"rightLabel\">{{record[toggleField] ? onLabel : offLabel}}</div>--> <div ng-if=\"log\"> form-input value: {{record[field]}}<br> togglefield: {{record[toggleField]}}<br> isRequired: {{isRequired | json}} </div> </div>"
+    "<div class=\"text-toggle\"> <input type=\"text\" ng-readonly=\"isReadonly\" type=\"{{::type}}\" class=\"form-control inputField\" ng-required=\"isRequired\" ng-model=\"record[field]\"> <!-- bug in toggle where setting any disabled makes it disabled - so needing an if here --> <toggle-switch ng-if=\"isReadonly\" disabled class=\"{{::toggleSwitchType}}\" ng-model=\"record[toggleField]\" on-label=\"{{::onLabel}}\" off-label=\"{{::offLabel}}\"> </toggle-switch> <toggle-switch ng-if=\"!isReadonly\" class=\"{{::toggleSwitchType}}\" ng-model=\"record[toggleField]\" on-label=\"{{::onLabel}}\" off-label=\"{{::offLabel}}\"> </toggle-switch> </div>"
   );
 
 

@@ -9,7 +9,8 @@
   "description": "Angular Directives used with sds-angular generator",
   "license": "MIT",
   "main": [
-    "dist/sds-angular-controls.js"
+    "dist/sds-angular-controls.js",
+    "dist/sds-angular-controls.css"
   ],
   "keywords": [
     "angular",
