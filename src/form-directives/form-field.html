@@ -37,7 +37,7 @@
     </div>
 
     <div ng-if="layout === 'horizontal'" class="row">
-        <div class='form-group' ng-form="{{field}}"
+        <div class='form-group clearfix' ng-form="{{field}}"
          ng-class="{ 'has-error': showError({{field}}) }">
 
         <label ng-if="showLabel" class='control-label {{labelCss}}'> {{ label }} <span ng-if='isRequired && !isReadonly'>*</span></label>
@@ -46,7 +46,12 @@
             <div ng-if="showDefault"><form-input></form-input></div>
 
         <!-- validation -->
-        <div class="pull-right" ng-include="'validation.html'"></div>
+            <div ng-if="!hideValidationMessage" ng-show='showError({{field}})' class="popover right alert-danger"
+                 style="display:inline-block; top:auto; left:auto; margin-top:-4px; min-width:240px;">
+                <div class="arrow" style="top: 20px"></div>
+                <div class="popover-content" ng-include="'validation.html'" >
+                </div>
+            </div>
         </div>
     </div>
 
@@ -57,6 +62,3 @@
         <div ng-if="showDefault"><form-input></form-input></div>
     </div>
 </div>
-
-
-
