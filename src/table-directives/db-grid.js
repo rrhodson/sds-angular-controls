@@ -20,6 +20,7 @@
             restrict: 'E',
             replace: true,
             transclude:true,
+            scope:true,
             templateUrl: 'sds-angular-controls/table-directives/db-grid.html',
             compile: function (tElement, tAttrs){
                 var loop = tAttrs.for.split(' ');
@@ -60,7 +61,9 @@
                 var loop = $attrs.for.split(' ');
                 $scope.rowName = loop[0];
                 if (loop[2]) {
-                    $element.parent().scope().$watch(loop.slice(2).join(' '), function (items) {
+                    console.log(loop.slice(2).join(' '),$element.parent().scope() );
+                    $scope.$watch(loop.slice(2).join(' '), function (items) {
+                        console.log('gotItems');
                         $scope._model.items = items;
                         refresh();
                     });
