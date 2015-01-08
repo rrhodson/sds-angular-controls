@@ -8,13 +8,11 @@ To Install this package:
     bower install SMARTDATASYSTEMSLLC/sds-angular-controls --save
 
 
+See the wiki for more information on these controls
+
+
+
+[Form-Field Directives](https://github.com/SMARTDATASYSTEMSLLC/sds-angular-controls/wiki/Form-Field-Directives)
+
 -------------
 
-    # commit your changes
-    git commit -am "Made some awesome new changes, now its even awesomer"
-    
-    # tag the commit
-    git tag -a v0.0.2 -m "Release version 0.0.2"
-    
-    # push to GitHub
-    git push origin master --tags 
