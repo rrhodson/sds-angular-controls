@@ -240,6 +240,121 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
 
 (function () {
     'use strict';
+    function formSelect ($filter, $rootScope) {
+        return{
+            restrict: 'EA',
+            //require: '^formField',
+            replace: true,
+            scope: {
+                items           : '=',
+                itemKey         : '@?',
+                itemValue       : '@?',
+                log             : '@?',
+                style           : '@?',
+                layoutCss       : '@?', //default col-md-6
+                isReadonly      : '=?'  //boolean
+            },
+            templateUrl: 'sds-angular-controls/form-directives/form-select.html',
+
+            link: function (scope, element) {
+                // defaults
+                var parentScope = element.parent().scope();
+                parentScope.$watch('record', function(newVal, oldVal){
+                    //formField.setValue(newVal[scope.field]);
+                    scope.record = newVal;
+                });
+
+                parentScope.$watch('field', function(newVal, oldVal){
+                    //formField.setValue(newVal[scope.field]);
+                    scope.field = newVal;
+                });
+
+                parentScope.$watch('isRequired', function(newVal, oldVal){
+                    //formField.setValue(newVal[scope.field]);
+                    scope.isRequired = newVal;
+                });
+
+                parentScope.$watch('layout', function(newVal, oldVal){
+                    //formField.setValue(newVal[scope.field]);
+                    scope.layout = newVal;
+                });
+
+                scope.isReadonly = scope.isReadonly || false;
+
+                scope.log = scope.log || false;
+
+
+                switch(scope.layout){
+                    case "horizontal":
+                        scope.layoutCss = scope.layoutCss || "col-md-6";
+                        break;
+                    default: //stacked
+                        scope.layoutCss = scope.layoutCss || "col-md-4";
+                }
+
+                scope.orderHash = function(obj){
+                    if (!obj) {
+                        return [];
+                    }
+                    return obj.orderedKeys || Object.keys(obj);
+                };
+
+                function convertToHash(items, itemKey, itemValue){
+                    var OrderedDictionary = function (){};
+                    OrderedDictionary.prototype.orderedKeys = [];
+                    return _.reduce(items, function (result, item) {
+                        result[item[itemKey]] = item[itemValue];
+
+                        // set the ordered keys value
+                        result.orderedKeys.push(item[itemKey]);
+                        return result;
+                    }, new OrderedDictionary());
+                }
+
+                function checkIfReadonly(){
+                    if(scope.isReadonly) {
+                        if (scope.record && scope.record[scope.field]) {
+
+                            var value = scope.items[scope.record[scope.field]];
+                            scope.readOnlyModel = value;
+                        }
+                    }
+                }
+
+                // If a key is numeric, javascript converts it to a string when using a foreach. This
+                // tests if the key is numeric, and if so converts it back.
+                scope.convertType = function (item){
+                    //if the record is a string type then keep the item as a string
+                    if(scope.record && scope.record[scope.field]) {
+                        if (typeof scope.record[scope.field] === 'string') {
+                            return item.toString();
+                        }
+                    }
+                    //if it's a number - make sure the values are numbers
+                    if (item && !isNaN(parseInt(item, 10))) {
+                        return parseInt(item, 10);
+                    } else {
+                        return item;
+                    }
+                };
+
+                scope.$watch("items", function(newVal, oldVal){
+                    if(scope.items && _.isArray(scope.items)) {
+                        if (scope.itemKey && scope.itemValue) {
+                            scope.items = convertToHash(scope.items, scope.itemKey, scope.itemValue);
+                        }
+                    }
+                });
+            }
+        }
+    }
+    formSelect.$inject = ["$filter", "$rootScope"];
+
+    angular.module('sds-angular-controls').directive('formSelect', formSelect);
+})();
+
+(function () {
+    'use strict';
     function formDatePicker ($filter, $rootScope) {
         return{
             restrict: 'EA',
@@ -1342,7 +1457,7 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                 $scope.rowName = loop[0];
                 if (loop[2]) {
                     console.log(loop.slice(2).join(' '),$element.parent().scope() );
-                    $scope.$watch(loop.slice(2).join(' '), function (items) {
+                    $scope.$watchCollection(loop.slice(2).join(' '), function (items) {
                         console.log('gotItems');
                         $scope._model.items = items;
                         refresh();
@@ -1425,6 +1540,11 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
 
 angular.module('sds-angular-controls').run(['$templateCache', function($templateCache) {
   'use strict';
+
+  $templateCache.put('sds-angular-controls/form-directives/form-autocomplete.html',
+    "<div> <select ng-if=\"!isReadonly && !hasFilter\" ng-readonly=\"isReadonly\" class=\"form-control\" name=\"{{::field}}\" ng-model=\"record[field]\" ng-required=\"isRequired\"></select> <!-- optionValue as optionLabel for arrayItem in array --> <input ng-if=\"isReadonly\" style=\"{{::style}}\" ng-readonly=\"isReadonly\" type=\"text\" class=\"form-control inputField {{::inputLayoutCss}}\" ng-model=\"readOnlyModel\"> <div ng-if=\"log\"> form-input value: {{record[field]}}<br> {{isRequired}} </div> </div>"
+  );
+
 
   $templateCache.put('sds-angular-controls/form-directives/form-datepicker.html',
     "<span class=\"input-group\"> <input type=\"text\" style=\"{{::style}}\" class=\"form-control datepicker\" ng-if=\"!isReadonly\" ng-readonly=\"isReadonly\" placeholder=\"{{placeholder}}\" ng-model=\"record[field]\" ng-required=\"::isRequired\" min-date=\"::min\" max-date=\"::max\" datepicker-popup=\"{{::dateFormat}}\" is-open=\"calendar.opened\"> <span ng-if=\"!isReadonly\" class=\"input-group-btn\"> <button type=\"button\" class=\"btn btn-default\" ng-click=\"open($event)\"><i class=\"glyphicon glyphicon-calendar\"></i></button> </span> </span>"

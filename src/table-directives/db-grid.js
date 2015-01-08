@@ -62,7 +62,7 @@
                 $scope.rowName = loop[0];
                 if (loop[2]) {
                     console.log(loop.slice(2).join(' '),$element.parent().scope() );
-                    $scope.$watch(loop.slice(2).join(' '), function (items) {
+                    $scope.$watchCollection(loop.slice(2).join(' '), function (items) {
                         console.log('gotItems');
                         $scope._model.items = items;
                         refresh();
