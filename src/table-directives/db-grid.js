@@ -20,7 +20,7 @@
             restrict: 'E',
             replace: true,
             transclude:true,
-            scope:true,
+            //scope:true,
             templateUrl: 'sds-angular-controls/table-directives/db-grid.html',
             compile: function (tElement, tAttrs){
                 var loop = tAttrs.for.split(' ');
@@ -30,7 +30,6 @@
                 }
 
                 tElement.find('tbody > tr').attr('ng-repeat', loop[0] + ' in _model.filteredItems');
-
             },
             controller: function ($scope, $element, $attrs){
                 var complexFilter = $filter('complexFilter');
@@ -57,9 +56,13 @@
                     onEnter: onEnter,
                     refresh: _.debounce(refresh, 250)
                 };
+                $scope.$grid = {
+                    refresh: $scope._model.refresh,
+                    items: function (){ return $scope._model.filteredItems; }
+                };
 
                 var loop = $attrs.for.split(' ');
-                $scope.rowName = loop[0];
+                $scope._model.rowName = loop[0];
                 if (loop[2]) {
                     console.log(loop.slice(2).join(' '),$element.parent().scope() );
                     $scope.$watchCollection(loop.slice(2).join(' '), function (items) {

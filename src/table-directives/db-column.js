@@ -27,7 +27,7 @@
                 return function (scope, element, attr, dbGrid) {
                     var templateFunc = null;
                     if (!templateText && attr.key){
-                        templateText = '{{' + scope.$parent.rowName + '.' + attr.key + '}}'
+                        templateText = '{{' + scope.$parent._model.rowName + '.' + attr.key + '}}'
                     }
 
                     if (attr.bind === 'true'){

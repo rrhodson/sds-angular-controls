@@ -1311,11 +1311,6 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                     element.append(scope._col.template(scope));
 
                 }else if(!angular.element.trim(element.html())){
-
-                    scope.$grid = {
-                        refresh: scope._model.refresh
-                    };
-
                     var html = angular.element('<span>' + scope._col.template  + '</span>');
                     var compiled = $compile(html) ;
                     element.append(html);
@@ -1359,7 +1354,7 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                 return function (scope, element, attr, dbGrid) {
                     var templateFunc = null;
                     if (!templateText && attr.key){
-                        templateText = '{{' + scope.$parent.rowName + '.' + attr.key + '}}'
+                        templateText = '{{' + scope.$parent._model.rowName + '.' + attr.key + '}}'
                     }
 
                     if (attr.bind === 'true'){
@@ -1408,7 +1403,7 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
             restrict: 'E',
             replace: true,
             transclude:true,
-            scope:true,
+            //scope:true,
             templateUrl: 'sds-angular-controls/table-directives/db-grid.html',
             compile: function (tElement, tAttrs){
                 var loop = tAttrs.for.split(' ');
@@ -1418,7 +1413,6 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                 }
 
                 tElement.find('tbody > tr').attr('ng-repeat', loop[0] + ' in _model.filteredItems');
-
             },
             controller: ["$scope", "$element", "$attrs", function ($scope, $element, $attrs){
                 var complexFilter = $filter('complexFilter');
@@ -1445,9 +1439,13 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                     onEnter: onEnter,
                     refresh: _.debounce(refresh, 250)
                 };
+                $scope.$grid = {
+                    refresh: $scope._model.refresh,
+                    items: function (){ return $scope._model.filteredItems; }
+                };
 
                 var loop = $attrs.for.split(' ');
-                $scope.rowName = loop[0];
+                $scope._model.rowName = loop[0];
                 if (loop[2]) {
                     console.log(loop.slice(2).join(' '),$element.parent().scope() );
                     $scope.$watchCollection(loop.slice(2).join(' '), function (items) {
@@ -1568,12 +1566,12 @@ angular.module('sds-angular-controls').run(['$templateCache', function($template
 
 
   $templateCache.put('sds-angular-controls/form-directives/form-input.html',
-    "<div> <div class=\"{{layout === 'horizontal' ? inputLayout : '' }}\"> <input class=\"form-control inputField {{layout !== 'horizontal' ? layoutCss : ''}}\" ng-model=\"record[field]\" type=\"{{::type}}\" ng-required=\"isRequired\" ng-disabled=\"isReadonly\" placeholder=\"{{::placeholder}}\" max=\"{{::max}}\" min=\"{{::min}}\" style=\"{{::style}}\" mask-input=\"{{mask}}\"> <div ng-if=\"::(rightLabel && rightLabel.length > 0)\" class=\"rightLabel\">{{::rightLabel}}</div> <div ng-if=\"log\"> form-input value: {{record[field]}}<br> {{isRequired}} </div> </div> </div>"
+    "<div> <div class=\"{{layout === 'horizontal' ? inputLayout : '' }}\"> <input class=\"form-control inputField {{layout !== 'horizontal' ? layoutCss : ''}}\" ng-model=\"record[field]\" type=\"{{::type}}\" ng-required=\"isRequired\" ng-disabled=\"isReadonly\" placeholder=\"{{::placeholder}}\" max=\"{{::max}}\" min=\"{{::min}}\" step=\"any\" style=\"{{::style}}\" mask-input=\"{{mask}}\"> <div ng-if=\"::(rightLabel && rightLabel.length > 0)\" class=\"rightLabel\">{{::rightLabel}}</div> <div ng-if=\"log\"> form-input value: {{record[field]}}<br> {{isRequired}} </div> </div> </div>"
   );
 
 
   $templateCache.put('sds-angular-controls/form-directives/form-numeric-input.html',
-    "<div> <div class=\"{{layout === 'horizontal' ? layoutCss : '' }}\"> <input class=\"form-control inputField {{layout === 'stacked' ? layoutCss : ''}}\" ng-model=\"record[field]\" type=\"text\" ng-required=\"isRequired\" ng-disabled=\"isReadonly\" placeholder=\"{{::placeholder}}\" max=\"{{::max}}\" min=\"{{::min}}\" style=\"{{::style}}\" mask-input=\"{{::mask}}\" auto-numeric> <div ng-if=\"::(rightLabel && rightLabel.length > 0)\" class=\"rightLabel\">{{::rightLabel}}</div> <div ng-if=\"log\"> form-input value: {{record[field]}}<br> {{isRequired}} </div> </div> </div>"
+    "<div> <div class=\"{{layout === 'horizontal' ? layoutCss : '' }}\"> <input class=\"form-control inputField {{layout !== 'horizontal' ? layoutCss : ''}}\" ng-model=\"record[field]\" type=\"text\" ng-required=\"isRequired\" ng-disabled=\"isReadonly\" placeholder=\"{{::placeholder}}\" max=\"{{::max}}\" min=\"{{::min}}\" step=\"any\" style=\"{{::style}}\" mask-input=\"{{::mask}}\" auto-numeric> <div ng-if=\"::(rightLabel && rightLabel.length > 0)\" class=\"rightLabel\">{{::rightLabel}}</div> <div ng-if=\"log\"> form-input value: {{record[field]}}<br> {{isRequired}} </div> </div> </div>"
   );
 
 
@@ -1583,7 +1581,7 @@ angular.module('sds-angular-controls').run(['$templateCache', function($template
 
 
   $templateCache.put('sds-angular-controls/form-directives/form-text-area.html',
-    "<div> <div class=\"{{layout === 'horizontal' ? layoutCss : '' }}\"> <textarea class=\"form-control inputField {{layout === 'stacked' ? layoutCss : ''}}\" ng-model=\"record[field]\" type=\"{{::type}}\" ng-required=\"isRequired\" ng-disabled=\"isReadonly\" style=\"{{::style}}\">\n" +
+    "<div> <div class=\"{{layout === 'horizontal' ? layoutCss : '' }}\"> <textarea class=\"form-control inputField {{layout !== 'horizontal' ? layoutCss : ''}}\" ng-model=\"record[field]\" type=\"{{::type}}\" ng-required=\"isRequired\" ng-disabled=\"isReadonly\" style=\"{{::style}}\">\n" +
     "\n" +
     "        <div ng-if=\"log\">\n" +
     "            form-input value: {{record[field]}}<br>\n" +
