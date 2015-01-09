@@ -1,4 +1,4 @@
-/*! sds-angular-controls - v0.2.7 - 2015-01-09
+/*! sds-angular-controls - v0.2.8 - 2015-01-09
 * https://github.com/SMARTDATASYSTEMSLLC/sds-angular-controls
 * Copyright (c) 2015 Steve Gentile, David Benson; Licensed MIT */
 angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSanitize']);
@@ -1599,7 +1599,7 @@ angular.module('sds-angular-controls').run(['$templateCache', function($template
 
 
   $templateCache.put('sds-angular-controls/form-directives/form-time-picker.html',
-    "<div class=\"{{::layoutCss}} timepicker\"> <timepicker ng-model=\"record[field]\" ng-required=\"::isRequired\" ng-if=\"!isReadonly\"></timepicker> </div>"
+    "<div class=\"{{::layoutCss}} timepicker\"> <timepicker ng-model=\"record[field]\" ng-required=\"::isRequired\" ng-if=\"!isReadonly\" minute-step=\"5\"></timepicker> </div>"
   );
 
 
