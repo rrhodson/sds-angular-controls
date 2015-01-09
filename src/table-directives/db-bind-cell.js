@@ -13,6 +13,11 @@
                     element.append(scope._col.template(scope));
 
                 }else if(!angular.element.trim(element.html())){
+
+                    scope.$grid = {
+                        refresh: scope._model.refresh
+                    };
+
                     var html = angular.element('<span>' + scope._col.template  + '</span>');
                     var compiled = $compile(html) ;
                     element.append(html);

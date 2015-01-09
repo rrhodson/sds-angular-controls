@@ -1,6 +1,6 @@
 <div>
     <div class="{{layout === 'horizontal' ? inputLayout : '' }}">
-        <input class="form-control inputField {{layout === 'stacked' ? layoutCss : ''}}"
+        <input class="form-control inputField {{layout !== 'horizontal' ? layoutCss : ''}}"
             ng-model='record[field]'
             type='{{::type}}'
             ng-required='isRequired'

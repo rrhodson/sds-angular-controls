@@ -3,21 +3,24 @@
  */
 (function () {
     'use strict';
-    function formSelect ($filter, $rootScope) {
+    function formAutocomplete ($filter, $rootScope, $timeout) {
         return{
             restrict: 'EA',
             //require: '^formField',
             replace: true,
             scope: {
                 items           : '=',
+                groups          : '=?',
                 itemKey         : '@?',
                 itemValue       : '@?',
+                itemGroupKey    : '@?',
+                itemGroupValue  : '@?',
                 log             : '@?',
                 style           : '@?',
                 layoutCss       : '@?', //default col-md-6
                 isReadonly      : '=?'  //boolean
             },
-            templateUrl: 'sds-angular-controls/form-directives/form-select.html',
+            templateUrl: 'sds-angular-controls/form-directives/form-autocomplete.html',
 
             link: function (scope, element) {
                 // defaults
@@ -62,55 +65,40 @@
                     return obj.orderedKeys || Object.keys(obj);
                 };
 
-                function convertToHash(items, itemKey, itemValue){
-                    var OrderedDictionary = function (){};
-                    OrderedDictionary.prototype.orderedKeys = [];
-                    return _.reduce(items, function (result, item) {
-                        result[item[itemKey]] = item[itemValue];
-
-                        // set the ordered keys value
-                        result.orderedKeys.push(item[itemKey]);
-                        return result;
-                    }, new OrderedDictionary());
-                }
-
-                function checkIfReadonly(){
-                    if(scope.isReadonly) {
-                        if (scope.record && scope.record[scope.field]) {
-
-                            var value = scope.items[scope.record[scope.field]];
-                            scope.readOnlyModel = value;
-                        }
-                    }
-                }
-
-                // If a key is numeric, javascript converts it to a string when using a foreach. This
-                // tests if the key is numeric, and if so converts it back.
-                scope.convertType = function (item){
-                    //if the record is a string type then keep the item as a string
-                    if(scope.record && scope.record[scope.field]) {
-                        if (typeof scope.record[scope.field] === 'string') {
-                            return item.toString();
-                        }
-                    }
-                    //if it's a number - make sure the values are numbers
-                    if (item && !isNaN(parseInt(item, 10))) {
-                        return parseInt(item, 10);
-                    } else {
-                        return item;
-                    }
-                };
-
-                scope.$watch("items", function(newVal, oldVal){
+                function watchChanges (){
                     if(scope.items && _.isArray(scope.items)) {
-                        if (scope.itemKey && scope.itemValue) {
-                            scope.items = convertToHash(scope.items, scope.itemKey, scope.itemValue);
+                        var sel = element.find('.autocomplete');
+                        if (sel[0].selectize){
+                            sel[0].selectize.destroy();
                         }
+                        var options = {
+                            options: angular.copy(scope.items),
+                            valueField: scope.itemKey,
+                            labelField: scope.itemValue,
+                            searchField: [scope.itemValue],
+                            onChange: function (value){
+                                $timeout(function (){
+                                    scope.record[scope.field] = value;
+                                });
+                            },
+                            maxOptions: 10
+                        };
+
+                        if (scope.itemGroupKey && _.isArray(scope.groups)){
+                            options.optgroups =  scope.groups;
+                            options.optgroupField = scope.itemGroupKey;
+                            options.optgroupValueField = scope.itemGroupKey;
+                            options.optgroupLabelField = scope.itemGroupValue;
+                        }
+                        console.log(options);
+                        sel.selectize(options).val(scope.record[scope.field]);
                     }
-                });
+                }
+
+                scope.$watch("items", watchChanges);
             }
         }
     }
 
-    angular.module('sds-angular-controls').directive('formSelect', formSelect);
+    angular.module('sds-angular-controls').directive('formAutocomplete', formAutocomplete);
 })();

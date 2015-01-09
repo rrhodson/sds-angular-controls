@@ -1,4 +1,4 @@
-/*! sds-angular-controls - v0.2.6 - 2015-01-08
+/*! sds-angular-controls - v0.2.7 - 2015-01-09
 * https://github.com/SMARTDATASYSTEMSLLC/sds-angular-controls
 * Copyright (c) 2015 Steve Gentile, David Benson; Licensed MIT */
 angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSanitize']);
@@ -240,21 +240,24 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
 
 (function () {
     'use strict';
-    function formSelect ($filter, $rootScope) {
+    function formAutocomplete ($filter, $rootScope, $timeout) {
         return{
             restrict: 'EA',
             //require: '^formField',
             replace: true,
             scope: {
                 items           : '=',
+                groups          : '=?',
                 itemKey         : '@?',
                 itemValue       : '@?',
+                itemGroupKey    : '@?',
+                itemGroupValue  : '@?',
                 log             : '@?',
                 style           : '@?',
                 layoutCss       : '@?', //default col-md-6
                 isReadonly      : '=?'  //boolean
             },
-            templateUrl: 'sds-angular-controls/form-directives/form-select.html',
+            templateUrl: 'sds-angular-controls/form-directives/form-autocomplete.html',
 
             link: function (scope, element) {
                 // defaults
@@ -299,58 +302,43 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                     return obj.orderedKeys || Object.keys(obj);
                 };
 
-                function convertToHash(items, itemKey, itemValue){
-                    var OrderedDictionary = function (){};
-                    OrderedDictionary.prototype.orderedKeys = [];
-                    return _.reduce(items, function (result, item) {
-                        result[item[itemKey]] = item[itemValue];
-
-                        // set the ordered keys value
-                        result.orderedKeys.push(item[itemKey]);
-                        return result;
-                    }, new OrderedDictionary());
-                }
-
-                function checkIfReadonly(){
-                    if(scope.isReadonly) {
-                        if (scope.record && scope.record[scope.field]) {
-
-                            var value = scope.items[scope.record[scope.field]];
-                            scope.readOnlyModel = value;
-                        }
-                    }
-                }
-
-                // If a key is numeric, javascript converts it to a string when using a foreach. This
-                // tests if the key is numeric, and if so converts it back.
-                scope.convertType = function (item){
-                    //if the record is a string type then keep the item as a string
-                    if(scope.record && scope.record[scope.field]) {
-                        if (typeof scope.record[scope.field] === 'string') {
-                            return item.toString();
-                        }
-                    }
-                    //if it's a number - make sure the values are numbers
-                    if (item && !isNaN(parseInt(item, 10))) {
-                        return parseInt(item, 10);
-                    } else {
-                        return item;
-                    }
-                };
-
-                scope.$watch("items", function(newVal, oldVal){
+                function watchChanges (){
                     if(scope.items && _.isArray(scope.items)) {
-                        if (scope.itemKey && scope.itemValue) {
-                            scope.items = convertToHash(scope.items, scope.itemKey, scope.itemValue);
+                        var sel = element.find('.autocomplete');
+                        if (sel[0].selectize){
+                            sel[0].selectize.destroy();
                         }
+                        var options = {
+                            options: angular.copy(scope.items),
+                            valueField: scope.itemKey,
+                            labelField: scope.itemValue,
+                            searchField: [scope.itemValue],
+                            onChange: function (value){
+                                $timeout(function (){
+                                    scope.record[scope.field] = value;
+                                });
+                            },
+                            maxOptions: 10
+                        };
+
+                        if (scope.itemGroupKey && _.isArray(scope.groups)){
+                            options.optgroups =  scope.groups;
+                            options.optgroupField = scope.itemGroupKey;
+                            options.optgroupValueField = scope.itemGroupKey;
+                            options.optgroupLabelField = scope.itemGroupValue;
+                        }
+                        console.log(options);
+                        sel.selectize(options).val(scope.record[scope.field]);
                     }
-                });
+                }
+
+                scope.$watch("items", watchChanges);
             }
         }
     }
-    formSelect.$inject = ["$filter", "$rootScope"];
+    formAutocomplete.$inject = ["$filter", "$rootScope", "$timeout"];
 
-    angular.module('sds-angular-controls').directive('formSelect', formSelect);
+    angular.module('sds-angular-controls').directive('formAutocomplete', formAutocomplete);
 })();
 
 (function () {
@@ -1323,6 +1311,11 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                     element.append(scope._col.template(scope));
 
                 }else if(!angular.element.trim(element.html())){
+
+                    scope.$grid = {
+                        refresh: scope._model.refresh
+                    };
+
                     var html = angular.element('<span>' + scope._col.template  + '</span>');
                     var compiled = $compile(html) ;
                     element.append(html);
@@ -1542,7 +1535,7 @@ angular.module('sds-angular-controls').run(['$templateCache', function($template
   'use strict';
 
   $templateCache.put('sds-angular-controls/form-directives/form-autocomplete.html',
-    "<div> <select ng-if=\"!isReadonly && !hasFilter\" ng-readonly=\"isReadonly\" class=\"form-control\" name=\"{{::field}}\" ng-model=\"record[field]\" ng-required=\"isRequired\"></select> <!-- optionValue as optionLabel for arrayItem in array --> <input ng-if=\"isReadonly\" style=\"{{::style}}\" ng-readonly=\"isReadonly\" type=\"text\" class=\"form-control inputField {{::inputLayoutCss}}\" ng-model=\"readOnlyModel\"> <div ng-if=\"log\"> form-input value: {{record[field]}}<br> {{isRequired}} </div> </div>"
+    "<div> <select ng-if=\"!isReadonly && !hasFilter\" ng-readonly=\"isReadonly\" class=\"autocomplete\" name=\"{{::field}}\"></select> <!-- optionValue as optionLabel for arrayItem in array --> <input ng-if=\"isReadonly\" style=\"{{::style}}\" ng-readonly=\"isReadonly\" type=\"text\" class=\"form-control inputField {{::inputLayoutCss}}\" ng-model=\"readOnlyModel\"> <div ng-if=\"log\"> form-input value: {{record[field]}}<br> {{isRequired}} </div> </div>"
   );
 
 
@@ -1570,12 +1563,12 @@ angular.module('sds-angular-controls').run(['$templateCache', function($template
     "            <span class='control-label' ng-message='min'> {{ validationFieldName }} must be at least {{min}}. </span>\n" +
     "            <span class='control-label' ng-message='max'> {{ validationFieldName }} must not exceed {{max}} </span>\n" +
     "            <span class='control-label' ng-repeat='(k, v) in types' ng-message='{{k}}'> {{ validationFieldName }}{{v[1]}}</span>\n" +
-    "        </div></script> <div ng-if=\"layout === 'stacked'\" class=\"row\"> <div class=\"form-group clearfix\" ng-form=\"{{field}}\" ng-class=\"{ 'has-error': showError({{field}}) }\"> <div class=\"{{::layoutCss}}\"> <label ng-if=\"showLabel\" class=\"control-label {{labelCss}}\"> {{ label }} <span ng-if=\"isRequired && !isReadonly\">*</span></label> <ng-transclude></ng-transclude> <div ng-if=\"showDefault\"><form-input></form-input></div> <!-- validation --> <div class=\"pull-left\" ng-include=\"'validation.html'\"></div> </div> </div> </div> <div ng-if=\"layout === 'horizontal'\" class=\"row\"> <div class=\"form-group clearfix\" ng-form=\"{{field}}\" ng-class=\"{ 'has-error': showError({{field}}) }\"> <label ng-if=\"showLabel\" class=\"control-label {{labelCss}}\"> {{ label }} <span ng-if=\"isRequired && !isReadonly\">*</span></label> <ng-transclude></ng-transclude> <div ng-if=\"showDefault\"><form-input></form-input></div> <!-- validation --> <div ng-if=\"!hideValidationMessage\" ng-show=\"showError({{field}})\" class=\"popover right alert-danger\" style=\"display:inline-block; top:auto; left:auto; margin-top:-4px; min-width:240px\"> <div class=\"arrow\" style=\"top: 20px\"></div> <div class=\"popover-content\" ng-include=\"'validation.html'\"> </div> </div> </div> </div> <div ng-if=\"layout === 'grid'\" ng-form=\"{{field}}\" ng-class=\"{ 'has-error': showError({{field}}) }\"> <ng-transclude></ng-transclude> <div ng-if=\"showDefault\"><form-input></form-input></div> </div> </div>"
+    "        </div></script> <div ng-if=\"layout === 'stacked'\" class=\"row\"> <div class=\"form-group clearfix\" ng-form=\"{{field}}\" ng-class=\"{ 'has-error': showError({{field}}) }\"> <div class=\"{{::layoutCss}}\"> <label ng-if=\"showLabel\" class=\"control-label {{labelCss}}\"> {{ label }} <span ng-if=\"isRequired && !isReadonly\">*</span></label> <ng-transclude></ng-transclude> <div ng-if=\"showDefault\"><form-input></form-input></div> <!-- validation --> <div class=\"pull-left\" ng-include=\"'validation.html'\"></div> </div> </div> </div> <div ng-if=\"layout === 'horizontal'\" class=\"row\"> <div class=\"form-group clearfix\" ng-form=\"{{field}}\" ng-class=\"{ 'has-error': showError({{field}}) }\"> <label ng-if=\"showLabel\" class=\"control-label {{labelCss}}\"> {{ label }} <span ng-if=\"isRequired && !isReadonly\">*</span></label> <ng-transclude></ng-transclude> <div ng-if=\"showDefault\"><form-input></form-input></div> <!-- validation --> <div ng-if=\"!hideValidationMessage\" ng-show=\"showError({{field}})\" class=\"popover right alert-danger\" style=\"display:inline-block; top:auto; left:auto; margin-top:-4px; min-width:240px\"> <div class=\"arrow\" style=\"top: 20px\"></div> <div class=\"popover-content\" ng-include=\"'validation.html'\"> </div> </div> </div> </div> <div ng-if=\"layout !== 'stacked' && layout !== 'horizontal'\" ng-form=\"{{field}}\" ng-class=\"{ 'has-error': showError({{field}}) }\"> <ng-transclude></ng-transclude> <div ng-if=\"showDefault\"><form-input></form-input></div> </div> </div>"
   );
 
 
   $templateCache.put('sds-angular-controls/form-directives/form-input.html',
-    "<div> <div class=\"{{layout === 'horizontal' ? inputLayout : '' }}\"> <input class=\"form-control inputField {{layout === 'stacked' ? layoutCss : ''}}\" ng-model=\"record[field]\" type=\"{{::type}}\" ng-required=\"isRequired\" ng-disabled=\"isReadonly\" placeholder=\"{{::placeholder}}\" max=\"{{::max}}\" min=\"{{::min}}\" style=\"{{::style}}\" mask-input=\"{{mask}}\"> <div ng-if=\"::(rightLabel && rightLabel.length > 0)\" class=\"rightLabel\">{{::rightLabel}}</div> <div ng-if=\"log\"> form-input value: {{record[field]}}<br> {{isRequired}} </div> </div> </div>"
+    "<div> <div class=\"{{layout === 'horizontal' ? inputLayout : '' }}\"> <input class=\"form-control inputField {{layout !== 'horizontal' ? layoutCss : ''}}\" ng-model=\"record[field]\" type=\"{{::type}}\" ng-required=\"isRequired\" ng-disabled=\"isReadonly\" placeholder=\"{{::placeholder}}\" max=\"{{::max}}\" min=\"{{::min}}\" style=\"{{::style}}\" mask-input=\"{{mask}}\"> <div ng-if=\"::(rightLabel && rightLabel.length > 0)\" class=\"rightLabel\">{{::rightLabel}}</div> <div ng-if=\"log\"> form-input value: {{record[field]}}<br> {{isRequired}} </div> </div> </div>"
   );
 
 
@@ -1608,7 +1601,7 @@ angular.module('sds-angular-controls').run(['$templateCache', function($template
 
 
   $templateCache.put('sds-angular-controls/form-directives/form-time-picker.html',
-    "<div class=\"{{::layoutCss}}\"> <timepicker ng-model=\"record[field]\" ng-required=\"::isRequired\" ng-if=\"!isReadonly\"></timepicker> </div>"
+    "<div class=\"{{::layoutCss}} timepicker\"> <timepicker ng-model=\"record[field]\" ng-required=\"::isRequired\" ng-if=\"!isReadonly\"></timepicker> </div>"
   );
 
 

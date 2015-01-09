@@ -57,6 +57,21 @@ input.datepicker+ul {
     margin: 0px 10px;
 }
 
+.timepicker table {
+    margin-top: -10px;
+    margin-bottom: -10px;
+    position: relative;
+    z-index: 1;
+    margin-left: -5px;
+}
+.timepicker table tr.text-center .btn{
+    height: 10px;
+    line-height: 10px;
+    font-size: 10px;
+    padding: 0px;
+    margin-top: -5px;
+}
+
 
 
 

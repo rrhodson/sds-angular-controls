@@ -1,6 +1,5 @@
 <div>
-    <select ng-if="!isReadonly && !hasFilter" ng-readonly="isReadonly"  class="form-control" name="{{::field}}"
-            ng-model="record[field]" ng-required="isRequired"></select>
+    <select ng-if="!isReadonly && !hasFilter" ng-readonly="isReadonly"  class="autocomplete" name="{{::field}}"></select>
     <!-- optionValue as optionLabel for arrayItem in array -->
 
     <input ng-if="isReadonly" style="{{::style}}" ng-readonly="isReadonly" type='text'

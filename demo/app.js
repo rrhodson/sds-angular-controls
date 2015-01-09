@@ -38,6 +38,17 @@
       {stateCode: "IN", stateName: "Indiana"},
       {stateCode: "MI", stateName: "Michigan"}
     ];
+
+    vm.countries = [
+      {continent: 'Europe', country: 'Sweeden', countryCode: 'SWE'},
+      {continent: 'North America', country: 'Cananda', countryCode: 'CAN'},
+      {continent: 'North America', country: 'United States', countryCode: 'USA'}
+    ];
+    vm.continents = [
+      {continent: 'Europe'},
+      {continent: 'North America'}
+    ];
+
     vm.itemList = [];
 
     vm.save = function(testFrm){

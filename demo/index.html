@@ -5,6 +5,8 @@
   <title></title>
   <link rel="stylesheet" href="../bower_components/bootstrap/dist/css/bootstrap.min.css" type="text/css">
     <link rel="stylesheet" href="../bower_components/angular-toggle-switch/angular-toggle-switch.css" type="text/css">
+    <link rel="stylesheet" href="../bower_components/selectize/dist/css/selectize.css" type="text/css">
+    <link rel="stylesheet" href="../bower_components/selectize/dist/css/selectize.bootstrap3.css" type="text/css">
   <link rel="stylesheet" href="../bower_components/angular-toggle-switch/angular-toggle-switch-bootstrap.css" type="text/css">
   <link rel="stylesheet" href="../dist/sds-angular-controls.css" type="text/css">
 </head>
@@ -56,6 +58,14 @@
           <form-field record="vm.testForm" field="State" label="State" is-required=true>
               <form-select items="vm.states" log="true" item-key="stateCode" item-value="stateName"></form-select>
           </form-field>
+          <form-field record="vm.testForm" field="State2" layout-css="col-md-8">
+              <form-autocomplete items="vm.states" log="true" item-key="stateCode" item-value="stateName"></form-autocomplete>
+          </form-field>
+          <form-field record="vm.testForm" field="Country" layout-css="col-md-8">
+              <form-autocomplete items="vm.countries" groups="vm.continents" log="true"
+                                 item-key="countryCode" item-value="country"
+                                 item-group-key="continent" item-group-value="continent"></form-autocomplete>
+          </form-field>
           <form-field label="DOB" disable-timepicker="true" placeholder="Select Date" record="vm.testForm" field="DateOfBirth">
               <form-date-picker></form-date-picker>
           </form-field>
@@ -104,6 +114,7 @@
 
   <script src="../bower_components/jquery/dist/jquery.min.js"></script>
   <script src="../bower_components/lodash/dist/lodash.min.js"></script>
+  <script src="../bower_components/selectize/dist/js/standalone/selectize.js"></script>
   <script src="../bower_components/angular/angular.js"></script>
   <script src="../bower_components/angular-sanitize/angular-sanitize.min.js"></script>
   <script src="../bower_components/angular-messages/angular-messages.min.js"></script>
