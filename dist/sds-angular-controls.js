@@ -1,4 +1,4 @@
-/*! sds-angular-controls - v0.2.8 - 2015-01-09
+/*! sds-angular-controls - v0.2.9 - 2015-01-13
 * https://github.com/SMARTDATASYSTEMSLLC/sds-angular-controls
 * Copyright (c) 2015 Steve Gentile, David Benson; Licensed MIT */
 angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSanitize']);
@@ -282,6 +282,11 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                     scope.layout = newVal;
                 });
 
+                parentScope.$watch('isReadonly', function(newVal, oldVal){
+                    //formField.setValue(newVal[scope.field]);
+                    scope.isReadonly = newVal;
+                });
+
                 scope.isReadonly = scope.isReadonly || false;
 
                 scope.log = scope.log || false;
@@ -379,6 +384,11 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                 parentScope.$watch('layout', function(newVal, oldVal){
                     //formField.setValue(newVal[scope.field]);
                     scope.layout = newVal;
+                });
+
+                parentScope.$watch('isReadonly', function(newVal, oldVal){
+                    //formField.setValue(newVal[scope.field]);
+                    scope.isReadonly = newVal;
                 });
 
                 scope.isReadonly = scope.isReadonly || false;
@@ -643,6 +653,11 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                     scope.placeholder = scope.placeholder || newVal;
                 });
 
+                parentScope.$watch('isReadonly', function(newVal, oldVal){
+                    //formField.setValue(newVal[scope.field]);
+                    scope.isReadonly = newVal;
+                });
+
                 scope.isReadonly = scope.isReadonly || false;
 
                 scope.log = scope.log || false;
@@ -720,6 +735,11 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                 parentScope.$watch('layout', function(newVal, oldVal){
                     //formField.setValue(newVal[scope.field]);
                     scope.layout = newVal;
+                });
+
+                parentScope.$watch('isReadonly', function(newVal, oldVal){
+                    //formField.setValue(newVal[scope.field]);
+                    scope.isReadonly = newVal;
                 });
 
                 scope.isReadonly = scope.isReadonly || false;
@@ -838,6 +858,11 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                     scope.placeholder = scope.placeholder || newVal;
                 });
 
+                parentScope.$watch('isReadonly', function(newVal, oldVal){
+                    //formField.setValue(newVal[scope.field]);
+                    scope.isReadonly = newVal;
+                });
+
                 scope.isReadonly = scope.isReadonly || false;
 
                 scope.log = scope.log || false;
@@ -902,6 +927,11 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                 parentScope.$watch('isRequired', function(newVal, oldVal){
                     //formField.setValue(newVal[scope.field]);
                     scope.isRequired = newVal;
+                });
+
+                parentScope.$watch('isReadonly', function(newVal, oldVal){
+                    //formField.setValue(newVal[scope.field]);
+                    scope.isReadonly = newVal;
                 });
 
                 scope.isReadonly = scope.isReadonly || false;
@@ -971,6 +1001,11 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                     scope.layout = newVal;
                 });
 
+                parentScope.$watch('isReadonly', function(newVal, oldVal){
+                    //formField.setValue(newVal[scope.field]);
+                    scope.isReadonly = newVal;
+                });
+
                 scope.isReadonly = scope.isReadonly || false;
 
             }
@@ -1020,6 +1055,11 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                 parentScope.$watch('layout', function(newVal, oldVal){
                     //formField.setValue(newVal[scope.field]);
                     scope.layout = newVal;
+                });
+
+                parentScope.$watch('isReadonly', function(newVal, oldVal){
+                    //formField.setValue(newVal[scope.field]);
+                    scope.isReadonly = newVal;
                 });
 
                 scope.isReadonly = scope.isReadonly || false;
@@ -1594,7 +1634,7 @@ angular.module('sds-angular-controls').run(['$templateCache', function($template
 
 
   $templateCache.put('sds-angular-controls/form-directives/form-text-toggle.html',
-    "<div class=\"text-toggle\"> <input type=\"text\" ng-readonly=\"isReadonly\" type=\"{{::type}}\" class=\"form-control inputField\" ng-required=\"isRequired\" ng-model=\"record[field]\"> <!-- bug in toggle where setting any disabled makes it disabled - so needing an if here --> <toggle-switch ng-if=\"isReadonly\" disabled class=\"{{::toggleSwitchType}}\" ng-model=\"record[toggleField]\" on-label=\"{{::onLabel}}\" off-label=\"{{::offLabel}}\"> </toggle-switch> <toggle-switch ng-if=\"!isReadonly\" class=\"{{::toggleSwitchType}}\" ng-model=\"record[toggleField]\" on-label=\"{{::onLabel}}\" off-label=\"{{::offLabel}}\"> </toggle-switch> </div>"
+    "<div class=\"text-toggle\"> <input type=\"text\" ng-readonly=\"isReadonly\" type=\"{{::type}}\" class=\"form-control inputField\" ng-required=\"isRequired\" ng-model=\"record[field]\"> <!-- bug in toggle where setting any disabled makes it disabled - so needing an if here --> <toggle-switch ng-if=\"isReadonly\" is-disabled=\"true\" class=\"{{::toggleSwitchType}}\" ng-model=\"record[toggleField]\" on-label=\"{{::onLabel}}\" off-label=\"{{::offLabel}}\"> </toggle-switch> <toggle-switch ng-if=\"!isReadonly\" class=\"{{::toggleSwitchType}}\" ng-model=\"record[toggleField]\" on-label=\"{{::onLabel}}\" off-label=\"{{::offLabel}}\"> </toggle-switch> </div>"
   );
 
 
@@ -1604,7 +1644,7 @@ angular.module('sds-angular-controls').run(['$templateCache', function($template
 
 
   $templateCache.put('sds-angular-controls/form-directives/form-toggle.html',
-    "<div> <!-- bug in toggle where setting any disabled makes it disabled - so needing an if here --> <toggle-switch ng-if=\"isReadonly\" style=\"{{::style}}\" disabled class=\"{{::toggleSwitchType}}\" ng-model=\"record[field]\" on-label=\"{{::onLabel}}\" off-label=\"{{::offLabel}}\"> </toggle-switch> <toggle-switch ng-if=\"!isReadonly\" style=\"{{::style}}\" class=\"{{::toggleSwitchType}}\" ng-model=\"record[field]\" on-label=\"{{::onLabel}}\" off-label=\"{{::offLabel}}\"> </toggle-switch> <div ng-if=\"log\"> form-input value: {{record[field]}}<br> {{isRequired}} </div> </div>"
+    "<div> <!-- bug in toggle where setting any disabled makes it disabled - so needing an if here --> <toggle-switch ng-if=\"isReadonly\" style=\"{{::style}}\" is-disabled=\"true\" class=\"{{::toggleSwitchType}}\" ng-model=\"record[field]\" on-label=\"{{::onLabel}}\" off-label=\"{{::offLabel}}\"> </toggle-switch> <toggle-switch ng-if=\"!isReadonly\" style=\"{{::style}}\" class=\"{{::toggleSwitchType}}\" ng-model=\"record[field]\" on-label=\"{{::onLabel}}\" off-label=\"{{::offLabel}}\"> </toggle-switch> <div ng-if=\"log\"> form-input value: {{record[field]}}<br> {{isRequired}} </div> </div>"
   );
 
 
