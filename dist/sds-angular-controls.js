@@ -1,7 +1,7 @@
-/*! sds-angular-controls - v0.2.8 - 2015-01-09
+/*! sds-angular-controls - v0.2.9 - 2015-01-13
 * https://github.com/SMARTDATASYSTEMSLLC/sds-angular-controls
 * Copyright (c) 2015 Steve Gentile, David Benson; Licensed MIT */
-angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSanitize']);
+angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSanitize', 'selectize-ng']);
 
 (function (){
   'use strict';
@@ -253,6 +253,7 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                 itemGroupKey    : '@?',
                 itemGroupValue  : '@?',
                 log             : '@?',
+                allowCustom     : '=?',
                 style           : '@?',
                 layoutCss       : '@?', //default col-md-6
                 isReadonly      : '=?'  //boolean
@@ -295,44 +296,26 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                         scope.layoutCss = scope.layoutCss || "col-md-4";
                 }
 
-                scope.orderHash = function(obj){
-                    if (!obj) {
-                        return [];
-                    }
-                    return obj.orderedKeys || Object.keys(obj);
+                var options = {
+                    valueField: scope.itemKey,
+                    labelField: scope.itemValue,
+                    searchField: [scope.itemValue],
+                    maxOptions: 10
                 };
 
-                function watchChanges (){
-                    if(scope.items && _.isArray(scope.items)) {
-                        var sel = element.find('.autocomplete');
-                        if (sel[0].selectize){
-                            sel[0].selectize.destroy();
-                        }
-                        var options = {
-                            options: angular.copy(scope.items),
-                            valueField: scope.itemKey,
-                            labelField: scope.itemValue,
-                            searchField: [scope.itemValue],
-                            onChange: function (value){
-                                $timeout(function (){
-                                    scope.record[scope.field] = value;
-                                });
-                            },
-                            maxOptions: 10
-                        };
-
-                        if (scope.itemGroupKey && _.isArray(scope.groups)){
-                            options.optgroups =  scope.groups;
-                            options.optgroupField = scope.itemGroupKey;
-                            options.optgroupValueField = scope.itemGroupKey;
-                            options.optgroupLabelField = scope.itemGroupValue;
-                        }
-                        console.log(options);
-                        sel.selectize(options).val(scope.record[scope.field]);
-                    }
+                if (scope.allowCustom){
+                    options.persist = false;
+                    options.create = true;
                 }
 
-                scope.$watch("items", watchChanges);
+                if (scope.itemGroupKey && _.isArray(scope.groups)){
+                    options.optgroups =  scope.groups;
+                    options.optgroupField = scope.itemGroupKey;
+                    options.optgroupValueField = scope.itemGroupKey;
+                    options.optgroupLabelField = scope.itemGroupValue;
+                }
+
+                scope.options = options;
             }
         }
     }
@@ -1533,7 +1516,7 @@ angular.module('sds-angular-controls').run(['$templateCache', function($template
   'use strict';
 
   $templateCache.put('sds-angular-controls/form-directives/form-autocomplete.html',
-    "<div> <select ng-if=\"!isReadonly && !hasFilter\" ng-readonly=\"isReadonly\" class=\"autocomplete\" name=\"{{::field}}\"></select> <!-- optionValue as optionLabel for arrayItem in array --> <input ng-if=\"isReadonly\" style=\"{{::style}}\" ng-readonly=\"isReadonly\" type=\"text\" class=\"form-control inputField {{::inputLayoutCss}}\" ng-model=\"readOnlyModel\"> <div ng-if=\"log\"> form-input value: {{record[field]}}<br> {{isRequired}} </div> </div>"
+    "<div> <select ng-if=\"!isReadonly && !hasFilter\" ng-readonly=\"isReadonly\" name=\"{{::field}}\" selectize=\"options\" options=\"items\" ng-model=\"record[field]\"></select> <!-- optionValue as optionLabel for arrayItem in array --> <input ng-if=\"isReadonly\" style=\"{{::style}}\" ng-readonly=\"isReadonly\" type=\"text\" class=\"form-control inputField {{::inputLayoutCss}}\" ng-model=\"readOnlyModel\"> <div ng-if=\"log\"> form-input value: {{record[field]}}<br> {{isRequired}} </div> </div>"
   );
 
 

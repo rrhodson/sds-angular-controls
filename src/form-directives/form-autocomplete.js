@@ -16,6 +16,7 @@
                 itemGroupKey    : '@?',
                 itemGroupValue  : '@?',
                 log             : '@?',
+                allowCustom     : '=?',
                 style           : '@?',
                 layoutCss       : '@?', //default col-md-6
                 isReadonly      : '=?'  //boolean
@@ -58,44 +59,26 @@
                         scope.layoutCss = scope.layoutCss || "col-md-4";
                 }
 
-                scope.orderHash = function(obj){
-                    if (!obj) {
-                        return [];
-                    }
-                    return obj.orderedKeys || Object.keys(obj);
+                var options = {
+                    valueField: scope.itemKey,
+                    labelField: scope.itemValue,
+                    searchField: [scope.itemValue],
+                    maxOptions: 10
                 };
 
-                function watchChanges (){
-                    if(scope.items && _.isArray(scope.items)) {
-                        var sel = element.find('.autocomplete');
-                        if (sel[0].selectize){
-                            sel[0].selectize.destroy();
-                        }
-                        var options = {
-                            options: angular.copy(scope.items),
-                            valueField: scope.itemKey,
-                            labelField: scope.itemValue,
-                            searchField: [scope.itemValue],
-                            onChange: function (value){
-                                $timeout(function (){
-                                    scope.record[scope.field] = value;
-                                });
-                            },
-                            maxOptions: 10
-                        };
-
-                        if (scope.itemGroupKey && _.isArray(scope.groups)){
-                            options.optgroups =  scope.groups;
-                            options.optgroupField = scope.itemGroupKey;
-                            options.optgroupValueField = scope.itemGroupKey;
-                            options.optgroupLabelField = scope.itemGroupValue;
-                        }
-                        console.log(options);
-                        sel.selectize(options).val(scope.record[scope.field]);
-                    }
+                if (scope.allowCustom){
+                    options.persist = false;
+                    options.create = true;
                 }
 
-                scope.$watch("items", watchChanges);
+                if (scope.itemGroupKey && _.isArray(scope.groups)){
+                    options.optgroups =  scope.groups;
+                    options.optgroupField = scope.itemGroupKey;
+                    options.optgroupValueField = scope.itemGroupKey;
+                    options.optgroupLabelField = scope.itemGroupValue;
+                }
+
+                scope.options = options;
             }
         }
     }

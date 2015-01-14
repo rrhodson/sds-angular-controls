@@ -43,6 +43,7 @@
     "jquery.maskedinput": "digitalBush/jquery.maskedinput#~1.4.0",
     "jquery": "~2.1.3",
     "moment": "~2.8.4",
-    "selectize": "~0.11.2"
+    "selectize": "~0.11.2",
+    "selectize-ng": "https://github.com/theaqua/selectize-ng.git"
   }
 }
