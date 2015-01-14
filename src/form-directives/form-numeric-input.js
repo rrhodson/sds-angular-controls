@@ -46,6 +46,11 @@
                     scope.placeholder = scope.placeholder || newVal;
                 });
 
+                parentScope.$watch('isReadonly', function(newVal, oldVal){
+                    //formField.setValue(newVal[scope.field]);
+                    scope.isReadonly = newVal;
+                });
+
                 scope.isReadonly = scope.isReadonly || false;
 
                 scope.log = scope.log || false;
