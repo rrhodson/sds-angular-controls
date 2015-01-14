@@ -11,8 +11,8 @@
                 dateFormat       : '@',
                 log              : '@?',
                 style            : '@?',
-                max              : '@?',
-                min              : '@?',
+                max              : '=?',
+                min              : '=?',
                 layoutCss        : '@?', //default col-md-6
                 isReadonly       : '=?',  //boolean
                 disableTimepicker: '=?'
@@ -76,5 +76,16 @@
         }
     }
 
-    angular.module('sds-angular-controls').directive('formDatePicker', formDatePicker);
+    function datepickerPopup (){
+        return {
+            restrict: 'EAC',
+            require: 'ngModel',
+            link: function(scope, element, attr, controller) {
+                //remove the default formatter from the input directive to prevent conflict
+                controller.$formatters.shift();
+            }
+        }
+    }
+
+    angular.module('sds-angular-controls').directive('formDatePicker', formDatePicker).directive('datepickerPopup', datepickerPopup);
 })();
