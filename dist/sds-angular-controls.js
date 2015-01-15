@@ -1,4 +1,4 @@
-/*! sds-angular-controls - v0.2.11 - 2015-01-14
+/*! sds-angular-controls - v0.2.12 - 2015-01-15
 * https://github.com/SMARTDATASYSTEMSLLC/sds-angular-controls
 * Copyright (c) 2015 Steve Gentile, David Benson; Licensed MIT */
 angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSanitize', 'selectize-ng']);
@@ -1437,7 +1437,7 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
             restrict: 'E',
             replace: true,
             transclude:true,
-            //scope:true,
+            scope:true,
             templateUrl: 'sds-angular-controls/table-directives/db-grid.html',
             compile: function (tElement, tAttrs){
                 var loop = tAttrs.for.split(' ');
@@ -1538,6 +1538,9 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                 }
 
                 this.addColumn = function (item){
+                    if ($attrs.sort && $attrs.sort === item.key && $scope._model.sort === null){
+                        $scope._model.sort = $scope._model.cols.length;
+                    }
                     $scope._model.cols.push(item);
                 };
 

@@ -20,7 +20,7 @@
             restrict: 'E',
             replace: true,
             transclude:true,
-            //scope:true,
+            scope:true,
             templateUrl: 'sds-angular-controls/table-directives/db-grid.html',
             compile: function (tElement, tAttrs){
                 var loop = tAttrs.for.split(' ');
@@ -121,6 +121,9 @@
                 }
 
                 this.addColumn = function (item){
+                    if ($attrs.sort && $attrs.sort === item.key && $scope._model.sort === null){
+                        $scope._model.sort = $scope._model.cols.length;
+                    }
                     $scope._model.cols.push(item);
                 };
 

@@ -20,16 +20,20 @@
         <h3>Grid</h3>
         <form>
 
-        <db-grid for="field in vm.gridItems" page-size="4">
-            <db-col key="name" bind="true">
-                <form-field record="field" field="name" label="Name" layout="grid">
-                    <form-input type="text"></form-input>
-                </form-field>
-            </db-col>
-            <db-col key="name" bind="true" width="200px">{{field.name}}</db-col>
-            <db-col key="name">{{field.name}}</db-col>
-            <db-col key="age"></db-col>
-        </db-grid>
+            <db-grid for="field in vm.gridItems" page-size="4">
+                <db-col key="name" bind="true">
+                    <form-field record="field" field="name" label="Name" layout="grid">
+                        <form-input type="text"></form-input>
+                    </form-field>
+                </db-col>
+                <db-col key="name" bind="true" width="200px">{{field.name}}</db-col>
+                <db-col key="name">{{field.name}}</db-col>
+                <db-col key="age"></db-col>
+            </db-grid>
+            <db-grid for="field2 in vm.gridItems2" page-size="4">
+                <db-col key="key"></db-col>
+                <db-col key="value"></db-col>
+            </db-grid>
         </form>
 
 
@@ -123,6 +127,7 @@
   <script src="../bower_components/jquery.maskedinput/dist/jquery.maskedinput.min.js"></script>
   <script src="../bower_components/moment/min/moment.min.js"></script>
   <script src="../bower_components/autoNumeric/autoNumeric.js"></script>
+<script src="../bower_components/selectize-ng/selectize-ng.js"></script>
   <script src="../dist/sds-angular-controls.js"></script>
   <script src="app.js"></script>
 </body>
