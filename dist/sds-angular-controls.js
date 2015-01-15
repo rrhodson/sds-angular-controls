@@ -1,4 +1,4 @@
-/*! sds-angular-controls - v0.2.15 - 2015-01-15
+/*! sds-angular-controls - v0.2.16 - 2015-01-15
 * https://github.com/SMARTDATASYSTEMSLLC/sds-angular-controls
 * Copyright (c) 2015 Steve Gentile, David Benson; Licensed MIT */
 angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSanitize', 'selectize-ng']);
@@ -1504,7 +1504,7 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                     $timeout(function () {
                         $scope._model.getItems(
                             $scope._model.showAdvancedFilter ? $scope._model.cols : $scope._model.filterText,
-                            $scope._model.sort ? $scope._model.cols[$scope._model.sort].key : null,
+                            $scope._model.sort !== null ? $scope._model.cols[$scope._model.sort].key : null,
                             $scope._model.sortAsc,
                             $scope._model.currentPage - 1,
                             $scope._model.pageSize,
