@@ -5,7 +5,7 @@ SDS Angular Directives
 
 To Install this package:
 
-    bower install SMARTDATASYSTEMSLLC/sds-angular-controls --save
+    bower install sds-angular-controls --save
 
 
 See the wiki for more information on these controls
