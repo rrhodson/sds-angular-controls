@@ -4,7 +4,7 @@
             ng-model='record[field]'
             type='{{::type}}'
             ng-required='isRequired'
-            ng-disabled="isReadonly"
+            ng-disabled='isReadonly'
             placeholder='{{::placeholder}}'
             max="{{::max}}"
             min="{{::min}}"
@@ -12,6 +12,7 @@
             style="{{::style}}"
             mask-input="{{mask}}"
         />
+        {{isReadonly}}
         <div ng-if="::(rightLabel && rightLabel.length > 0)" class="rightLabel">{{::rightLabel}}</div>
         <div ng-if="log">
             form-input value: {{record[field]}}<br>
