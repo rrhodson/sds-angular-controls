@@ -21,33 +21,33 @@
                 var parentScope = element.parent().scope();
 
                 parentScope.$watch('record', function(newVal, oldVal){
-                    //formField.setValue(newVal[scope.field]);
+
                     scope.record = newVal;
                 });
 
                 parentScope.$watch('field', function(newVal, oldVal){
-                    //formField.setValue(newVal[scope.field]);
+
                     scope.field = newVal;
                 });
 
                 parentScope.$watch('isRequired', function(newVal, oldVal){
-                    //formField.setValue(newVal[scope.field]);
+
                     scope.isRequired = newVal;
                 });
 
                 parentScope.$watch('layout', function(newVal, oldVal){
-                    //formField.setValue(newVal[scope.field]);
+
                     scope.layout = newVal;
                 });
 
                 parentScope.$watch('label', function(newVal, oldVal){
-                    //formField.setValue(newVal[scope.field]);
+
                     scope.label = newVal;
                     scope.placeholder = scope.placeholder || newVal;
                 });
 
                 parentScope.$watch('isReadonly', function(newVal, oldVal){
-                    //formField.setValue(newVal[scope.field]);
+
                     scope.isReadonly = newVal;
                 });
 

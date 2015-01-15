@@ -1,4 +1,4 @@
-/*! sds-angular-controls - v0.2.12 - 2015-01-15
+/*! sds-angular-controls - v0.2.15 - 2015-01-15
 * https://github.com/SMARTDATASYSTEMSLLC/sds-angular-controls
 * Copyright (c) 2015 Steve Gentile, David Benson; Licensed MIT */
 angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSanitize', 'selectize-ng']);
@@ -264,27 +264,27 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                 // defaults
                 var parentScope = element.parent().scope();
                 parentScope.$watch('record', function(newVal, oldVal){
-                    //formField.setValue(newVal[scope.field]);
+
                     scope.record = newVal;
                 });
 
                 parentScope.$watch('field', function(newVal, oldVal){
-                    //formField.setValue(newVal[scope.field]);
+
                     scope.field = newVal;
                 });
 
                 parentScope.$watch('isRequired', function(newVal, oldVal){
-                    //formField.setValue(newVal[scope.field]);
+
                     scope.isRequired = newVal;
                 });
 
                 parentScope.$watch('layout', function(newVal, oldVal){
-                    //formField.setValue(newVal[scope.field]);
+
                     scope.layout = newVal;
                 });
 
                 parentScope.$watch('isReadonly', function(newVal, oldVal){
-                    //formField.setValue(newVal[scope.field]);
+
                     scope.isReadonly = newVal;
                 });
 
@@ -350,27 +350,27 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
             link: function (scope, element) {
                 var parentScope = element.parent().scope();
                 parentScope.$watch('record', function(newVal, oldVal){
-                    //formField.setValue(newVal[scope.field]);
+
                     scope.record = newVal;
                 });
 
                 parentScope.$watch('field', function(newVal, oldVal){
-                    //formField.setValue(newVal[scope.field]);
+
                     scope.field = newVal;
                 });
 
                 parentScope.$watch('isRequired', function(newVal, oldVal){
-                    //formField.setValue(newVal[scope.field]);
+
                     scope.isRequired = newVal;
                 });
 
                 parentScope.$watch('layout', function(newVal, oldVal){
-                    //formField.setValue(newVal[scope.field]);
+
                     scope.layout = newVal;
                 });
 
                 parentScope.$watch('isReadonly', function(newVal, oldVal){
-                    //formField.setValue(newVal[scope.field]);
+
                     scope.isReadonly = newVal;
                 });
 
@@ -529,17 +529,17 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                 var parentScope = element.parent().scope();
 
                 parentScope.$watch('record', function(newVal, oldVal){
-                    //formField.setValue(newVal[scope.field]);
+
                     scope.record = newVal;
                 });
 
                 parentScope.$watch('field', function(newVal, oldVal){
-                    //formField.setValue(newVal[scope.field]);
+
                     scope.field = newVal;
                 });
 
                 parentScope.$watch('isRequired', function(newVal, oldVal){
-                    //formField.setValue(newVal[scope.field]);
+
                     scope.isRequired = newVal;
                 });
 
@@ -554,46 +554,24 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                     }
                 });
 
-                parentScope.$watch('label', function(newVal, oldVal){
-                    //formField.setValue(newVal[scope.field]);
-                    scope.label = newVal;
-                    scope.placeholder = scope.placeholder || newVal;
+                parentScope.$watch('isReadonly', function(newVal, oldVal){
+
+                    scope.isReadonly = newVal;
                 });
 
                 scope.isReadonly = scope.isReadonly || false;
+
+                parentScope.$watch('label', function(newVal, oldVal){
+
+                    scope.label = newVal;
+                    scope.placeholder = scope.placeholder || newVal;
+                });
 
                 scope.log = scope.log || false;
                 scope.type = scope.type || "text";
 
                 scope.min = parentScope.min;
                 scope.max = parentScope.max;
-
-
-                //switch(scope.layout){
-                //    case "horizontal":
-                //        scope.layoutCss = scope.inputLayout || "col-md-6";
-                //        break;
-                //    default: //stacked
-                //        scope.layoutCss = scope.inputLayout || "col-md-4";
-                //}
-
-
-
-                scope.$watch("isReadonly", function(newVal, oldVal){
-                    if(newVal && oldVal) {
-                        if (newVal !== oldVal) {
-                            checkIfReadonly();
-                        }
-                    }
-                });
-
-                function checkIfReadonly(){
-                    if(scope.isReadonly) {
-                        if (scope.fieldType === 'toggle') {
-                            scope.readOnlyModel = scope.record[scope.field];
-                        }
-                    }
-                }
             }
         }
     }
@@ -622,33 +600,33 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                 var parentScope = element.parent().scope();
 
                 parentScope.$watch('record', function(newVal, oldVal){
-                    //formField.setValue(newVal[scope.field]);
+
                     scope.record = newVal;
                 });
 
                 parentScope.$watch('field', function(newVal, oldVal){
-                    //formField.setValue(newVal[scope.field]);
+
                     scope.field = newVal;
                 });
 
                 parentScope.$watch('isRequired', function(newVal, oldVal){
-                    //formField.setValue(newVal[scope.field]);
+
                     scope.isRequired = newVal;
                 });
 
                 parentScope.$watch('layout', function(newVal, oldVal){
-                    //formField.setValue(newVal[scope.field]);
+
                     scope.layout = newVal;
                 });
 
                 parentScope.$watch('label', function(newVal, oldVal){
-                    //formField.setValue(newVal[scope.field]);
+
                     scope.label = newVal;
                     scope.placeholder = scope.placeholder || newVal;
                 });
 
                 parentScope.$watch('isReadonly', function(newVal, oldVal){
-                    //formField.setValue(newVal[scope.field]);
+
                     scope.isReadonly = newVal;
                 });
 
@@ -712,27 +690,27 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                 // defaults
                 var parentScope = element.parent().scope();
                 parentScope.$watch('record', function(newVal, oldVal){
-                    //formField.setValue(newVal[scope.field]);
+
                     scope.record = newVal;
                 });
 
                 parentScope.$watch('field', function(newVal, oldVal){
-                    //formField.setValue(newVal[scope.field]);
+
                     scope.field = newVal;
                 });
 
                 parentScope.$watch('isRequired', function(newVal, oldVal){
-                    //formField.setValue(newVal[scope.field]);
+
                     scope.isRequired = newVal;
                 });
 
                 parentScope.$watch('layout', function(newVal, oldVal){
-                    //formField.setValue(newVal[scope.field]);
+
                     scope.layout = newVal;
                 });
 
                 parentScope.$watch('isReadonly', function(newVal, oldVal){
-                    //formField.setValue(newVal[scope.field]);
+
                     scope.isReadonly = newVal;
                 });
 
@@ -827,33 +805,33 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                 // defaults
                 var parentScope = element.parent().scope();
                 parentScope.$watch('record', function(newVal, oldVal){
-                    //formField.setValue(newVal[scope.field]);
+
                     scope.record = newVal;
                 });
 
                 parentScope.$watch('field', function(newVal, oldVal){
-                    //formField.setValue(newVal[scope.field]);
+
                     scope.field = newVal;
                 });
 
                 parentScope.$watch('isRequired', function(newVal, oldVal){
-                    //formField.setValue(newVal[scope.field]);
+
                     scope.isRequired = newVal;
                 });
 
                 parentScope.$watch('layout', function(newVal, oldVal){
-                    //formField.setValue(newVal[scope.field]);
+
                     scope.layout = newVal;
                 });
 
                 parentScope.$watch('label', function(newVal, oldVal){
-                    //formField.setValue(newVal[scope.field]);
+
                     scope.label = newVal;
                     scope.placeholder = scope.placeholder || newVal;
                 });
 
                 parentScope.$watch('isReadonly', function(newVal, oldVal){
-                    //formField.setValue(newVal[scope.field]);
+
                     scope.isReadonly = newVal;
                 });
 
@@ -909,22 +887,22 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                 // defaults
                 var parentScope = element.parent().scope();
                 parentScope.$watch('record', function(newVal, oldVal){
-                    //formField.setValue(newVal[scope.field]);
+
                     scope.record = newVal;
                 });
 
                 parentScope.$watch('field', function(newVal, oldVal){
-                    //formField.setValue(newVal[scope.field]);
+
                     scope.field = newVal;
                 });
 
                 parentScope.$watch('isRequired', function(newVal, oldVal){
-                    //formField.setValue(newVal[scope.field]);
+
                     scope.isRequired = newVal;
                 });
 
                 parentScope.$watch('isReadonly', function(newVal, oldVal){
-                    //formField.setValue(newVal[scope.field]);
+
                     scope.isReadonly = newVal;
                 });
 
@@ -976,27 +954,27 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                 var parentScope = element.parent().scope();
 
                 parentScope.$watch('record', function(newVal, oldVal){
-                    //formField.setValue(newVal[scope.field]);
+
                     scope.record = newVal;
                 });
 
                 parentScope.$watch('field', function(newVal, oldVal){
-                    //formField.setValue(newVal[scope.field]);
+
                     scope.field = newVal;
                 });
 
                 parentScope.$watch('isRequired', function(newVal, oldVal){
-                    //formField.setValue(newVal[scope.field]);
+
                     scope.isRequired = newVal;
                 });
 
                 parentScope.$watch('layout', function(newVal, oldVal){
-                    //formField.setValue(newVal[scope.field]);
+
                     scope.layout = newVal;
                 });
 
                 parentScope.$watch('isReadonly', function(newVal, oldVal){
-                    //formField.setValue(newVal[scope.field]);
+
                     scope.isReadonly = newVal;
                 });
 
@@ -1032,27 +1010,27 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                 // defaults
                 var parentScope = element.parent().scope();
                 parentScope.$watch('record', function(newVal, oldVal){
-                    //formField.setValue(newVal[scope.field]);
+
                     scope.record = newVal;
                 });
 
                 parentScope.$watch('field', function(newVal, oldVal){
-                    //formField.setValue(newVal[scope.field]);
+
                     scope.field = newVal;
                 });
 
                 parentScope.$watch('isRequired', function(newVal, oldVal){
-                    //formField.setValue(newVal[scope.field]);
+
                     scope.isRequired = newVal;
                 });
 
                 parentScope.$watch('layout', function(newVal, oldVal){
-                    //formField.setValue(newVal[scope.field]);
+
                     scope.layout = newVal;
                 });
 
                 parentScope.$watch('isReadonly', function(newVal, oldVal){
-                    //formField.setValue(newVal[scope.field]);
+
                     scope.isReadonly = newVal;
                 });
 
@@ -1641,7 +1619,7 @@ angular.module('sds-angular-controls').run(['$templateCache', function($template
 
 
   $templateCache.put('sds-angular-controls/form-directives/form-toggle.html',
-    "<div> <!-- bug in toggle where setting any disabled makes it disabled - so needing an if here --> <toggle-switch ng-if=\"isReadonly\" style=\"{{::style}}\" is-disabled=\"true\" class=\"{{::toggleSwitchType}}\" ng-model=\"record[field]\" on-label=\"{{::onLabel}}\" off-label=\"{{::offLabel}}\"> </toggle-switch> <toggle-switch ng-if=\"!isReadonly\" style=\"{{::style}}\" class=\"{{::toggleSwitchType}}\" ng-model=\"record[field]\" on-label=\"{{::onLabel}}\" off-label=\"{{::offLabel}}\"> </toggle-switch> <div ng-if=\"log\"> form-input value: {{record[field]}}<br> {{isRequired}} </div> </div>"
+    "<div> <!-- bug in toggle where setting any disabled makes it disabled - so needing an if here --> <toggle-switch ng-if=\"isReadonly\" style=\"{{::style}}\" is-disabled=\"true\" class=\"{{::toggleSwitchType}}\" ng-model=\"record[field]\" on-label=\"{{::onLabel}}\" off-label=\"{{::offLabel}}\"> </toggle-switch> <toggle-switch ng-if=\"!isReadonly\" style=\"{{::style}}\" class=\"{{::toggleSwitchType}}\" ng-model=\"record[field]\" on-label=\"{{::onLabel}}\" off-label=\"{{::offLabel}}\"> </toggle-switch> <div ng-if=\"log\"> form-input value: {{record[field]}}<br> </div> </div>"
   );
 
 
