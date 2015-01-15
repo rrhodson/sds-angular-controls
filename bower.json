@@ -1,6 +1,6 @@
 {
   "name": "sds-angular-controls",
-  "version": "0.2.19",
+  "version": "0.2.20",
   "homepage": "https://github.com/SMARTDATASYSTEMSLLC/sds-angular-controls",
   "authors": [
     "Steve Gentile <steven.gentile@gmail.com>",
@@ -34,7 +34,7 @@
     },
     "angular-bootstrap":{
       "dependencies": {
-        "jquery": "~1"
+        "angular": "~1"
       }
     }
   },
@@ -53,5 +53,9 @@
     "moment": "~2",
     "selectize": "~0.11",
     "selectize-ng": "https://github.com/theaqua/selectize-ng.git"
+  },
+  "resolutions": {
+    "angular": "~1",
+    "jquery": "~2"
   }
 }
