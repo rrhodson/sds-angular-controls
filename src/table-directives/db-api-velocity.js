@@ -8,7 +8,8 @@
             require: '^dbGrid',
             scope:{
                 api: '@',
-                postParams: '='
+                postParams: '=',
+                filterBy: '='
             },
             link: function (scope, element, attr, dbGrid) {
 

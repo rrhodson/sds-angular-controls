@@ -1,4 +1,4 @@
-/*! sds-angular-controls - v0.2.19 - 2015-01-15
+/*! sds-angular-controls - v0.2.20 - 2015-01-15
 * https://github.com/SMARTDATASYSTEMSLLC/sds-angular-controls
 * Copyright (c) 2015 Steve Gentile, David Benson; Licensed MIT */
 angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSanitize', 'selectize-ng']);
