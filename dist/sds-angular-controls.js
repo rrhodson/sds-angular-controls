@@ -1,4 +1,4 @@
-/*! sds-angular-controls - v0.2.21 - 2015-01-19
+/*! sds-angular-controls - v0.2.22 - 2015-01-19
 * https://github.com/SMARTDATASYSTEMSLLC/sds-angular-controls
 * Copyright (c) 2015 Steve Gentile, David Benson; Licensed MIT */
 angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSanitize', 'selectize-ng']);
@@ -359,7 +359,7 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                 });
 
                 scope.$watch('record[field]', function (val){
-                    if (typeof scope.record[scope.field] === 'string'){
+                    if (typeof val === 'string'){
                         scope.record[scope.field] = moment(scope.record[scope.field]).toDate();
                     }
                 });

@@ -31,7 +31,7 @@
                 });
 
                 scope.$watch('record[field]', function (val){
-                    if (typeof scope.record[scope.field] === 'string'){
+                    if (typeof val === 'string'){
                         scope.record[scope.field] = moment(scope.record[scope.field]).toDate();
                     }
                 });
