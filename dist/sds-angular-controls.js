@@ -1,4 +1,4 @@
-/*! sds-angular-controls - v0.2.20 - 2015-01-15
+/*! sds-angular-controls - v0.2.21 - 2015-01-19
 * https://github.com/SMARTDATASYSTEMSLLC/sds-angular-controls
 * Copyright (c) 2015 Steve Gentile, David Benson; Licensed MIT */
 angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSanitize', 'selectize-ng']);
@@ -350,13 +350,18 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
             link: function (scope, element) {
                 var parentScope = element.parent().scope();
                 parentScope.$watch('record', function(newVal, oldVal){
-
                     scope.record = newVal;
                 });
 
                 parentScope.$watch('field', function(newVal, oldVal){
 
                     scope.field = newVal;
+                });
+
+                scope.$watch('record[field]', function (val){
+                    if (typeof scope.record[scope.field] === 'string'){
+                        scope.record[scope.field] = moment(scope.record[scope.field]).toDate();
+                    }
                 });
 
                 parentScope.$watch('isRequired', function(newVal, oldVal){
@@ -1153,7 +1158,8 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
             require: '^dbGrid',
             scope:{
                 api: '@',
-                postParams: '='
+                postParams: '=',
+                filterBy: '='
             },
             link: function (scope, element, attr, dbGrid) {
 
@@ -1553,7 +1559,7 @@ angular.module('sds-angular-controls').run(['$templateCache', function($template
 
 
   $templateCache.put('sds-angular-controls/form-directives/form-datepicker.html',
-    "<span class=\"input-group\"> <input type=\"text\" style=\"{{::style}}\" class=\"form-control datepicker\" ng-if=\"!isReadonly\" ng-readonly=\"isReadonly\" placeholder=\"{{placeholder}}\" ng-model=\"record[field]\" ng-required=\"::isRequired\" min-date=\"::min\" max-date=\"::max\" datepicker-popup=\"{{::dateFormat}}\" is-open=\"calendar.opened\"> <span ng-if=\"!isReadonly\" class=\"input-group-btn\"> <button type=\"button\" class=\"btn btn-default\" ng-click=\"open($event)\"><i class=\"glyphicon glyphicon-calendar\"></i></button> </span> </span>"
+    "<span> <span class=\"input-group\"> <input type=\"text\" style=\"{{::style}}\" class=\"form-control datepicker\" ng-if=\"!isReadonly\" ng-readonly=\"isReadonly\" placeholder=\"{{placeholder}}\" ng-model=\"record[field]\" ng-required=\"::isRequired\" min-date=\"::min\" max-date=\"::max\" datepicker-popup=\"{{::dateFormat}}\" is-open=\"calendar.opened\"> <span ng-if=\"!isReadonly\" class=\"input-group-btn\"> <button type=\"button\" class=\"btn btn-default\" ng-click=\"open($event)\"><i class=\"glyphicon glyphicon-calendar\"></i></button> </span> </span> <div ng-if=\"log\"> form-datepicker value: {{record[field]}}<br> {{isRequired}} </div> </span>"
   );
 
 

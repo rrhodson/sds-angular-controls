@@ -1,3 +1,4 @@
+<span>
 <span class="input-group">
     <input type="text" style="{{::style}}" class="form-control datepicker"
            ng-if="!isReadonly"
@@ -12,4 +13,10 @@
     <span ng-if="!isReadonly" class="input-group-btn">
         <button type="button" class="btn btn-default" ng-click="open($event)"><i class="glyphicon glyphicon-calendar"></i></button>
     </span>
+
 </span>
+<div ng-if="log">
+    form-datepicker value: {{record[field]}}<br>
+    {{isRequired}}
+</div>
+    </span>

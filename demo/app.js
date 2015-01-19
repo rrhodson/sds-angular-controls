@@ -25,7 +25,7 @@
       ZipCode: "",
       Price:  5.983,
       LikesIceCream: false,
-      DateOfBirth : null,
+      DateOfBirth : '2015-01-07',
       weight: 100,
       weightUnit: true
     };

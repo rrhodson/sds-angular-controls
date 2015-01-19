@@ -22,13 +22,18 @@
             link: function (scope, element) {
                 var parentScope = element.parent().scope();
                 parentScope.$watch('record', function(newVal, oldVal){
-
                     scope.record = newVal;
                 });
 
                 parentScope.$watch('field', function(newVal, oldVal){
 
                     scope.field = newVal;
+                });
+
+                scope.$watch('record[field]', function (val){
+                    if (typeof scope.record[scope.field] === 'string'){
+                        scope.record[scope.field] = moment(scope.record[scope.field]).toDate();
+                    }
                 });
 
                 parentScope.$watch('isRequired', function(newVal, oldVal){
