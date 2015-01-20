@@ -1,4 +1,4 @@
-/*! sds-angular-controls - v0.2.22 - 2015-01-19
+/*! sds-angular-controls - v0.2.22 - 2015-01-20
 * https://github.com/SMARTDATASYSTEMSLLC/sds-angular-controls
 * Copyright (c) 2015 Steve Gentile, David Benson; Licensed MIT */
 angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSanitize', 'selectize-ng']);
@@ -697,6 +697,13 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                 parentScope.$watch('record', function(newVal, oldVal){
 
                     scope.record = newVal;
+                    if(scope.isReadonly) {
+                        if (scope.record && scope.record[scope.field]) {
+
+                            var value = scope.items[scope.record[scope.field]];
+                            scope.readOnlyModel = value;
+                        }
+                    }
                 });
 
                 parentScope.$watch('field', function(newVal, oldVal){
@@ -717,6 +724,7 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                 parentScope.$watch('isReadonly', function(newVal, oldVal){
 
                     scope.isReadonly = newVal;
+
                 });
 
                 scope.isReadonly = scope.isReadonly || false;
@@ -749,16 +757,6 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                         result.orderedKeys.push(item[itemKey]);
                         return result;
                     }, new OrderedDictionary());
-                }
-
-                function checkIfReadonly(){
-                    if(scope.isReadonly) {
-                        if (scope.record && scope.record[scope.field]) {
-
-                            var value = scope.items[scope.record[scope.field]];
-                            scope.readOnlyModel = value;
-                        }
-                    }
                 }
 
                 // If a key is numeric, javascript converts it to a string when using a foreach. This
