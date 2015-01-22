@@ -25,6 +25,13 @@
                 parentScope.$watch('record', function(newVal, oldVal){
 
                     scope.record = newVal;
+                    if(scope.isReadonly) {
+                        if (scope.record && scope.record[scope.field]) {
+
+                            var value = scope.items[scope.record[scope.field]];
+                            scope.readOnlyModel = value;
+                        }
+                    }
                 });
 
                 parentScope.$watch('field', function(newVal, oldVal){
@@ -45,6 +52,7 @@
                 parentScope.$watch('isReadonly', function(newVal, oldVal){
 
                     scope.isReadonly = newVal;
+
                 });
 
                 scope.isReadonly = scope.isReadonly || false;
@@ -77,16 +85,6 @@
                         result.orderedKeys.push(item[itemKey]);
                         return result;
                     }, new OrderedDictionary());
-                }
-
-                function checkIfReadonly(){
-                    if(scope.isReadonly) {
-                        if (scope.record && scope.record[scope.field]) {
-
-                            var value = scope.items[scope.record[scope.field]];
-                            scope.readOnlyModel = value;
-                        }
-                    }
                 }
 
                 // If a key is numeric, javascript converts it to a string when using a foreach. This
