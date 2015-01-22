@@ -46,7 +46,7 @@
             <div ng-if="showDefault"><form-input></form-input></div>
 
         <!-- validation -->
-            <div ng-if="!hideValidationMessage" ng-show='showError({{field}})' class="popover right alert-danger"
+            <div ng-if="!hideValidationMessage" ng-show='showError({{field}})' class="popover validation right alert-danger"
                  style="display:inline-block; top:auto; left:auto; margin-top:-4px; min-width:240px;">
                 <div class="arrow" style="top: 20px"></div>
                 <div class="popover-content" ng-include="'validation.html'" >

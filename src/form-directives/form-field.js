@@ -54,8 +54,8 @@
 
                 $scope.showLabel = $scope.showLabel !== false; // default to true
                 $scope.hideValidationMessage = $scope.hideValidationMessage || false;
-                $scope.isRequired = $scope.isRequired || false;
-                $scope.isReadonly = $scope.isReadonly || false;
+                //$scope.isRequired = $scope.isRequired || false;
+                //$scope.isReadonly = $scope.isReadonly || false;
                 $scope.layoutCss = $scope.layoutCss || "col-md-12";
                 $scope.errorLayoutCss = $scope.errorLayoutCss || "col-md-12";
 

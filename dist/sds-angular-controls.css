@@ -111,3 +111,13 @@ db-grid.table tbody>tr>td{
 db-grid.table thead>tr>td{
     vertical-align: bottom;
 }
+
+@media (max-width: 992px) {
+    .popover.validation {
+        position: static;
+    }
+
+    .popover.validation .arrow{
+        display:none;
+    }
+}
