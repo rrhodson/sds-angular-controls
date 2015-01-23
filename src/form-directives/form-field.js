@@ -68,7 +68,9 @@
                     try{
                         if(form.$submitted){
                             return field.$invalid;
-                        }else {
+                        }else if (element.find('[name=' + field.$name + ']:focus').length) {
+                            return false;
+                        }else{
                             return field.$dirty && field.$invalid;
                         }
                     }

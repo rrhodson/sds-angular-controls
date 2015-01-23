@@ -3,6 +3,7 @@
         <textarea class="form-control inputField {{layout !== 'horizontal' ? layoutCss : ''}}"
                ng-model='record[field]'
                type='{{::type}}'
+               name='{{::field}}'
                ng-required='isRequired'
                ng-disabled="isReadonly"
                style="{{::style}}"

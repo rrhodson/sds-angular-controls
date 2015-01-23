@@ -2,6 +2,7 @@
     <div class="{{layout === 'horizontal' ? inputLayout : '' }}">
         <input class="form-control inputField {{layout !== 'horizontal' ? layoutCss : ''}}"
             ng-model='record[field]'
+            name='{{::field}}'
             type='{{::type}}'
             ng-required='isRequired'
             ng-disabled='isReadonly'

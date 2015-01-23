@@ -3,6 +3,7 @@
         <input class="form-control inputField {{layout !== 'horizontal' ? layoutCss : ''}}"
                ng-model='record[field]'
                type='text'
+               name='{{::field}}'
                ng-required='isRequired'
                ng-disabled="isReadonly"
                placeholder='{{::placeholder}}'
