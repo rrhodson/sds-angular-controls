@@ -41,7 +41,7 @@
                     layoutCss: $attrs.layoutCss,
                     currentPage: 1,
                     total: 0,
-                    sortAsc: false,
+                    sortAsc: $attrs.sort ? $attrs.sort[0] !== '-' : true,
                     sort: null,
                     filterText: '',
                     showAdvancedFilter: false,
@@ -68,9 +68,7 @@
                 var loop = $attrs.for.split(' ');
                 $scope._model.rowName = loop[0];
                 if (loop[2]) {
-                    console.log(loop.slice(2).join(' '),$element.parent().scope() );
                     $scope.$watchCollection(loop.slice(2).join(' '), function (items) {
-                        console.log('gotItems');
                         $scope._model.items = items;
                         refresh();
                     });
@@ -78,7 +76,7 @@
 
                 function defaultGetItems (filter, sortKey, sortAsc, page, pageSize, cols){
                     var deferred = $q.defer();
-                    var items = orderByFilter(complexFilter($scope._model.items, filter), sortKey, sortAsc);
+                    var items = orderByFilter(complexFilter($scope._model.items, filter), sortKey, !sortAsc);
                     $scope._model.total = items ? items.length : 0;
                     deferred.resolve(pageFilter(items, page, pageSize));
                     return deferred.promise;
@@ -125,7 +123,12 @@
                 }
 
                 this.addColumn = function (item){
-                    if ($attrs.sort && $attrs.sort === item.key && $scope._model.sort === null){
+                    var sort = $attrs.sort || '';
+                    if (sort[0] === '-' || sort[0] === '+'){
+                        sort = sort.slice(1);
+                    }
+
+                    if (sort && sort === item.key && $scope._model.sort === null){
                         $scope._model.sort = $scope._model.cols.length;
                     }
                     $scope._model.cols.push(item);

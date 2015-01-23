@@ -5,11 +5,15 @@ module.exports = function(grunt) {
   grunt.initConfig({
     // Metadata.
     pkg: grunt.file.readJSON('package.json'),
-    banner: '/*! <%= pkg.title || pkg.name %> - v<%= pkg.version %> - ' +
-      '<%= grunt.template.today("yyyy-mm-dd") %>\n' +
-      '<%= pkg.homepage ? "* " + pkg.homepage + "\\n" : "" %>' +
-      '* Copyright (c) <%= grunt.template.today("yyyy") %> <%= _.pluck(pkg.authors, "name").join(", ") %>;' +
-      ' Licensed <%= _.pluck(pkg.licenses, "type").join(", ") %> */\n',
+    banner:
+    '/* \n * \n' +
+    ' * <%= pkg.title || pkg.name %> - <%= pkg.description %> \n' +
+    ' * Version <%= pkg.version %> \n' +
+    ' * \n' +
+    ' * Copyright (c) <%= grunt.template.today("yyyy") %> <%= _.pluck(pkg.authors, "name").join(", ") %> \n' +
+    ' * Examples and docs at: <%= pkg.homepage %> \n' +
+    ' * Licensed under <%= _.pluck(pkg.licenses, "type").join(", ") %> \n' +
+    ' *  \n */ \n',
     // Task configuration.
     concat: {
       options: {
@@ -26,7 +30,8 @@ module.exports = function(grunt) {
     },
     uglify: {
       options: {
-        banner: '<%= banner %>'
+        banner: '<%= banner %>',
+        sourceMap: 'dist/<%= pkg.name %>.map'
       },
       dist: {
         src: '<%= concat.dist.dest %>',
@@ -59,6 +64,16 @@ module.exports = function(grunt) {
           src: ['**/*.js'],
           dest: '.tmp'
         }]
+      }
+    },
+    less: {
+      options: {
+        banner: '<%= banner %>'
+      },
+      dist: {
+        files: {
+          'dist/<%= pkg.name %>.css': 'src/**/*.less'
+        }
       }
     },
     jshint: {
@@ -130,12 +145,13 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-contrib-watch');
+  grunt.loadNpmTasks('grunt-contrib-less');
   grunt.loadNpmTasks('grunt-ng-annotate');
   grunt.loadNpmTasks('grunt-angular-templates');
 
     grunt.registerTask('serve', ['default', 'connect', 'watch']);
 
   // Default task.
-  grunt.registerTask('default', ['jshint', 'clean', 'ngAnnotate', 'ngtemplates', 'concat', 'uglify']);
+  grunt.registerTask('default', ['jshint', 'clean', 'ngAnnotate', 'ngtemplates', 'concat', 'uglify', 'less']);
 
 };

@@ -12,11 +12,11 @@
         </div>
 
         <a href="" ng-if="_model.filterType === 'advanced'" class="btn btn-default" ng-class="{active: _model.showAdvancedFilter}"
-           ng-click="_model.showAdvancedFilter = !_model.showAdvancedFilter">Advanced Filtering</a>
+           ng-click="_model.showAdvancedFilter = !_model.showAdvancedFilter">{{_model.showAdvancedFilter ? 'Simple' : 'Advanced'}} Filtering</a>
 
         <ng-transclude></ng-transclude>
 
-        <p ng-if="data && label"><i>{{_model.total}} {{_model.label}}</i></p>
+        <p ng-if="_model.total && _model.label"><i>{{_model.total}} {{_model.label}}</i></p>
     </div>
 
     <table class="table db-grid table-hover {{_model.layoutCss}}" >
