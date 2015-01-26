@@ -36,7 +36,8 @@
                         templateFunc = $interpolate(templateText);
                     }
 
-                    dbGrid.addColumn({
+                    var column = {
+                        filter: attr.filter,
                         width: attr.width,
                         key: attr.key,
                         label: attr.label,
@@ -44,7 +45,18 @@
                         type: attr.type,
                         bind: attr.bind === 'true',
                         template: templateFunc
-                    });
+                    };
+
+                    dbGrid.addColumn(column);
+
+                    if(attr.filter !== undefined){
+                        attr.$observe('filter', function (val, old){
+                           if(val != old){
+                               column.filter = val;
+                               dbGrid.refresh();
+                           }
+                        });
+                    }
                 }
             }
         }

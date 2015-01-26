@@ -59,18 +59,22 @@
                 $scope.$grid = {
                     refresh: function(){
                         // hard refresh all rows
+                        console.log('hard refresh');
+                        $scope._model.currentPage = 1;
                         $scope._model.filteredItems = [];
                         $timeout(refresh);
                     },
                     items: function (){ return $scope._model.filteredItems; }
                 };
 
+
+
                 var loop = $attrs.for.split(' ');
                 $scope._model.rowName = loop[0];
                 if (loop[2]) {
                     $scope.$watchCollection(loop.slice(2).join(' '), function (items) {
                         $scope._model.items = items;
-                        refresh();
+                        $scope._model.refresh();
                     });
                 }
 
@@ -83,7 +87,6 @@
                 }
 
                 function toggleSort(index){
-                    console.log(index);
                     if ($scope._model.sort === index)  {
                         $scope._model.sortAsc = !$scope._model.sortAsc;
                     }else{
@@ -95,7 +98,7 @@
                     _.each($scope._model.cols, function (item){
                        item.filter = '';
                     });
-                    refresh();
+                    $scope._model.refresh();
                 }
 
                 function onEnter(){
@@ -136,11 +139,17 @@
 
                 this.setDataSource = function (dataSource){
                     $scope._model.getItems = dataSource;
-                    refresh();
+                    $scope._model.refresh();
                 };
 
                 this.setTotal = function (total){
                     $scope._model.total = total;
+                };
+
+                this.refresh = function (total){
+                    if ($scope._model.items){
+                        $scope.$grid.refresh();
+                    }
                 };
 
                 $scope.$watch('_model.currentPage', $scope._model.refresh);

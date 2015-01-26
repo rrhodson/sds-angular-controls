@@ -1,6 +1,6 @@
 <div>
 
-    <select ng-if="!isReadonly && !hasFilter" ng-readonly="isReadonly"  name="{{::field}}"
+    <select ng-if="!isReadonly && !hasFilter" ng-readonly="isReadonly" ng-required="isRequired" name="{{::field}}"
             selectize="options" options="items" ng-model="record[field]"></select>
     <!-- optionValue as optionLabel for arrayItem in array -->
 

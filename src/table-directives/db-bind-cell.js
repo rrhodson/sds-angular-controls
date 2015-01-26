@@ -23,5 +23,18 @@
         }
     }
 
-    angular.module('sds-angular-controls').directive('dbBindCell', dbBindCell);
+    function dbTransclude (){
+        return {
+            restrict: 'EAC',
+            link: function($scope, $element, $attrs, controller, $transclude) {
+                $transclude(function(clone, scope) {
+                    $element.empty();
+                    scope.$grid = $scope.$grid;
+                    $element.append(clone);
+                });
+            }
+        }
+    }
+
+    angular.module('sds-angular-controls').directive('dbBindCell', dbBindCell).directive('dbTransclude', dbTransclude)
 })();

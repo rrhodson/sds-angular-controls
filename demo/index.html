@@ -62,7 +62,7 @@
           <form-field record="vm.testForm" field="State" label="State" is-required=true>
               <form-select items="vm.states" log="true" item-key="stateCode" item-value="stateName"></form-select>
           </form-field>
-          <form-field record="vm.testForm" field="State2" layout-css="col-md-8">
+          <form-field record="vm.testForm" field="State2" layout-css="col-md-8" is-required="true">
               <form-autocomplete items="vm.states" log="true" item-key="stateCode" item-value="stateName"></form-autocomplete>
           </form-field>
           <form-field record="vm.testForm" field="Country" layout-css="col-md-8">
@@ -78,7 +78,7 @@
               <form-toggle log="true" on-label="Yes" off-label="No"></form-toggle>
           </form-field>
 
-          <input type="submit" value="Submit" class="btn btn-primary" ng-disabled="testFrm.$invalid">
+          <input type="submit" value="Submit" class="btn btn-primary"ß>
       </form>
 
         <hr>

@@ -14,7 +14,7 @@
         <a href="" ng-if="_model.filterType === 'advanced'" class="btn btn-default" ng-class="{active: _model.showAdvancedFilter}"
            ng-click="_model.showAdvancedFilter = !_model.showAdvancedFilter">{{_model.showAdvancedFilter ? 'Simple' : 'Advanced'}} Filtering</a>
 
-        <ng-transclude></ng-transclude>
+        <db-transclude></db-transclude>
 
         <p ng-if="_model.total && _model.label"><i>{{_model.total}} {{_model.label}}</i></p>
     </div>
@@ -25,7 +25,7 @@
                 <th ng-repeat="_col in _model.cols" ng-style="{width: _col.width}">
                     <div ng-if="_model.showAdvancedFilter && _col.sortable">
                         <input type="text" class="form-control filter-input" on-enter="_model.onEnter()"
-                               ng-keyup="_model.refresh();" ng-model="_col.filter" placeholder="Filter {{::_col.label || _col.key}}"
+                               ng-keyup="$grid.refresh()" ng-model="_col.filter" placeholder="Filter {{::_col.label || _col.key}}"
                                tooltip="{{_col.type ? 'Use a dash (-) to specify a range' : ''}}"  tooltip-trigger="focus"
                                tooltip-placement="top">
                     </div>

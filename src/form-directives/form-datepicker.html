@@ -1,6 +1,7 @@
 <span>
 <span class="input-group">
     <input type="text" style="{{::style}}" class="form-control datepicker"
+           class="{{layout !== 'horizontal' ? layoutCss : ''}}"
            ng-if="!isReadonly"
            ng-readonly="isReadonly"
            placeholder="{{placeholder}}"
