@@ -730,11 +730,20 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                     scope.layout = newVal;
                 });
 
-                parentScope.$watch('isReadonly', function(newVal, oldVal){
-
+                scope.$watch("isReadonly", function(newVal, oldVal){
                     scope.isReadonly = newVal;
-
+                    if(newVal !== oldVal){
+                        checkIfReadonly();
+                    }
                 });
+
+                function checkIfReadonly(){
+                    if(scope.isReadonly) {
+                        if (scope.fieldType === 'toggle') {
+                            scope.readOnlyModel = scope.record[scope.field];
+                        }
+                    }
+                }
 
                 scope.isReadonly = scope.isReadonly || false;
 
@@ -913,9 +922,11 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                     scope.isRequired = newVal;
                 });
 
-                parentScope.$watch('isReadonly', function(newVal, oldVal){
-
+                scope.$watch("isReadonly", function(newVal, oldVal){
                     scope.isReadonly = newVal;
+                    if(newVal !== oldVal){
+                        checkIfReadonly();
+                    }
                 });
 
                 scope.isReadonly = scope.isReadonly || false;
@@ -926,13 +937,6 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                 scope.toggleSwitchType = scope.toggleSwitchType || "primary";
                 scope.onLabel = scope.onLabel   || "Yes";
                 scope.offLabel = scope.offLabel || "No";
-
-
-                scope.$watch("isReadonly", function(newVal, oldVal){
-                    if(newVal !== oldVal){
-                        checkIfReadonly();
-                    }
-                });
 
                 function checkIfReadonly(){
                     if(scope.isReadonly) {

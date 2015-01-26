@@ -49,11 +49,20 @@
                     scope.layout = newVal;
                 });
 
-                parentScope.$watch('isReadonly', function(newVal, oldVal){
-
+                scope.$watch("isReadonly", function(newVal, oldVal){
                     scope.isReadonly = newVal;
-
+                    if(newVal !== oldVal){
+                        checkIfReadonly();
+                    }
                 });
+
+                function checkIfReadonly(){
+                    if(scope.isReadonly) {
+                        if (scope.fieldType === 'toggle') {
+                            scope.readOnlyModel = scope.record[scope.field];
+                        }
+                    }
+                }
 
                 scope.isReadonly = scope.isReadonly || false;
 

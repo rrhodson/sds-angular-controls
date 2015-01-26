@@ -36,9 +36,11 @@
                     scope.isRequired = newVal;
                 });
 
-                parentScope.$watch('isReadonly', function(newVal, oldVal){
-
+                scope.$watch("isReadonly", function(newVal, oldVal){
                     scope.isReadonly = newVal;
+                    if(newVal !== oldVal){
+                        checkIfReadonly();
+                    }
                 });
 
                 scope.isReadonly = scope.isReadonly || false;
@@ -49,13 +51,6 @@
                 scope.toggleSwitchType = scope.toggleSwitchType || "primary";
                 scope.onLabel = scope.onLabel   || "Yes";
                 scope.offLabel = scope.offLabel || "No";
-
-
-                scope.$watch("isReadonly", function(newVal, oldVal){
-                    if(newVal !== oldVal){
-                        checkIfReadonly();
-                    }
-                });
 
                 function checkIfReadonly(){
                     if(scope.isReadonly) {
