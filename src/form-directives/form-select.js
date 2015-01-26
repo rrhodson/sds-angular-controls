@@ -14,8 +14,7 @@
                 itemValue       : '@?',
                 log             : '@?',
                 style           : '@?',
-                layoutCss       : '@?', //default col-md-6
-                isReadonly      : '=?'  //boolean
+                layoutCss       : '@?' //default col-md-6
             },
             templateUrl: 'sds-angular-controls/form-directives/form-select.html',
 
@@ -23,15 +22,7 @@
                 // defaults
                 var parentScope = element.parent().scope();
                 parentScope.$watch('record', function(newVal, oldVal){
-
                     scope.record = newVal;
-                    if(scope.isReadonly) {
-                        if (scope.record && scope.record[scope.field]) {
-
-                            var value = scope.items[scope.record[scope.field]];
-                            scope.readOnlyModel = value;
-                        }
-                    }
                 });
 
                 parentScope.$watch('field', function(newVal, oldVal){
@@ -49,20 +40,17 @@
                     scope.layout = newVal;
                 });
 
-                scope.$watch("isReadonly", function(newVal, oldVal){
+                parentScope.$watch("isReadonly", function(newVal, oldVal){
                     scope.isReadonly = newVal;
-                    if(newVal !== oldVal){
-                        checkIfReadonly();
-                    }
-                });
 
-                function checkIfReadonly(){
                     if(scope.isReadonly) {
-                        if (scope.fieldType === 'toggle') {
-                            scope.readOnlyModel = scope.record[scope.field];
+                        if (scope.record && scope.record[scope.field]) {
+
+                            var value = scope.items[scope.record[scope.field]];
+                            scope.readOnlyModel = value;
                         }
                     }
-                }
+                });
 
                 scope.isReadonly = scope.isReadonly || false;
 

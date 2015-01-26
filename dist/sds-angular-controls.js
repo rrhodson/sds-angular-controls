@@ -1,7 +1,7 @@
 /* 
  * 
  * sds-angular-controls - Angular Directives used with sds-angular generator 
- * Version 0.2.25 
+ * Version 0.2.27 
  * 
  * Copyright (c) 2015 Steve Gentile, David Benson 
  * Examples and docs at: https://github.com/SMARTDATASYSTEMSLLC/sds-angular-controls 
@@ -695,8 +695,7 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                 itemValue       : '@?',
                 log             : '@?',
                 style           : '@?',
-                layoutCss       : '@?', //default col-md-6
-                isReadonly      : '=?'  //boolean
+                layoutCss       : '@?' //default col-md-6
             },
             templateUrl: 'sds-angular-controls/form-directives/form-select.html',
 
@@ -704,15 +703,7 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                 // defaults
                 var parentScope = element.parent().scope();
                 parentScope.$watch('record', function(newVal, oldVal){
-
                     scope.record = newVal;
-                    if(scope.isReadonly) {
-                        if (scope.record && scope.record[scope.field]) {
-
-                            var value = scope.items[scope.record[scope.field]];
-                            scope.readOnlyModel = value;
-                        }
-                    }
                 });
 
                 parentScope.$watch('field', function(newVal, oldVal){
@@ -730,20 +721,17 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                     scope.layout = newVal;
                 });
 
-                scope.$watch("isReadonly", function(newVal, oldVal){
+                parentScope.$watch("isReadonly", function(newVal, oldVal){
                     scope.isReadonly = newVal;
-                    if(newVal !== oldVal){
-                        checkIfReadonly();
-                    }
-                });
 
-                function checkIfReadonly(){
                     if(scope.isReadonly) {
-                        if (scope.fieldType === 'toggle') {
-                            scope.readOnlyModel = scope.record[scope.field];
+                        if (scope.record && scope.record[scope.field]) {
+
+                            var value = scope.items[scope.record[scope.field]];
+                            scope.readOnlyModel = value;
                         }
                     }
-                }
+                });
 
                 scope.isReadonly = scope.isReadonly || false;
 
