@@ -1,7 +1,7 @@
 /* 
  * 
  * sds-angular-controls - Angular Directives used with sds-angular generator 
- * Version 0.2.28 
+ * Version 0.2.29 
  * 
  * Copyright (c) 2015 Steve Gentile, David Benson 
  * Examples and docs at: https://github.com/SMARTDATASYSTEMSLLC/sds-angular-controls 
@@ -774,13 +774,14 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                             return item.toString();
                         }
                     }
-                    //this below has issues - ie. a 'guid' is converted incorrectly
+
                     //if it's a number - make sure the values are numbers
-                    //if (item && !isNaN(parseInt(item, 10))) {
-                    //    return parseInt(item, 10);
-                    //} else {
-                    //    return item;
-                    //}
+                    if (item && !isNaN(item)) {
+                        return parseInt(item, 10);
+                    } else {
+                        return item;
+                    }
+
                     return item;
                 };
 
