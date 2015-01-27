@@ -774,12 +774,14 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                             return item.toString();
                         }
                     }
+                    //this below has issues - ie. a 'guid' is converted incorrectly
                     //if it's a number - make sure the values are numbers
-                    if (item && !isNaN(parseInt(item, 10))) {
-                        return parseInt(item, 10);
-                    } else {
-                        return item;
-                    }
+                    //if (item && !isNaN(parseInt(item, 10))) {
+                    //    return parseInt(item, 10);
+                    //} else {
+                    //    return item;
+                    //}
+                    return item;
                 };
 
                 scope.$watch("items", function(newVal, oldVal){
