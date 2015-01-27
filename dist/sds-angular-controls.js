@@ -1,7 +1,7 @@
 /* 
  * 
  * sds-angular-controls - Angular Directives used with sds-angular generator 
- * Version 0.2.29 
+ * Version 0.2.31 
  * 
  * Copyright (c) 2015 Steve Gentile, David Benson 
  * Examples and docs at: https://github.com/SMARTDATASYSTEMSLLC/sds-angular-controls 
@@ -537,7 +537,7 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                 isReadonly      : '=?'  //boolean
             },
             templateUrl: 'sds-angular-controls/form-directives/form-input.html',
-            link: function (scope, element) {
+            link: function (scope, element, attr) {
                 // defaults
 
                 var parentScope = element.parent().scope();
@@ -584,8 +584,22 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                 scope.log = scope.log || false;
                 scope.type = scope.type || "text";
 
+                if(scope.type === "integer"){
+                    var inputField = element.find(".inputField");
+                    $(inputField).on('keyup', function(ev){
+                        inputField.val(inputField.val().replace(/[^0-9]/g,''));
+                    });
+                }
+
                 scope.min = parentScope.min;
                 scope.max = parentScope.max;
+
+                scope.step = attr.step || "any";
+                scope.pattern = attr.pattern;//pattern="[0-9]{10}"
+                //commenting out below, don't need to watch on 'step'
+                //attr.$observe("step", function(val){
+                //   scope.step = val || "any";
+                //});
             }
         }
     }
@@ -1611,6 +1625,7 @@ angular.module('sds-angular-controls').run(['$templateCache', function($template
     "             ng-messages='{{field}}.$error'>\n" +
     "            <span class='control-label' ng-message='required'> {{ validationFieldName }} is required. </span>\n" +
     "            <span class='control-label' ng-message='text'> {{ validationFieldName }} should be text. </span>\n" +
+    "            <span class='control-label' ng-message='integer'> {{ validationFieldName }} should be an integer. </span>\n" +
     "            <span class='control-label' ng-message='email'> {{ validationFieldName }} should be an email address. </span>\n" +
     "            <span class='control-label' ng-message='date'> {{ validationFieldName}} should be a date. </span>\n" +
     "            <span class='control-label' ng-message='datetime'> {{ validationFieldName }} should be a datetime. </span>\n" +
@@ -1630,7 +1645,7 @@ angular.module('sds-angular-controls').run(['$templateCache', function($template
 
 
   $templateCache.put('sds-angular-controls/form-directives/form-input.html',
-    "<div> <div class=\"{{layout === 'horizontal' ? inputLayout : '' }}\"> <input class=\"form-control inputField {{layout !== 'horizontal' ? layoutCss : ''}}\" ng-model=\"record[field]\" name=\"{{::field}}\" type=\"{{::type}}\" ng-required=\"isRequired\" ng-disabled=\"isReadonly\" placeholder=\"{{::placeholder}}\" max=\"{{::max}}\" min=\"{{::min}}\" step=\"any\" style=\"{{::style}}\" mask-input=\"{{mask}}\"> <div ng-if=\"::(rightLabel && rightLabel.length > 0)\" class=\"rightLabel\">{{::rightLabel}}</div> <div ng-if=\"log\"> form-input value: {{record[field]}}<br> {{isRequired}} </div> </div> </div>"
+    "<div> <div class=\"{{layout === 'horizontal' ? inputLayout : '' }}\"> <input class=\"form-control inputField {{layout !== 'horizontal' ? layoutCss : ''}}\" ng-model=\"record[field]\" name=\"{{::field}}\" type=\"{{::type}}\" ng-required=\"isRequired\" ng-disabled=\"isReadonly\" placeholder=\"{{::placeholder}}\" max=\"{{::max}}\" min=\"{{::min}}\" step=\"{{::step}}\" pattern=\"{{::pattern}}\" style=\"{{::style}}\" mask-input=\"{{mask}}\"> <div ng-if=\"::(rightLabel && rightLabel.length > 0)\" class=\"rightLabel\">{{::rightLabel}}</div> <div ng-if=\"log\"> form-input value: {{record[field]}}<br> {{isRequired}} </div> </div> </div>"
   );
 
 
