@@ -21,7 +21,7 @@
                 isReadonly      : '=?'  //boolean
             },
             templateUrl: 'sds-angular-controls/form-directives/form-input.html',
-            link: function (scope, element) {
+            link: function (scope, element, attr) {
                 // defaults
 
                 var parentScope = element.parent().scope();
@@ -68,8 +68,22 @@
                 scope.log = scope.log || false;
                 scope.type = scope.type || "text";
 
+                if(scope.type === "integer"){
+                    var inputField = element.find(".inputField");
+                    $(inputField).on('keyup', function(ev){
+                        inputField.val(inputField.val().replace(/[^0-9]/g,''));
+                    });
+                }
+
                 scope.min = parentScope.min;
                 scope.max = parentScope.max;
+
+                scope.step = attr.step || "any";
+                scope.pattern = attr.pattern;//pattern="[0-9]{10}"
+                //commenting out below, don't need to watch on 'step'
+                //attr.$observe("step", function(val){
+                //   scope.step = val || "any";
+                //});
             }
         }
     }

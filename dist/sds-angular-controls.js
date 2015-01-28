@@ -1,7 +1,7 @@
 /* 
  * 
  * sds-angular-controls - Angular Directives used with sds-angular generator 
- * Version 0.2.31 
+ * Version 0.3.0 
  * 
  * Copyright (c) 2015 Steve Gentile, David Benson 
  * Examples and docs at: https://github.com/SMARTDATASYSTEMSLLC/sds-angular-controls 
@@ -537,7 +537,7 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                 isReadonly      : '=?'  //boolean
             },
             templateUrl: 'sds-angular-controls/form-directives/form-input.html',
-            link: function (scope, element) {
+            link: function (scope, element, attr) {
                 // defaults
 
                 var parentScope = element.parent().scope();
@@ -584,8 +584,22 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                 scope.log = scope.log || false;
                 scope.type = scope.type || "text";
 
+                if(scope.type === "integer"){
+                    var inputField = element.find(".inputField");
+                    $(inputField).on('keyup', function(ev){
+                        inputField.val(inputField.val().replace(/[^0-9]/g,''));
+                    });
+                }
+
                 scope.min = parentScope.min;
                 scope.max = parentScope.max;
+
+                scope.step = attr.step || "any";
+                scope.pattern = attr.pattern;//pattern="[0-9]{10}"
+                //commenting out below, don't need to watch on 'step'
+                //attr.$observe("step", function(val){
+                //   scope.step = val || "any";
+                //});
             }
         }
     }
@@ -913,11 +927,8 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                     scope.isRequired = newVal;
                 });
 
-                scope.$watch("isReadonly", function(newVal, oldVal){
+                parentScope.$watch('isReadonly', function(newVal, oldVal){
                     scope.isReadonly = newVal;
-                    if(newVal !== oldVal){
-                        checkIfReadonly();
-                    }
                 });
 
                 scope.isReadonly = scope.isReadonly || false;
@@ -929,13 +940,6 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                 scope.onLabel = scope.onLabel   || "Yes";
                 scope.offLabel = scope.offLabel || "No";
 
-                function checkIfReadonly(){
-                    if(scope.isReadonly) {
-                        if (scope.fieldType === 'toggle') {
-                            scope.readOnlyModel = scope.record[scope.field];
-                        }
-                    }
-                }
             }
         }
     }
@@ -1611,6 +1615,7 @@ angular.module('sds-angular-controls').run(['$templateCache', function($template
     "             ng-messages='{{field}}.$error'>\n" +
     "            <span class='control-label' ng-message='required'> {{ validationFieldName }} is required. </span>\n" +
     "            <span class='control-label' ng-message='text'> {{ validationFieldName }} should be text. </span>\n" +
+    "            <span class='control-label' ng-message='integer'> {{ validationFieldName }} should be an integer. </span>\n" +
     "            <span class='control-label' ng-message='email'> {{ validationFieldName }} should be an email address. </span>\n" +
     "            <span class='control-label' ng-message='date'> {{ validationFieldName}} should be a date. </span>\n" +
     "            <span class='control-label' ng-message='datetime'> {{ validationFieldName }} should be a datetime. </span>\n" +
@@ -1630,7 +1635,7 @@ angular.module('sds-angular-controls').run(['$templateCache', function($template
 
 
   $templateCache.put('sds-angular-controls/form-directives/form-input.html',
-    "<div> <div class=\"{{layout === 'horizontal' ? inputLayout : '' }}\"> <input class=\"form-control inputField {{layout !== 'horizontal' ? layoutCss : ''}}\" ng-model=\"record[field]\" name=\"{{::field}}\" type=\"{{::type}}\" ng-required=\"isRequired\" ng-disabled=\"isReadonly\" placeholder=\"{{::placeholder}}\" max=\"{{::max}}\" min=\"{{::min}}\" step=\"any\" style=\"{{::style}}\" mask-input=\"{{mask}}\"> <div ng-if=\"::(rightLabel && rightLabel.length > 0)\" class=\"rightLabel\">{{::rightLabel}}</div> <div ng-if=\"log\"> form-input value: {{record[field]}}<br> {{isRequired}} </div> </div> </div>"
+    "<div> <div class=\"{{layout === 'horizontal' ? inputLayout : '' }}\"> <input class=\"form-control inputField {{layout !== 'horizontal' ? layoutCss : ''}}\" ng-model=\"record[field]\" name=\"{{::field}}\" type=\"{{::type}}\" ng-required=\"isRequired\" ng-disabled=\"isReadonly\" placeholder=\"{{::placeholder}}\" max=\"{{::max}}\" min=\"{{::min}}\" step=\"{{::step}}\" pattern=\"{{::pattern}}\" style=\"{{::style}}\" mask-input=\"{{mask}}\"> <div ng-if=\"::(rightLabel && rightLabel.length > 0)\" class=\"rightLabel\">{{::rightLabel}}</div> <div ng-if=\"log\"> form-input value: {{record[field]}}<br> {{isRequired}} </div> </div> </div>"
   );
 
 
@@ -1658,7 +1663,7 @@ angular.module('sds-angular-controls').run(['$templateCache', function($template
 
 
   $templateCache.put('sds-angular-controls/form-directives/form-text-toggle.html',
-    "<div class=\"text-toggle\"> <input type=\"text\" ng-readonly=\"isReadonly\" type=\"{{::type}}\" class=\"form-control inputField\" ng-required=\"isRequired\" ng-model=\"record[field]\"> <!-- bug in toggle where setting any disabled makes it disabled - so needing an if here --> <toggle-switch ng-if=\"isReadonly\" is-disabled=\"true\" class=\"{{::toggleSwitchType}}\" ng-model=\"record[toggleField]\" on-label=\"{{::onLabel}}\" off-label=\"{{::offLabel}}\"> </toggle-switch> <toggle-switch ng-if=\"!isReadonly\" class=\"{{::toggleSwitchType}}\" ng-model=\"record[toggleField]\" on-label=\"{{::onLabel}}\" off-label=\"{{::offLabel}}\"> </toggle-switch> </div>"
+    "<div class=\"text-toggle\"> <input type=\"text\" ng-disabled=\"isReadonly\" type=\"{{::type}}\" class=\"form-control inputField\" ng-required=\"isRequired\" ng-model=\"record[field]\"> <!-- bug in toggle where setting any disabled makes it disabled - so needing an if here --> <toggle-switch ng-if=\"isReadonly\" is-disabled=\"true\" class=\"{{::toggleSwitchType}}\" ng-model=\"record[toggleField]\" on-label=\"{{::onLabel}}\" off-label=\"{{::offLabel}}\"> </toggle-switch> <toggle-switch ng-if=\"!isReadonly\" class=\"{{::toggleSwitchType}}\" ng-model=\"record[toggleField]\" on-label=\"{{::onLabel}}\" off-label=\"{{::offLabel}}\"> </toggle-switch> </div>"
   );
 
 
@@ -1677,7 +1682,7 @@ angular.module('sds-angular-controls').run(['$templateCache', function($template
     "                         'fa-sort'     : _model.sort !== $index,\n" +
     "                         'fa-sort-down': _model.sort === $index &&  _model.sortAsc,\n" +
     "                         'fa-sort-up'  : _model.sort === $index && !_model.sortAsc\n" +
-    "                         }\"></i> </a> <span ng-if=\"::!_col.sortable\"> {{::_col.label || (_col.key | labelCase)}} </span>    <tbody> <tr> <td ng-repeat=\"_col in _model.cols\" db-bind-cell>   </table> <pagination ng-if=\"_model.total > _model.pageSize\" total-items=\"_model.total\" items-per-page=\"_model.pageSize\" max-size=\"10\" rotate=\"false\" ng-model=\"_model.currentPage\"></pagination> </div>"
+    "                         }\"></i> </a> <span ng-if=\"::!_col.sortable\"> {{::_col.label || (_col.key | labelCase)}} </span>    <tbody> <tr> <td ng-repeat=\"_col in _model.cols\" db-bind-cell>   </table> <div ng-if=\"!_model.filteredItems.length\"> No {{_model.label}}git . </div> <pagination ng-if=\"_model.total > _model.pageSize\" total-items=\"_model.total\" items-per-page=\"_model.pageSize\" max-size=\"10\" rotate=\"false\" ng-model=\"_model.currentPage\"></pagination> </div>"
   );
 
 }]);

@@ -1,5 +1,5 @@
 <div class="text-toggle">
-    <input type='text' ng-readonly="isReadonly" type='{{::type}}'
+    <input type='text' ng-disabled='isReadonly' type='{{::type}}'
            class="form-control inputField " ng-required='isRequired' ng-model='record[field]'/>
 
     <!-- bug in toggle where setting any disabled makes it disabled - so needing an if here -->

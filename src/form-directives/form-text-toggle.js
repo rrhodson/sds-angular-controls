@@ -36,11 +36,8 @@
                     scope.isRequired = newVal;
                 });
 
-                scope.$watch("isReadonly", function(newVal, oldVal){
+                parentScope.$watch('isReadonly', function(newVal, oldVal){
                     scope.isReadonly = newVal;
-                    if(newVal !== oldVal){
-                        checkIfReadonly();
-                    }
                 });
 
                 scope.isReadonly = scope.isReadonly || false;
@@ -52,13 +49,6 @@
                 scope.onLabel = scope.onLabel   || "Yes";
                 scope.offLabel = scope.offLabel || "No";
 
-                function checkIfReadonly(){
-                    if(scope.isReadonly) {
-                        if (scope.fieldType === 'toggle') {
-                            scope.readOnlyModel = scope.record[scope.field];
-                        }
-                    }
-                }
             }
         }
     }

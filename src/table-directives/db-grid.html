@@ -49,5 +49,8 @@
             </tr>
         </tbody>
     </table>
+    <div ng-if="!_model.filteredItems.length">
+        No {{_model.label}}git .
+    </div>
     <pagination ng-if="_model.total > _model.pageSize" total-items="_model.total" items-per-page="_model.pageSize" max-size="10" rotate="false" ng-model="_model.currentPage"></pagination>
 </div>
