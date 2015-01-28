@@ -1,7 +1,7 @@
 /* 
  * 
  * sds-angular-controls - Angular Directives used with sds-angular generator 
- * Version 0.2.31 
+ * Version 0.2.32 
  * 
  * Copyright (c) 2015 Steve Gentile, David Benson 
  * Examples and docs at: https://github.com/SMARTDATASYSTEMSLLC/sds-angular-controls 
@@ -927,11 +927,8 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                     scope.isRequired = newVal;
                 });
 
-                scope.$watch("isReadonly", function(newVal, oldVal){
+                parentScope.$watch('isReadonly', function(newVal, oldVal){
                     scope.isReadonly = newVal;
-                    if(newVal !== oldVal){
-                        checkIfReadonly();
-                    }
                 });
 
                 scope.isReadonly = scope.isReadonly || false;
@@ -943,13 +940,6 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                 scope.onLabel = scope.onLabel   || "Yes";
                 scope.offLabel = scope.offLabel || "No";
 
-                function checkIfReadonly(){
-                    if(scope.isReadonly) {
-                        if (scope.fieldType === 'toggle') {
-                            scope.readOnlyModel = scope.record[scope.field];
-                        }
-                    }
-                }
             }
         }
     }
@@ -1673,7 +1663,7 @@ angular.module('sds-angular-controls').run(['$templateCache', function($template
 
 
   $templateCache.put('sds-angular-controls/form-directives/form-text-toggle.html',
-    "<div class=\"text-toggle\"> <input type=\"text\" ng-readonly=\"isReadonly\" type=\"{{::type}}\" class=\"form-control inputField\" ng-required=\"isRequired\" ng-model=\"record[field]\"> <!-- bug in toggle where setting any disabled makes it disabled - so needing an if here --> <toggle-switch ng-if=\"isReadonly\" is-disabled=\"true\" class=\"{{::toggleSwitchType}}\" ng-model=\"record[toggleField]\" on-label=\"{{::onLabel}}\" off-label=\"{{::offLabel}}\"> </toggle-switch> <toggle-switch ng-if=\"!isReadonly\" class=\"{{::toggleSwitchType}}\" ng-model=\"record[toggleField]\" on-label=\"{{::onLabel}}\" off-label=\"{{::offLabel}}\"> </toggle-switch> </div>"
+    "<div class=\"text-toggle\"> <input type=\"text\" ng-disabled=\"isReadonly\" type=\"{{::type}}\" class=\"form-control inputField\" ng-required=\"isRequired\" ng-model=\"record[field]\"> <!-- bug in toggle where setting any disabled makes it disabled - so needing an if here --> <toggle-switch ng-if=\"isReadonly\" is-disabled=\"true\" class=\"{{::toggleSwitchType}}\" ng-model=\"record[toggleField]\" on-label=\"{{::onLabel}}\" off-label=\"{{::offLabel}}\"> </toggle-switch> <toggle-switch ng-if=\"!isReadonly\" class=\"{{::toggleSwitchType}}\" ng-model=\"record[toggleField]\" on-label=\"{{::onLabel}}\" off-label=\"{{::offLabel}}\"> </toggle-switch> </div>"
   );
 
 
