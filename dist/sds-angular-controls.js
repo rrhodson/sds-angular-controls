@@ -742,6 +742,12 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                         if (scope.record && scope.record[scope.field]) {
 
                             var value = scope.items[scope.record[scope.field]];
+                            if(scope.itemValue){
+                                var arrayItem = _.find(scope.items, function(item){
+                                   return item[scope.field] === scope.record[scope.field];
+                                });
+                                value = arrayItem[scope.itemValue];
+                            }
                             scope.readOnlyModel = value;
                         }
                     }
