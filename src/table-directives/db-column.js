@@ -24,33 +24,33 @@
                 var templateText = tElement.html().trim();
                 tElement.empty();
 
-                return function (scope, element, attr, dbGrid) {
+                return function ($scope, $element, $attrs, dbGrid) {
                     var templateFunc = null;
-                    if (!templateText && attr.key){
-                        templateText = '{{' + scope.$parent._model.rowName + '.' + attr.key + '}}'
+                    if (!templateText && $attrs.key){
+                        templateText = '{{' + $scope.$parent._model.rowName + '.' + $attrs.key + '}}'
                     }
 
-                    if (attr.bind === 'true'){
+                    if ($attrs.bind === 'true'){
                         templateFunc = templateText;
                     }else{
                         templateFunc = $interpolate(templateText);
                     }
 
                     var column = {
-                        filter: attr.filter,
-                        width: attr.width,
-                        key: attr.key,
-                        label: attr.label,
-                        sortable:  attr.sortable === 'false' ? false : !!attr.key,
-                        type: attr.type,
-                        bind: attr.bind === 'true',
+                        filter: $attrs.query,
+                        width: $attrs.width,
+                        key: $attrs.key,
+                        label: $attrs.label,
+                        sortable:  $attrs.sortable === 'false' ? false : !!$attrs.key,
+                        type: $attrs.type,
+                        bind: $attrs.bind === 'true',
                         template: templateFunc
                     };
 
                     dbGrid.addColumn(column);
 
-                    if(attr.filter !== undefined){
-                        attr.$observe('filter', function (val, old){
+                    if($attrs.query !== undefined){
+                        $attrs.$observe('query', function (val, old){
                            if(val != old){
                                column.filter = val;
                                dbGrid.refresh();

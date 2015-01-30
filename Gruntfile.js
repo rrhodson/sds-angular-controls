@@ -5,15 +5,15 @@ module.exports = function(grunt) {
   grunt.initConfig({
     // Metadata.
     pkg: grunt.file.readJSON('package.json'),
-    banner:
-    '/* \n * \n' +
-    ' * <%= pkg.title || pkg.name %> - <%= pkg.description %> \n' +
-    ' * Version <%= pkg.version %> \n' +
+    banner: '/*! \n' +
+        ' * <%= pkg.title || pkg.name %>\n' +
+    ' * <%= pkg.description %>\n' +
+    ' * @version <%= pkg.version %> \n' +
     ' * \n' +
     ' * Copyright (c) <%= grunt.template.today("yyyy") %> <%= _.pluck(pkg.authors, "name").join(", ") %> \n' +
-    ' * Examples and docs at: <%= pkg.homepage %> \n' +
-    ' * Licensed under <%= _.pluck(pkg.licenses, "type").join(", ") %> \n' +
-    ' *  \n */ \n',
+    ' * @link <%= pkg.homepage %> \n' +
+    ' * @license  <%= _.pluck(pkg.licenses, "type").join(", ") %> \n' +
+    ' */ \n',
     // Task configuration.
     concat: {
       options: {
