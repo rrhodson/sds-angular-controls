@@ -57,13 +57,12 @@
                     refresh: _.debounce(refresh, 250)
                 };
                 $scope.$grid = {
-                    refresh: function(){
+                    refresh: _.debounce(function(){
                         // hard refresh all rows
-                        console.log('hard refresh');
                         $scope._model.currentPage = 1;
                         $scope._model.filteredItems = [];
                         $timeout(refresh);
-                    },
+                    }, 250),
                     items: function (){ return $scope._model.filteredItems; }
                 };
 

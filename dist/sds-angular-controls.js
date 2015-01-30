@@ -1,7 +1,7 @@
 /*! 
  * sds-angular-controls
  * Angular Directives used with sds-angular generator
- * @version 0.3.1 
+ * @version 0.3.2 
  * 
  * Copyright (c) 2015 Steve Gentile, David Benson 
  * @link https://github.com/SMARTDATASYSTEMSLLC/sds-angular-controls 
@@ -1333,8 +1333,8 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                 if (typeof $scope._col.template === 'function'){
                     $element.append($scope._col.template($scope));
 
-                }else if(!angular.$element.trim($element.html())){
-                    var html = angular.$element('<span>' + $scope._col.template  + '</span>');
+                }else if(!angular.element.trim($element.html())){
+                    var html = angular.element('<span>' + $scope._col.template  + '</span>');
                     var compiled = $compile(html) ;
                     $element.append(html);
                     compiled($scope);
@@ -1488,13 +1488,12 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                     refresh: _.debounce(refresh, 250)
                 };
                 $scope.$grid = {
-                    refresh: function(){
+                    refresh: _.debounce(function(){
                         // hard refresh all rows
-                        console.log('hard refresh');
                         $scope._model.currentPage = 1;
                         $scope._model.filteredItems = [];
                         $timeout(refresh);
-                    },
+                    }, 250),
                     items: function (){ return $scope._model.filteredItems; }
                 };
 
