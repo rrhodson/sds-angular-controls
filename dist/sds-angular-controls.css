@@ -1,7 +1,7 @@
 /* 
  * 
  * sds-angular-controls - Angular Directives used with sds-angular generator 
- * Version 0.3.1 
+ * Version 0.3.3 
  * 
  * Copyright (c) 2015 Steve Gentile, David Benson 
  * Examples and docs at: https://github.com/SMARTDATASYSTEMSLLC/sds-angular-controls 
