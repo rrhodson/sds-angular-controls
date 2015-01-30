@@ -1,12 +1,11 @@
-/* 
- * 
- * sds-angular-controls - Angular Directives used with sds-angular generator 
- * Version 0.3.0 
+/*! 
+ * sds-angular-controls
+ * Angular Directives used with sds-angular generator
+ * @version 0.3.1 
  * 
  * Copyright (c) 2015 Steve Gentile, David Benson 
- * Examples and docs at: https://github.com/SMARTDATASYSTEMSLLC/sds-angular-controls 
- * Licensed under MIT 
- *  
+ * @link https://github.com/SMARTDATASYSTEMSLLC/sds-angular-controls 
+ * @license  MIT 
  */
 .text-toggle .form-control {
   width: 40%;
@@ -103,13 +102,16 @@ input.datepicker + ul {
   margin-left: 10px;
   display: inline-block;
 }
+.db-summary {
+  margin-left: 30px;
+}
 .db-grid.table tbody > tr > td {
   vertical-align: middle;
 }
 .db-grid.table thead > tr > th {
   vertical-align: top;
 }
-.filter-input {
+.form-control.filter-input {
   height: 28px;
   padding: 4px 10px;
   font-size: 12px;

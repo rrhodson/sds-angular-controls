@@ -8,16 +8,16 @@
     function dbBindCell ($compile) {
         return{
             restrict: 'A',
-            link: function (scope, element) {
-                if (typeof scope._col.template === 'function'){
-                    element.append(scope._col.template(scope));
+            link: function ($scope, $element) {
+                if (typeof $scope._col.template === 'function'){
+                    $element.append($scope._col.template($scope));
 
-                }else if(!angular.element.trim(element.html())){
-                    var html = angular.element('<span>' + scope._col.template  + '</span>');
+                }else if(!angular.$element.trim($element.html())){
+                    var html = angular.$element('<span>' + $scope._col.template  + '</span>');
                     var compiled = $compile(html) ;
-                    element.append(html);
-                    compiled(scope);
-                    element.data('compiled', compiled);
+                    $element.append(html);
+                    compiled($scope);
+                    $element.data('compiled', compiled);
                 }
             }
         }

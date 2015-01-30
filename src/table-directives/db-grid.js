@@ -43,12 +43,12 @@
                     total: 0,
                     sortAsc: $attrs.sort ? $attrs.sort[0] !== '-' : true,
                     sort: null,
-                    filterText: '',
+                    filterText: null,
                     showAdvancedFilter: false,
                     pageSize: $attrs.pageSize ? parseInt($attrs.pageSize, 10) : 25,
                     filterType: ($attrs.filter || 'advanced').toLowerCase(),
                     cols: [],
-                    items: [],
+                    items: null,
                     filteredItems: [],
                     getItems: defaultGetItems,
                     toggleSort: toggleSort,
@@ -134,6 +134,10 @@
                     if (sort && sort === item.key && $scope._model.sort === null){
                         $scope._model.sort = $scope._model.cols.length;
                     }
+
+                    if (item.filter){
+                        $scope._model.showAdvancedFilter = true;
+                    }
                     $scope._model.cols.push(item);
                 };
 
@@ -152,10 +156,20 @@
                     }
                 };
 
+                if($attrs.query !== undefined){
+                    $attrs.$observe('query', function (val, old){
+                        if(val != old){
+                            if (_.isString(val)){
+                                $scope._model.filterText = val;
+                            }
+                            $scope.$grid.refresh();
+                        }
+                    });
+                }
+
                 $scope.$watch('_model.currentPage', $scope._model.refresh);
                 $scope.$watch('_model.sort',        $scope._model.refresh);
                 $scope.$watch('_model.sortAsc',     $scope._model.refresh);
-                $scope.$watch('_model.filterText',  $scope._model.refresh);
             }
         };
     }

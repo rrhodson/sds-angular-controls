@@ -5,7 +5,7 @@
 
         <div ng-if="!_model.showAdvancedFilter && _model.filterType !== 'none'" class="toolbar-input">
             <div class="form-group has-feedback">
-                <input class="form-control" type="text" ng-model="_model.filterText"
+                <input class="form-control" type="text" ng-model="_model.filterText" ng-keyup="$grid.refresh()"
                        placeholder="Filter {{_model.label || 'items'}}" on-enter="_model.onEnter()" />
                 <a href="" ng-click="_model.filterText = ''" class="form-control-feedback feedback-link">&times;</a>
             </div>
@@ -49,8 +49,8 @@
             </tr>
         </tbody>
     </table>
-    <div ng-if="!_model.filteredItems.length">
-        No {{_model.label}}git .
+    <div ng-if="!_model.filteredItems.length && _model.label" class="db-summary">
+        No {{_model.label}}.
     </div>
     <pagination ng-if="_model.total > _model.pageSize" total-items="_model.total" items-per-page="_model.pageSize" max-size="10" rotate="false" ng-model="_model.currentPage"></pagination>
 </div>
