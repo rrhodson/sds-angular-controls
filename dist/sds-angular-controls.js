@@ -1,7 +1,7 @@
 /* 
  * 
  * sds-angular-controls - Angular Directives used with sds-angular generator 
- * Version 0.3.0 
+ * Version 0.3.1 
  * 
  * Copyright (c) 2015 Steve Gentile, David Benson 
  * Examples and docs at: https://github.com/SMARTDATASYSTEMSLLC/sds-angular-controls 
@@ -742,7 +742,8 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                         if (scope.record && scope.record[scope.field]) {
 
                             var value = scope.items[scope.record[scope.field]];
-                            if(scope.itemValue){
+                            //if using itemKey/itemValue -we need to find it in the array vs. hash:
+                            if(scope.itemValue !== null && scope.itemKey !== null){
                                 var arrayItem = _.find(scope.items, function(item){
                                    return item[scope.field] === scope.record[scope.field];
                                 });
