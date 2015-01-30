@@ -48,7 +48,7 @@
 
                             var value = scope.items[scope.record[scope.field]];
                             //if using itemKey/itemValue -we need to find it in the array vs. hash:
-                            if(scope.itemValue !== null && scope.itemKey !== null){
+                            if(scope.itemValue && scope.itemKey){
                                 var arrayItem = _.find(scope.items, function(item){
                                    return item[scope.field] === scope.record[scope.field];
                                 });
