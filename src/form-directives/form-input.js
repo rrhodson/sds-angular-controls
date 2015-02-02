@@ -79,11 +79,8 @@
                 scope.max = parentScope.max;
 
                 scope.step = attr.step || "any";
-                scope.pattern = attr.pattern;//pattern="[0-9]{10}"
-                //commenting out below, don't need to watch on 'step'
-                //attr.$observe("step", function(val){
-                //   scope.step = val || "any";
-                //});
+                //scope.pattern = attr.pattern;//pattern="[0-9]{10}"
+
             }
         }
     }
