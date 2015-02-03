@@ -36,7 +36,9 @@
                         templateFunc = $interpolate(templateText);
                     }
 
+                    //debugger;
                     var column = {
+                        index: $element.prevAll('db-col').length,
                         filter: $attrs.query,
                         width: $attrs.width,
                         key: $attrs.key,
@@ -57,6 +59,10 @@
                            }
                         });
                     }
+
+                    $scope.$on('$destroy', function() {
+                        dbGrid.removeColumn(column);
+                    });
                 }
             }
         }

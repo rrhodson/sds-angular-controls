@@ -1,7 +1,7 @@
 /*! 
  * sds-angular-controls
  * Angular Directives used with sds-angular generator
- * @version 0.3.5 
+ * @version 0.3.6 
  * 
  * Copyright (c) 2015 Steve Gentile, David Benson 
  * @link https://github.com/SMARTDATASYSTEMSLLC/sds-angular-controls 
@@ -594,11 +594,8 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                 scope.max = parentScope.max;
 
                 scope.step = attr.step || "any";
-                scope.pattern = attr.pattern;//pattern="[0-9]{10}"
-                //commenting out below, don't need to watch on 'step'
-                //attr.$observe("step", function(val){
-                //   scope.step = val || "any";
-                //});
+                //scope.pattern = attr.pattern;//pattern="[0-9]{10}"
+
             }
         }
     }
@@ -1406,7 +1403,9 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                         templateFunc = $interpolate(templateText);
                     }
 
+                    //debugger;
                     var column = {
+                        index: $element.prevAll('db-col').length,
                         filter: $attrs.query,
                         width: $attrs.width,
                         key: $attrs.key,
@@ -1427,6 +1426,10 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                            }
                         });
                     }
+
+                    $scope.$on('$destroy', function() {
+                        dbGrid.removeColumn(column);
+                    });
                 }
             }
         }
@@ -1487,7 +1490,7 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                     filterType: ($attrs.filter || 'advanced').toLowerCase(),
                     cols: [],
                     items: null,
-                    filteredItems: [],
+                    filteredItems: null,
                     getItems: defaultGetItems,
                     toggleSort: toggleSort,
                     clearFilters: clearFilters,
@@ -1498,7 +1501,7 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                     refresh: _.debounce(function(){
                         // hard refresh all rows
                         $scope._model.currentPage = 1;
-                        $scope._model.filteredItems = [];
+                        $scope._model.filteredItems = null;
                         $timeout(refresh);
                     }, 250),
                     items: function (){ return $scope._model.filteredItems; }
@@ -1510,17 +1513,21 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                 $scope._model.rowName = loop[0];
                 if (loop[2]) {
                     $scope.$watchCollection(loop.slice(2).join(' '), function (items) {
+                        $scope._model.currentPage = 1;
+                        $scope._model.filteredItems = null;
                         $scope._model.items = items;
                         $scope._model.refresh();
                     });
                 }
 
                 function defaultGetItems (filter, sortKey, sortAsc, page, pageSize, cols){
-                    var deferred = $q.defer();
-                    var items = orderByFilter(complexFilter($scope._model.items, filter), sortKey, !sortAsc);
-                    $scope._model.total = items ? items.length : 0;
-                    deferred.resolve(pageFilter(items, page, pageSize));
-                    return deferred.promise;
+                    if ($scope._model.items) {
+                        var items = orderByFilter(complexFilter($scope._model.items, filter), sortKey, !sortAsc);
+                        $scope._model.total = items ? items.length : 0;
+                        return $q.when(pageFilter(items, page, pageSize));
+                    }else{
+                        return $q.when(null);
+                    }
                 }
 
                 function toggleSort(index){
@@ -1575,7 +1582,14 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                     if (item.filter){
                         $scope._model.showAdvancedFilter = true;
                     }
-                    $scope._model.cols.push(item);
+                    $scope._model.cols.splice(item.index, 0, item);
+                };
+
+                this.removeColumn = function (item) {
+                    var index = $scope._model.cols.indexOf(item);
+                    if (index > -1) {
+                        $scope._model.cols.splice(index, 1);
+                    }
                 };
 
                 this.setDataSource = function (dataSource){
@@ -1625,7 +1639,7 @@ angular.module('sds-angular-controls').run(['$templateCache', function($template
 
 
   $templateCache.put('sds-angular-controls/form-directives/form-datepicker.html',
-    "<span> <span class=\"input-group\"> <input type=\"text\" style=\"{{::style}}\" class=\"form-control datepicker\" class=\"{{layout !== 'horizontal' ? layoutCss : ''}}\" ng-if=\"!isReadonly\" ng-readonly=\"isReadonly\" placeholder=\"{{placeholder}}\" ng-model=\"record[field]\" ng-required=\"::isRequired\" min-date=\"::min\" max-date=\"::max\" datepicker-popup=\"{{::dateFormat}}\" is-open=\"calendar.opened\"> <span ng-if=\"!isReadonly\" class=\"input-group-btn\"> <button type=\"button\" class=\"btn btn-default\" ng-click=\"open($event)\"><i class=\"glyphicon glyphicon-calendar\"></i></button> </span> </span> <div ng-if=\"log\"> form-datepicker value: {{record[field]}}<br> {{isRequired}} </div> </span>"
+    "<span> <span class=\"input-group {{layout !== 'horizontal' ? layoutCss : ''}}\"> <input type=\"text\" style=\"{{::style}}\" class=\"form-control datepicker\" ng-if=\"!isReadonly\" ng-readonly=\"isReadonly\" placeholder=\"{{placeholder}}\" ng-model=\"record[field]\" ng-required=\"::isRequired\" min-date=\"::min\" max-date=\"::max\" datepicker-popup=\"{{::dateFormat}}\" is-open=\"calendar.opened\"> <span ng-if=\"!isReadonly\" class=\"input-group-btn\"> <button type=\"button\" class=\"btn btn-default\" ng-click=\"open($event)\"><i class=\"glyphicon glyphicon-calendar\"></i></button> </span> </span> <div ng-if=\"log\"> form-datepicker value: {{record[field]}}<br> {{isRequired}} </div> </span>"
   );
 
 
@@ -1654,7 +1668,7 @@ angular.module('sds-angular-controls').run(['$templateCache', function($template
 
 
   $templateCache.put('sds-angular-controls/form-directives/form-input.html',
-    "<div> <div class=\"{{layout === 'horizontal' ? inputLayout : '' }}\"> <input class=\"form-control inputField {{layout !== 'horizontal' ? layoutCss : ''}}\" ng-model=\"record[field]\" name=\"{{::field}}\" type=\"{{::type}}\" ng-required=\"isRequired\" ng-disabled=\"isReadonly\" placeholder=\"{{::placeholder}}\" max=\"{{::max}}\" min=\"{{::min}}\" step=\"{{::step}}\" pattern=\"{{::pattern}}\" style=\"{{::style}}\" mask-input=\"{{mask}}\"> <div ng-if=\"::(rightLabel && rightLabel.length > 0)\" class=\"rightLabel\">{{::rightLabel}}</div> <div ng-if=\"log\"> form-input value: {{record[field]}}<br> {{isRequired}} </div> </div> </div>"
+    "<div> <div class=\"{{layout === 'horizontal' ? inputLayout : '' }}\"> <input class=\"form-control inputField {{layout !== 'horizontal' ? layoutCss : ''}}\" ng-model=\"record[field]\" name=\"{{::field}}\" type=\"{{::type}}\" ng-required=\"isRequired\" ng-disabled=\"isReadonly\" placeholder=\"{{::placeholder}}\" max=\"{{::max}}\" min=\"{{::min}}\" step=\"{{::step}}\" style=\"{{::style}}\" mask-input=\"{{mask}}\"> <div ng-if=\"::(rightLabel && rightLabel.length > 0)\" class=\"rightLabel\">{{::rightLabel}}</div> <div ng-if=\"log\"> form-input value: {{record[field]}}<br> {{isRequired}} </div> </div> </div>"
   );
 
 
@@ -1701,7 +1715,7 @@ angular.module('sds-angular-controls').run(['$templateCache', function($template
     "                         'fa-sort'     : _model.sort !== $index,\n" +
     "                         'fa-sort-down': _model.sort === $index &&  _model.sortAsc,\n" +
     "                         'fa-sort-up'  : _model.sort === $index && !_model.sortAsc\n" +
-    "                         }\"></i> </a> <span ng-if=\"::!_col.sortable\"> {{::_col.label || (_col.key | labelCase)}} </span>    <tbody> <tr> <td ng-repeat=\"_col in _model.cols\" db-bind-cell>   </table> <div ng-if=\"!_model.filteredItems.length && _model.label\" class=\"db-summary\"> No {{_model.label}}. </div> <pagination ng-if=\"_model.total > _model.pageSize\" total-items=\"_model.total\" items-per-page=\"_model.pageSize\" max-size=\"10\" rotate=\"false\" ng-model=\"_model.currentPage\"></pagination> </div>"
+    "                         }\"></i> </a> <span ng-if=\"::!_col.sortable\"> {{::_col.label || (_col.key | labelCase)}} </span>    <tbody> <tr> <td ng-repeat=\"_col in _model.cols\" db-bind-cell>   </table> <div ng-if=\"_model.filteredItems && _model.filteredItems.length === 0 && _model.label\" class=\"db-summary\"> No {{_model.label}}. </div> <pagination ng-if=\"_model.total > _model.pageSize\" total-items=\"_model.total\" items-per-page=\"_model.pageSize\" max-size=\"10\" rotate=\"false\" ng-model=\"_model.currentPage\"></pagination> </div>"
   );
 
 }]);

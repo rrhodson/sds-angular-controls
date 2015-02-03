@@ -49,7 +49,7 @@
             </tr>
         </tbody>
     </table>
-    <div ng-if="!_model.filteredItems.length && _model.label" class="db-summary">
+    <div ng-if="_model.filteredItems && _model.filteredItems.length === 0 && _model.label" class="db-summary">
         No {{_model.label}}.
     </div>
     <pagination ng-if="_model.total > _model.pageSize" total-items="_model.total" items-per-page="_model.pageSize" max-size="10" rotate="false" ng-model="_model.currentPage"></pagination>

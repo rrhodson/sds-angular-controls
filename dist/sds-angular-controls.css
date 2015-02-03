@@ -1,7 +1,7 @@
 /*! 
  * sds-angular-controls
  * Angular Directives used with sds-angular generator
- * @version 0.3.5 
+ * @version 0.3.6 
  * 
  * Copyright (c) 2015 Steve Gentile, David Benson 
  * @link https://github.com/SMARTDATASYSTEMSLLC/sds-angular-controls 
@@ -119,7 +119,7 @@ input.datepicker + ul {
   border-width: 0 0 4px;
   margin-bottom: 8px;
   background-color: #fff;
-  margin-top: -6px;
+  margin-top: 0px;
   box-sizing: content-box;
   margin-left: -10px;
   border-radius: 0;

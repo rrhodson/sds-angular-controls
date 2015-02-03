@@ -49,7 +49,7 @@
                     filterType: ($attrs.filter || 'advanced').toLowerCase(),
                     cols: [],
                     items: null,
-                    filteredItems: [],
+                    filteredItems: null,
                     getItems: defaultGetItems,
                     toggleSort: toggleSort,
                     clearFilters: clearFilters,
@@ -60,7 +60,7 @@
                     refresh: _.debounce(function(){
                         // hard refresh all rows
                         $scope._model.currentPage = 1;
-                        $scope._model.filteredItems = [];
+                        $scope._model.filteredItems = null;
                         $timeout(refresh);
                     }, 250),
                     items: function (){ return $scope._model.filteredItems; }
@@ -72,17 +72,21 @@
                 $scope._model.rowName = loop[0];
                 if (loop[2]) {
                     $scope.$watchCollection(loop.slice(2).join(' '), function (items) {
+                        $scope._model.currentPage = 1;
+                        $scope._model.filteredItems = null;
                         $scope._model.items = items;
                         $scope._model.refresh();
                     });
                 }
 
                 function defaultGetItems (filter, sortKey, sortAsc, page, pageSize, cols){
-                    var deferred = $q.defer();
-                    var items = orderByFilter(complexFilter($scope._model.items, filter), sortKey, !sortAsc);
-                    $scope._model.total = items ? items.length : 0;
-                    deferred.resolve(pageFilter(items, page, pageSize));
-                    return deferred.promise;
+                    if ($scope._model.items) {
+                        var items = orderByFilter(complexFilter($scope._model.items, filter), sortKey, !sortAsc);
+                        $scope._model.total = items ? items.length : 0;
+                        return $q.when(pageFilter(items, page, pageSize));
+                    }else{
+                        return $q.when(null);
+                    }
                 }
 
                 function toggleSort(index){
@@ -137,7 +141,14 @@
                     if (item.filter){
                         $scope._model.showAdvancedFilter = true;
                     }
-                    $scope._model.cols.push(item);
+                    $scope._model.cols.splice(item.index, 0, item);
+                };
+
+                this.removeColumn = function (item) {
+                    var index = $scope._model.cols.indexOf(item);
+                    if (index > -1) {
+                        $scope._model.cols.splice(index, 1);
+                    }
                 };
 
                 this.setDataSource = function (dataSource){
