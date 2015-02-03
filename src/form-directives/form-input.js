@@ -23,21 +23,17 @@
             templateUrl: 'sds-angular-controls/form-directives/form-input.html',
             link: function (scope, element, attr) {
                 // defaults
-
                 var parentScope = element.parent().scope();
 
                 parentScope.$watch('record', function(newVal, oldVal){
-
                     scope.record = newVal;
                 });
 
                 parentScope.$watch('field', function(newVal, oldVal){
-
                     scope.field = newVal;
                 });
 
                 parentScope.$watch('isRequired', function(newVal, oldVal){
-
                     scope.isRequired = newVal;
                 });
 
@@ -53,14 +49,14 @@
                 });
 
                 parentScope.$watch('isReadonly', function(newVal, oldVal){
-
                     scope.isReadonly = newVal;
                 });
+
+
 
                 scope.isReadonly = scope.isReadonly || false;
 
                 parentScope.$watch('label', function(newVal, oldVal){
-
                     scope.label = newVal;
                     scope.placeholder = scope.placeholder || newVal;
                 });
@@ -74,12 +70,26 @@
                         inputField.val(inputField.val().replace(/[^0-9]/g,''));
                     });
                 }
-
-                scope.min = parentScope.min;
-                scope.max = parentScope.max;
-
                 scope.step = attr.step || "any";
-                //scope.pattern = attr.pattern;//pattern="[0-9]{10}"
+
+                var input = element.find('input');
+                if (parentScope.min){
+                    input.attr('min', parentScope.min);
+                }
+                if (parentScope.max){
+                    input.attr('max', parentScope.max);
+                }
+                if (attr.pattern){
+                    input.attr('pattern', scope.$eval(attr.pattern));
+                }
+                parentScope.$watch('isAutofocus', function(newVal, oldVal){
+                    if (newVal){
+                        input.attr('autofocus', 'autofocus');
+                    }else{
+                        input.removeAttr('autofocus');
+                    }
+                });
+
 
             }
         }

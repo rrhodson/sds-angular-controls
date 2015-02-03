@@ -77,6 +77,15 @@
                 function checkIfReadonly(){
                     scope.readOnlyModel = moment(scope.record[scope.field]).format(scope.dateFormat);
                 }
+
+                var input = element.find('input');
+                parentScope.$watch('isAutofocus', function(newVal, oldVal){
+                    if (newVal){
+                        input.attr('autofocus', 'autofocus');
+                    }else{
+                        input.removeAttr('autofocus');
+                    }
+                });
             }
         }
     }

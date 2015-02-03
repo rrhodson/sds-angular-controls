@@ -36,7 +36,6 @@
                         templateFunc = $interpolate(templateText);
                     }
 
-                    //debugger;
                     var column = {
                         index: $element.prevAll('db-col').length,
                         filter: $attrs.query,

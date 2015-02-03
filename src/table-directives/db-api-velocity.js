@@ -2,7 +2,7 @@
 (function () {
     'use strict';
 
-    function dbApiVelocity ($http) {
+    function dbApiVelocity ($http, $rootScope) {
         return{
             restrict: 'E',
             require: '^dbGrid',
@@ -33,11 +33,14 @@
 
                     _.extend(query, scope.postParams);
 
+                    $rootScope.$broadcast('db-api:start');
                     return $http.post(scope.api, query).then(function (response) {
+                        $rootScope.$broadcast('db-api:complete');
                         dbGrid.setTotal(response.data.total);
                         return response.data.tableData;
+                    }, function (){
+                        $rootScope.$broadcast('db-api:complete');
                     });
-
                 }
 
                 function createFilters (filter, cols){

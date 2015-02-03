@@ -15,6 +15,7 @@
                 record                  : '=' , //two-way binding
                 isRequired              : '=?',
                 isReadonly              : '=?',
+                isAutofocus             : '=?',
                 field                   : '@' , //one-way binding
                 label                   : '@' ,
                 rowClass                : '@?',

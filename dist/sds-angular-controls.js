@@ -1,7 +1,7 @@
 /*! 
  * sds-angular-controls
  * Angular Directives used with sds-angular generator
- * @version 0.3.6 
+ * @version 0.3.8 
  * 
  * Copyright (c) 2015 Steve Gentile, David Benson 
  * @link https://github.com/SMARTDATASYSTEMSLLC/sds-angular-controls 
@@ -327,6 +327,15 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                 }
 
                 scope.options = options;
+
+                var input = element.find('select');
+                parentScope.$watch('isAutofocus', function(newVal, oldVal){
+                    if (newVal){
+                        input.attr('autofocus', 'autofocus');
+                    }else{
+                        input.removeAttr('autofocus');
+                    }
+                });
             }
         }
     }
@@ -411,6 +420,15 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                 function checkIfReadonly(){
                     scope.readOnlyModel = moment(scope.record[scope.field]).format(scope.dateFormat);
                 }
+
+                var input = element.find('input');
+                parentScope.$watch('isAutofocus', function(newVal, oldVal){
+                    if (newVal){
+                        input.attr('autofocus', 'autofocus');
+                    }else{
+                        input.removeAttr('autofocus');
+                    }
+                });
             }
         }
     }
@@ -444,6 +462,7 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                 record                  : '=' , //two-way binding
                 isRequired              : '=?',
                 isReadonly              : '=?',
+                isAutofocus             : '=?',
                 field                   : '@' , //one-way binding
                 label                   : '@' ,
                 rowClass                : '@?',
@@ -538,21 +557,17 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
             templateUrl: 'sds-angular-controls/form-directives/form-input.html',
             link: function (scope, element, attr) {
                 // defaults
-
                 var parentScope = element.parent().scope();
 
                 parentScope.$watch('record', function(newVal, oldVal){
-
                     scope.record = newVal;
                 });
 
                 parentScope.$watch('field', function(newVal, oldVal){
-
                     scope.field = newVal;
                 });
 
                 parentScope.$watch('isRequired', function(newVal, oldVal){
-
                     scope.isRequired = newVal;
                 });
 
@@ -568,14 +583,14 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                 });
 
                 parentScope.$watch('isReadonly', function(newVal, oldVal){
-
                     scope.isReadonly = newVal;
                 });
+
+
 
                 scope.isReadonly = scope.isReadonly || false;
 
                 parentScope.$watch('label', function(newVal, oldVal){
-
                     scope.label = newVal;
                     scope.placeholder = scope.placeholder || newVal;
                 });
@@ -589,12 +604,26 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                         inputField.val(inputField.val().replace(/[^0-9]/g,''));
                     });
                 }
-
-                scope.min = parentScope.min;
-                scope.max = parentScope.max;
-
                 scope.step = attr.step || "any";
-                //scope.pattern = attr.pattern;//pattern="[0-9]{10}"
+
+                var input = element.find('input');
+                if (parentScope.min){
+                    input.attr('min', parentScope.min);
+                }
+                if (parentScope.max){
+                    input.attr('max', parentScope.max);
+                }
+                if (attr.pattern){
+                    input.attr('pattern', scope.$eval(attr.pattern));
+                }
+                parentScope.$watch('isAutofocus', function(newVal, oldVal){
+                    if (newVal){
+                        input.attr('autofocus', 'autofocus');
+                    }else{
+                        input.removeAttr('autofocus');
+                    }
+                });
+
 
             }
         }
@@ -684,6 +713,15 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                         }
                     }
                 }
+
+                var input = element.find('input');
+                parentScope.$watch('isAutofocus', function(newVal, oldVal){
+                    if (newVal){
+                        input.attr('autofocus', 'autofocus');
+                    }else{
+                        input.removeAttr('autofocus');
+                    }
+                });
             }
         }
     }
@@ -809,6 +847,15 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                         }
                     }
                 });
+
+                var input = element.find('select');
+                parentScope.$watch('isAutofocus', function(newVal, oldVal){
+                    if (newVal){
+                        input.attr('autofocus', 'autofocus');
+                    }else{
+                        input.removeAttr('autofocus');
+                    }
+                });
             }
         }
     }
@@ -888,6 +935,14 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                         }
                     }
                 }
+                var input = element.find('textarea');
+                parentScope.$watch('isAutofocus', function(newVal, oldVal){
+                    if (newVal){
+                        input.attr('autofocus', 'autofocus');
+                    }else{
+                        input.removeAttr('autofocus');
+                    }
+                });
             }
         }
     }
@@ -1161,7 +1216,7 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
 (function () {
     'use strict';
 
-    function dbApiVelocity ($http) {
+    function dbApiVelocity ($http, $rootScope) {
         return{
             restrict: 'E',
             require: '^dbGrid',
@@ -1192,11 +1247,14 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
 
                     _.extend(query, scope.postParams);
 
+                    $rootScope.$broadcast('db-api:start');
                     return $http.post(scope.api, query).then(function (response) {
+                        $rootScope.$broadcast('db-api:complete');
                         dbGrid.setTotal(response.data.total);
                         return response.data.tableData;
+                    }, function (){
+                        $rootScope.$broadcast('db-api:complete');
                     });
-
                 }
 
                 function createFilters (filter, cols){
@@ -1318,7 +1376,7 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
 
         }
     }
-    dbApiVelocity.$inject = ["$http"];
+    dbApiVelocity.$inject = ["$http", "$rootScope"];
 
     angular.module('sds-angular-controls').directive('dbApiVelocity', dbApiVelocity);
 })();
@@ -1403,7 +1461,6 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                         templateFunc = $interpolate(templateText);
                     }
 
-                    //debugger;
                     var column = {
                         index: $element.prevAll('db-col').length,
                         filter: $attrs.query,
@@ -1668,7 +1725,7 @@ angular.module('sds-angular-controls').run(['$templateCache', function($template
 
 
   $templateCache.put('sds-angular-controls/form-directives/form-input.html',
-    "<div> <div class=\"{{layout === 'horizontal' ? inputLayout : '' }}\"> <input class=\"form-control inputField {{layout !== 'horizontal' ? layoutCss : ''}}\" ng-model=\"record[field]\" name=\"{{::field}}\" type=\"{{::type}}\" ng-required=\"isRequired\" ng-disabled=\"isReadonly\" placeholder=\"{{::placeholder}}\" max=\"{{::max}}\" min=\"{{::min}}\" step=\"{{::step}}\" style=\"{{::style}}\" mask-input=\"{{mask}}\"> <div ng-if=\"::(rightLabel && rightLabel.length > 0)\" class=\"rightLabel\">{{::rightLabel}}</div> <div ng-if=\"log\"> form-input value: {{record[field]}}<br> {{isRequired}} </div> </div> </div>"
+    "<div class=\"{{layout === 'horizontal' ? inputLayout : '' }}\"> <input class=\"form-control inputField {{layout !== 'horizontal' ? layoutCss : ''}}\" ng-model=\"record[field]\" name=\"{{::field}}\" type=\"{{::type}}\" ng-required=\"isRequired\" ng-disabled=\"isReadonly\" placeholder=\"{{::placeholder}}\" step=\"{{::step}}\" style=\"{{::style}}\" mask-input=\"{{mask}}\"> <div ng-if=\"::(rightLabel && rightLabel.length > 0)\" class=\"rightLabel\">{{::rightLabel}}</div> <div ng-if=\"log\"> form-input value: {{record[field]}}<br> {{isRequired}} </div> </div>"
   );
 
 

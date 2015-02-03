@@ -72,6 +72,14 @@
                         }
                     }
                 }
+                var input = element.find('textarea');
+                parentScope.$watch('isAutofocus', function(newVal, oldVal){
+                    if (newVal){
+                        input.attr('autofocus', 'autofocus');
+                    }else{
+                        input.removeAttr('autofocus');
+                    }
+                });
             }
         }
     }
