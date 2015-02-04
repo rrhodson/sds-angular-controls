@@ -1,7 +1,7 @@
 /*! 
  * sds-angular-controls
  * Angular Directives used with sds-angular generator
- * @version 0.3.10 
+ * @version 0.3.11 
  * 
  * Copyright (c) 2015 Steve Gentile, David Benson 
  * @link https://github.com/SMARTDATASYSTEMSLLC/sds-angular-controls 
@@ -594,6 +594,72 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
     formInput.$inject = ["$timeout"];
 
     angular.module('sds-angular-controls').directive('formInput', formInput);
+})();
+
+(function () {
+    'use strict';
+    function formMultiSelect ($timeout) {
+        return{
+            restrict: 'EA',
+            require: '^formField',
+            replace: true,
+            scope: {
+                items           : '=',
+                groups          : '=?',
+                itemKey         : '@?',
+                itemValue       : '@?',
+                itemGroupKey    : '@?',
+                itemGroupValue  : '@?',
+                allowCustom     : '=?',
+                style           : '@?',
+                layoutCss       : '@?' //default col-md-6
+            },
+            templateUrl: 'sds-angular-controls/form-directives/form-multi-select.html',
+
+            link: function (scope, element, attr, container) {
+                var input = element.find('select');
+                scope.container = container.$scope;
+
+                // one-time bindings:
+                switch(container.$scope.layout){
+                    case "horizontal":
+                        scope.layoutCss = scope.layoutCss || "col-md-6";
+                        break;
+                    default: //stacked
+                        scope.layoutCss = scope.layoutCss || "";
+                }
+
+                if (container.$scope.isAutofocus){
+                    $timeout(input.focus);
+                }
+
+                var options = {
+                    plugins: ['remove_button'],
+                    valueField: scope.itemKey,
+                    labelField: scope.itemValue,
+                    searchField: [scope.itemValue],
+                    maxOptions: 10
+                };
+
+                if (scope.allowCustom){
+                    options.persist = false;
+                    options.create = true;
+                }
+
+                if (scope.itemGroupKey && _.isArray(scope.groups)){
+                    options.optgroups =  scope.groups;
+                    options.optgroupField = scope.itemGroupKey;
+                    options.optgroupValueField = scope.itemGroupKey;
+                    options.optgroupLabelField = scope.itemGroupValue;
+                }
+
+                scope.options = options;
+            }
+        }
+    }
+    formMultiSelect.$inject = ["$timeout"];
+
+    angular.module('sds-angular-controls').directive('formMultiSelect', formMultiSelect);
 })();
 
 (function () {
@@ -1451,7 +1517,7 @@ angular.module('sds-angular-controls').run(['$templateCache', function($template
   'use strict';
 
   $templateCache.put('sds-angular-controls/form-directives/form-autocomplete.html',
-    "<div class=\"{{::container.layout === 'horizontal' ? layoutCss : '' }}\"> <select ng-if=\"!container.isReadonly && !hasFilter\" ng-readonly=\"container.isReadonly\" ng-required=\"container.isRequired\" name=\"{{::container.field}}\" selectize=\"options\" options=\"items\" class=\"form-control {{::container.layout !== 'horizontal' ? layoutCss : ''}}\" ng-model=\"container.record[container.field]\"></select> <!-- optionValue as optionLabel for arrayItem in array --> <input ng-if=\"container.isReadonly\" style=\"{{::style}}\" readonly type=\"text\" class=\"form-control {{::container.layout !== 'horizontal' ? layoutCss : ''}}\" ng-model=\"container.record[container.field]\"> </div>"
+    "<div class=\"{{::container.layout === 'horizontal' ? layoutCss : '' }}\"> <select ng-if=\"!container.isReadonly\" ng-readonly=\"container.isReadonly\" ng-required=\"container.isRequired\" name=\"{{::container.field}}\" selectize=\"options\" options=\"items\" class=\"{{::container.layout !== 'horizontal' ? layoutCss : ''}}\" ng-model=\"container.record[container.field]\"></select> <!-- optionValue as optionLabel for arrayItem in array --> <input ng-if=\"container.isReadonly\" style=\"{{::style}}\" readonly type=\"text\" class=\"form-control {{::container.layout !== 'horizontal' ? layoutCss : ''}}\" ng-model=\"container.record[container.field]\"> </div>"
   );
 
 
@@ -1477,6 +1543,11 @@ angular.module('sds-angular-controls').run(['$templateCache', function($template
 
   $templateCache.put('sds-angular-controls/form-directives/form-input.html',
     "<div class=\"{{::container.layout === 'horizontal' ? layoutCss : '' }}\"> <input class=\"form-control inputField {{::container.layout !== 'horizontal' ? layoutCss : ''}}\" ng-model=\"container.record[container.field]\" name=\"{{::container.field}}\" type=\"{{::type}}\" ng-required=\"container.isRequired\" ng-disabled=\"container.isReadonly\" placeholder=\"{{::placeholder || container.label}}\" step=\"{{::step}}\" style=\"{{::style}}\" mask-input=\"{{mask}}\"> <div ng-if=\"::(rightLabel && rightLabel.length > 0)\" class=\"rightLabel\">{{::rightLabel}}</div> </div>"
+  );
+
+
+  $templateCache.put('sds-angular-controls/form-directives/form-multi-select.html',
+    "<div class=\"{{::container.layout === 'horizontal' ? layoutCss : '' }}\"> <input ng-if=\"!container.isReadonly\" ng-readonly=\"container.isReadonly\" ng-required=\"container.isRequired\" name=\"{{::container.field}}\" selectize=\"options\" options=\"items\" class=\"{{::container.layout !== 'horizontal' ? layoutCss : ''}}\" ng-model=\"container.record[container.field]\"> <!-- optionValue as optionLabel for arrayItem in array --> <input ng-if=\"container.isReadonly\" style=\"{{::style}}\" readonly type=\"text\" class=\"form-control {{::container.layout !== 'horizontal' ? layoutCss : ''}}\" ng-model=\"container.record[container.field]\"> </div>"
   );
 
 

@@ -1,12 +1,12 @@
 <div class="{{::container.layout === 'horizontal' ? layoutCss : '' }}">
-    <select ng-if="!container.isReadonly"
+    <input ng-if="!container.isReadonly"
             ng-readonly="container.isReadonly"
             ng-required="container.isRequired"
             name="{{::container.field}}"
             selectize="options"
             options="items"
             class="{{::container.layout !== 'horizontal' ? layoutCss : ''}}"
-            ng-model="container.record[container.field]"></select>
+            ng-model="container.record[container.field]" />
     <!-- optionValue as optionLabel for arrayItem in array -->
 
     <input ng-if="container.isReadonly"
