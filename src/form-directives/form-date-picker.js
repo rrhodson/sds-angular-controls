@@ -1,6 +1,9 @@
+/**
+ * Created by stevegentile on 12/19/14.
+ */
 (function () {
     'use strict';
-    function formDateTimePicker ($timeout) {
+    function formDatePicker ($timeout) {
         return{
             restrict: 'EA',
             require: '^form-field',
@@ -12,12 +15,12 @@
                 style            : '@?',
                 layoutCss        : '@?' //default col-md-6
             },
-            templateUrl: 'sds-angular-controls/form-directives/form-date-time-picker.html',
+            templateUrl: 'sds-angular-controls/form-directives/form-date-picker.html',
 
             link: function (scope, element, attr, container) {
                 var input = element.find('input');
                 scope.container = container.$scope;
-
+                
                 switch(container.$scope.layout){
                     case "horizontal":
                         scope.layoutCss = scope.layoutCss || "col-md-6";
@@ -29,7 +32,7 @@
                 if (container.$scope.isAutofocus){
                     $timeout(input.focus);
                 }
-
+                
                 scope.dateFormat = scope.dateFormat || "MM-dd-yyyy";
 
                 scope.calendar = {opened: false};
@@ -41,15 +44,13 @@
 
                 scope.$watch('container.record[container.field]', function (val){
                     if (typeof val === 'string'){
-                        var date = moment(container.$scope.record[container.$scope.field]);
-                        container.$scope.record[container.$scope.field] = date.toDate();
+                        container.$scope.record[container.$scope.field] = moment(container.$scope.record[container.$scope.field]).toDate();
                     }
                 });
 
                 scope.$watch("container.isReadonly", function(newVal){
                     if(newVal) {
-                        var date = moment(scope.container.record[scope.container.field]);
-                        scope.readOnlyModel = date.format(scope.dateFormat) + date.format(' h:mm a');
+                        scope.readOnlyModel = moment(scope.container.record[scope.container.field]).format(scope.dateFormat);
                     }
                 });
 
@@ -63,5 +64,16 @@
         }
     }
 
-    angular.module('sds-angular-controls').directive('formDateTimePicker', formDateTimePicker);
+    function datepickerPopup (){
+        return {
+            restrict: 'EAC',
+            require: 'ngModel',
+            link: function(scope, element, attr, controller) {
+                //remove the default formatter from the input directive to prevent conflict
+                controller.$formatters.shift();
+            }
+        }
+    }
+
+    angular.module('sds-angular-controls').directive('formDatePicker', formDatePicker).directive('datepickerPopup', datepickerPopup);
 })();

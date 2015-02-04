@@ -1,3 +1,13 @@
-<div class="{{::layoutCss}} timepicker">
-    <timepicker ng-model="record[field]" ng-required="::isRequired" ng-if="!isReadonly" minute-step="5"></timepicker>
+<div class="{{::container.layout === 'horizontal' ? layoutCss : '' }} timepicker">
+    <timepicker ng-model="container.record[container.field]"
+                ng-required="::container.isRequired"
+                ng-if="!container.isReadonly"
+                minute-step="1"></timepicker>
+
+    <input ng-if="container.isReadonly"
+           style="{{::style}}"
+           readonly="readonly"
+           type='text'
+           class="form-control {{::container.layout !== 'horizontal' ? layoutCss : ''}}"
+           ng-model='readOnlyModel'/>
 </div>

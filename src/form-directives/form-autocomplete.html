@@ -1,15 +1,18 @@
-<div>
-
-    <select ng-if="!isReadonly && !hasFilter" ng-readonly="isReadonly" ng-required="isRequired" name="{{::field}}"
-            selectize="options" options="items" ng-model="record[field]"></select>
+<div class="{{::container.layout === 'horizontal' ? layoutCss : '' }}">
+    <select ng-if="!container.isReadonly && !hasFilter"
+            ng-readonly="container.isReadonly"
+            ng-required="container.isRequired"
+            name="{{::container.field}}"
+            selectize="options"
+            options="items"
+            class="form-control {{::container.layout !== 'horizontal' ? layoutCss : ''}}"
+            ng-model="container.record[container.field]"></select>
     <!-- optionValue as optionLabel for arrayItem in array -->
 
-    <input ng-if="isReadonly" style="{{::style}}" ng-readonly="isReadonly" type='text'
-           class="form-control inputField {{::inputLayoutCss}}" ng-model='readOnlyModel'/>
-
-    <div ng-if="log">
-        form-input value: {{record[field]}}<br>
-        {{isRequired}}
-    </div>
-
+    <input ng-if="container.isReadonly"
+           style="{{::style}}"
+           readonly="readonly"
+           type='text'
+           class="form-control {{::container.layout !== 'horizontal' ? layoutCss : ''}}"
+           ng-model='container.record[container.field]'/>
 </div>

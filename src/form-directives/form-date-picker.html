@@ -1,4 +1,4 @@
-<div class="{{::container.layout === 'horizontal' ? layoutCss : '' }} datepicker timepicker">
+<div class="{{::container.layout === 'horizontal' ? layoutCss : '' }}">
     <span class="input-group  {{::container.layout !== 'horizontal' ? layoutCss : ''}}" ng-if="!container.isReadonly">
         <input type="text" style="{{::style}}"
                class="form-control datepicker"
@@ -13,13 +13,6 @@
             <button type="button" class="btn btn-default" ng-click="open($event)"><i class="glyphicon glyphicon-calendar"></i></button>
         </span>
     </span>
-
-    <timepicker ng-if="!container.isReadonly"
-                ng-model="container.record[container.field]"
-                ng-required="::container.isRequired"
-                ng-if="!container.isReadonly"
-                minute-step="1"></timepicker>
-
     <input ng-if="container.isReadonly"
            style="{{::style}}"
            readonly="readonly"

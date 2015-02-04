@@ -1,7 +1,7 @@
 /*! 
  * sds-angular-controls
  * Angular Directives used with sds-angular generator
- * @version 0.3.9 
+ * @version 0.3.10 
  * 
  * Copyright (c) 2015 Steve Gentile, David Benson 
  * @link https://github.com/SMARTDATASYSTEMSLLC/sds-angular-controls 
@@ -246,10 +246,10 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
 
 (function () {
     'use strict';
-    function formAutocomplete ($filter, $rootScope, $timeout) {
+    function formAutocomplete ($timeout) {
         return{
             restrict: 'EA',
-            //require: '^formField',
+            require: '^formField',
             replace: true,
             scope: {
                 items           : '=',
@@ -258,53 +258,27 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                 itemValue       : '@?',
                 itemGroupKey    : '@?',
                 itemGroupValue  : '@?',
-                log             : '@?',
                 allowCustom     : '=?',
                 style           : '@?',
-                layoutCss       : '@?', //default col-md-6
-                isReadonly      : '=?'  //boolean
+                layoutCss       : '@?' //default col-md-6
             },
             templateUrl: 'sds-angular-controls/form-directives/form-autocomplete.html',
 
-            link: function (scope, element) {
-                // defaults
-                var parentScope = element.parent().scope();
-                parentScope.$watch('record', function(newVal, oldVal){
+            link: function (scope, element, attr, container) {
+                var input = element.find('select');
+                scope.container = container.$scope;
 
-                    scope.record = newVal;
-                });
-
-                parentScope.$watch('field', function(newVal, oldVal){
-
-                    scope.field = newVal;
-                });
-
-                parentScope.$watch('isRequired', function(newVal, oldVal){
-
-                    scope.isRequired = newVal;
-                });
-
-                parentScope.$watch('layout', function(newVal, oldVal){
-
-                    scope.layout = newVal;
-                });
-
-                parentScope.$watch('isReadonly', function(newVal, oldVal){
-
-                    scope.isReadonly = newVal;
-                });
-
-                scope.isReadonly = scope.isReadonly || false;
-
-                scope.log = scope.log || false;
-
-
-                switch(scope.layout){
+                // one-time bindings:
+                switch(container.$scope.layout){
                     case "horizontal":
                         scope.layoutCss = scope.layoutCss || "col-md-6";
                         break;
                     default: //stacked
-                        scope.layoutCss = scope.layoutCss || "col-md-4";
+                        scope.layoutCss = scope.layoutCss || "";
+                }
+
+                if (container.$scope.isAutofocus){
+                    $timeout(input.focus);
                 }
 
                 var options = {
@@ -327,113 +301,77 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                 }
 
                 scope.options = options;
-
-                var input = element.find('select');
-                parentScope.$watch('isAutofocus', function(newVal, oldVal){
-                    if (newVal){
-                        input.attr('autofocus', 'autofocus');
-                    }else{
-                        input.removeAttr('autofocus');
-                    }
-                });
             }
         }
     }
-    formAutocomplete.$inject = ["$filter", "$rootScope", "$timeout"];
+    formAutocomplete.$inject = ["$timeout"];
 
     angular.module('sds-angular-controls').directive('formAutocomplete', formAutocomplete);
 })();
 
-
 (function () {
     'use strict';
-    function formDatePicker ($filter, $rootScope) {
+    function formDatePicker ($timeout) {
         return{
             restrict: 'EA',
+            require: '^form-field',
             replace: true,
             scope: {
                 dateFormat       : '@',
-                log              : '@?',
-                style            : '@?',
                 max              : '=?',
                 min              : '=?',
-                layoutCss        : '@?', //default col-md-6
-                isReadonly       : '=?',  //boolean
-                disableTimepicker: '=?'
+                style            : '@?',
+                layoutCss        : '@?' //default col-md-6
             },
-            templateUrl: 'sds-angular-controls/form-directives/form-datepicker.html',
+            templateUrl: 'sds-angular-controls/form-directives/form-date-picker.html',
 
-            link: function (scope, element) {
-                var parentScope = element.parent().scope();
-                parentScope.$watch('record', function(newVal, oldVal){
-                    scope.record = newVal;
-                });
+            link: function (scope, element, attr, container) {
+                var input = element.find('input');
+                scope.container = container.$scope;
+                
+                switch(container.$scope.layout){
+                    case "horizontal":
+                        scope.layoutCss = scope.layoutCss || "col-md-6";
+                        break;
+                    default: //stacked
+                        scope.layoutCss = scope.layoutCss || "";
+                }
 
-                parentScope.$watch('field', function(newVal, oldVal){
-
-                    scope.field = newVal;
-                });
-
-                scope.$watch('record[field]', function (val){
-                    if (typeof val === 'string'){
-                        scope.record[scope.field] = moment(scope.record[scope.field]).toDate();
-                    }
-                });
-
-                parentScope.$watch('isRequired', function(newVal, oldVal){
-
-                    scope.isRequired = newVal;
-                });
-
-                parentScope.$watch('layout', function(newVal, oldVal){
-
-                    scope.layout = newVal;
-                });
-
-                parentScope.$watch('isReadonly', function(newVal, oldVal){
-
-                    scope.isReadonly = newVal;
-                });
-
-                scope.isReadonly = scope.isReadonly || false;
-
-                scope.log = scope.log || false;
-
-                scope.disableTimepicker = scope.disableTimepicker || false;
+                if (container.$scope.isAutofocus){
+                    $timeout(input.focus);
+                }
+                
                 scope.dateFormat = scope.dateFormat || "MM-dd-yyyy";
 
                 scope.calendar = {opened: false};
                 scope.open = function($event) {
                     $event.preventDefault();
                     $event.stopPropagation();
-
                     scope.calendar.opened = true;
                 };
 
-                switch(scope.layout){
-                    case "horizontal":
-                        scope.layoutCss = scope.layoutCss || "col-md-6";
-                        break;
-                    default: //stacked
-                        scope.layoutCss = scope.layoutCss || "col-md-4";
-                }
-
-                function checkIfReadonly(){
-                    scope.readOnlyModel = moment(scope.record[scope.field]).format(scope.dateFormat);
-                }
-
-                var input = element.find('input');
-                parentScope.$watch('isAutofocus', function(newVal, oldVal){
-                    if (newVal){
-                        input.attr('autofocus', 'autofocus');
-                    }else{
-                        input.removeAttr('autofocus');
+                scope.$watch('container.record[container.field]', function (val){
+                    if (typeof val === 'string'){
+                        container.$scope.record[container.$scope.field] = moment(container.$scope.record[container.$scope.field]).toDate();
                     }
                 });
+
+                scope.$watch("container.isReadonly", function(newVal){
+                    if(newVal) {
+                        scope.readOnlyModel = moment(scope.container.record[scope.container.field]).format(scope.dateFormat);
+                    }
+                });
+
+                if (scope.max) {
+                    container.$scope.max = moment(scope.max).format(scope.dateFormat);
+                }
+                if (scope.min) {
+                    container.$scope.min = moment(scope.min).format(scope.dateFormat);
+                }
             }
         }
     }
-    formDatePicker.$inject = ["$filter", "$rootScope"];
+    formDatePicker.$inject = ["$timeout"];
 
     function datepickerPopup (){
         return {
@@ -447,6 +385,75 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
     }
 
     angular.module('sds-angular-controls').directive('formDatePicker', formDatePicker).directive('datepickerPopup', datepickerPopup);
+})();
+
+(function () {
+    'use strict';
+    function formDateTimePicker ($timeout) {
+        return{
+            restrict: 'EA',
+            require: '^form-field',
+            replace: true,
+            scope: {
+                dateFormat       : '@',
+                max              : '=?',
+                min              : '=?',
+                style            : '@?',
+                layoutCss        : '@?' //default col-md-6
+            },
+            templateUrl: 'sds-angular-controls/form-directives/form-date-time-picker.html',
+
+            link: function (scope, element, attr, container) {
+                var input = element.find('input');
+                scope.container = container.$scope;
+
+                switch(container.$scope.layout){
+                    case "horizontal":
+                        scope.layoutCss = scope.layoutCss || "col-md-6";
+                        break;
+                    default: //stacked
+                        scope.layoutCss = scope.layoutCss || "";
+                }
+
+                if (container.$scope.isAutofocus){
+                    $timeout(input.focus);
+                }
+
+                scope.dateFormat = scope.dateFormat || "MM-dd-yyyy";
+
+                scope.calendar = {opened: false};
+                scope.open = function($event) {
+                    $event.preventDefault();
+                    $event.stopPropagation();
+                    scope.calendar.opened = true;
+                };
+
+                scope.$watch('container.record[container.field]', function (val){
+                    if (typeof val === 'string'){
+                        var date = moment(container.$scope.record[container.$scope.field]);
+                        container.$scope.record[container.$scope.field] = date.toDate();
+                    }
+                });
+
+                scope.$watch("container.isReadonly", function(newVal){
+                    if(newVal) {
+                        var date = moment(scope.container.record[scope.container.field]);
+                        scope.readOnlyModel = date.format(scope.dateFormat) + date.format(' h:mm a');
+                    }
+                });
+
+                if (scope.max) {
+                    container.$scope.max = moment(scope.max).format(scope.dateFormat);
+                }
+                if (scope.min) {
+                    container.$scope.min = moment(scope.min).format(scope.dateFormat);
+                }
+            }
+        }
+    }
+    formDateTimePicker.$inject = ["$timeout"];
+
+    angular.module('sds-angular-controls').directive('formDateTimePicker', formDateTimePicker);
 })();
 
 /**
@@ -466,48 +473,42 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                 isAutofocus             : '=?',
                 field                   : '@' , //one-way binding
                 label                   : '@' ,
-                rowClass                : '@?',
                 layout                  : '@?',
                 labelCss                : '@?',
                 layoutCss               : '@?',
                 showLabel               : '=?',
                 errorLayoutCss          : '@?',
                 hideValidationMessage   : '=?',  //default is false
-                validationFieldName       : '@?'  //to override the default label   '[validationFieldName]' is required
+                log                     : '@?',
+                validationFieldName     : '@?'  //to override the default label   '[validationFieldName]' is required
             },
             templateUrl: 'sds-angular-controls/form-directives/form-field.html',
             require: '^form',
+            controller: ["$scope", function ($scope){
+                this.$scope = $scope;
+            }],
             link: function($scope, element, attrs, form){
                 //include a default form-input if no transclude included
                 $scope.showDefault = false;
                 $timeout(function(){
-                    if($(element).find('ng-transclude *').length === 0){
+                    if(element.find('ng-transclude *').length === 0){
                         $scope.showDefault = true;
                     }
                 }, 0);
                 //end include
 
-                $scope.layout = $scope.layout || "stacked";
 
                 if(!$scope.label){
                     $scope.label = $filter("labelCase")($scope.field);
                 }
 
                 $scope.validationFieldName = $scope.validationFieldName || $filter("labelCase")($scope.label);
-
-                $scope.$watch("record", function(newVal, oldVal){
-                    if(newVal) {
-                        $scope.record = newVal;
-                    }
-                });
-
                 $scope.showLabel = $scope.showLabel !== false; // default to true
                 $scope.hideValidationMessage = $scope.hideValidationMessage || false;
-                //$scope.isRequired = $scope.isRequired || false;
-                //$scope.isReadonly = $scope.isReadonly || false;
                 $scope.layoutCss = $scope.layoutCss || "col-md-12";
                 $scope.errorLayoutCss = $scope.errorLayoutCss || "col-md-12";
 
+                $scope.layout = $scope.layout || "stacked";
                 if($scope.layout === "horizontal"){
                     $scope.labelCss = $scope.labelCss || "col-md-4";
                 }
@@ -538,66 +539,48 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
 
 (function () {
     'use strict';
-    function formInput ($filter) {
+    function formInput ($timeout) {
         return{
             restrict: 'E',
+            require: '^form-field',
             replace: true,
             scope: {
-                log             : '@?',
                 placeholder     : '@?',
-                mask            : '@?', //todo
-                style           : '@?',
-                max             : '@?',
-                min             : '@?',
-                type            : '@',  //text, email, number etc.. see the InputTypes
-                layoutCss       : '@?', //default col-md-6
-                inputLayout     : '@?',
                 rightLabel      : '@?',
-                isReadonly      : '=?'  //boolean
+                style           : '@?',
+                layoutCss       : '@?' //default col-md-6
             },
             templateUrl: 'sds-angular-controls/form-directives/form-input.html',
-            link: function (scope, element, attr) {
-                // defaults
-                var parentScope = element.parent().scope();
+            link: function (scope, element, attr, container) {
+                var input = element.find('input');
+                scope.container = container.$scope;
 
-                parentScope.$watch('record', function(newVal, oldVal){
-                    scope.record = newVal;
-                });
+                // one-time bindings:
+                switch(container.$scope.layout){
+                    case "horizontal":
+                        scope.layoutCss = scope.layoutCss || "col-md-6";
+                        break;
+                    default: //stacked
+                        scope.layoutCss = scope.layoutCss || "";
+                }
 
-                parentScope.$watch('field', function(newVal, oldVal){
-                    scope.field = newVal;
-                });
+                if (container.$scope.isAutofocus){
+                    $timeout(input.focus);
+                }
+                if (attr.min){
+                    container.$scope.min = scope.$eval(attr.min);
+                    input.attr('min', container.$scope.min);
+                }
+                if (attr.max){
+                    container.$scope.max = scope.$eval(attr.max);
+                    input.attr('max', container.$scope.max);
+                }
+                if (attr.pattern){
+                    input.attr('pattern', attr.pattern);
+                }
 
-                parentScope.$watch('isRequired', function(newVal, oldVal){
-                    scope.isRequired = newVal;
-                });
-
-                parentScope.$watch('layout', function(newVal, oldVal){
-                    scope.layout = newVal;
-                    switch(scope.layout){
-                        case "horizontal":
-                            scope.inputLayout = scope.inputLayout || "col-md-6";
-                            break;
-                        default: //stacked
-                            scope.inputLayout = scope.inputLayout || "col-md-4";
-                    }
-                });
-
-                parentScope.$watch('isReadonly', function(newVal, oldVal){
-                    scope.isReadonly = newVal;
-                });
-
-
-
-                scope.isReadonly = scope.isReadonly || false;
-
-                parentScope.$watch('label', function(newVal, oldVal){
-                    scope.label = newVal;
-                    scope.placeholder = scope.placeholder || newVal;
-                });
-
-                scope.log = scope.log || false;
-                scope.type = scope.type || "text";
+                scope.step = attr.step || "any";
+                scope.type = attr.type || "text";
 
                 if(scope.type === "integer"){
                     var inputField = element.find(".inputField");
@@ -605,182 +588,107 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                         inputField.val(inputField.val().replace(/[^0-9]/g,''));
                     });
                 }
-                scope.step = attr.step || "any";
-
-                var input = element.find('input');
-                if (parentScope.min){
-                    input.attr('min', parentScope.min);
-                }
-                if (parentScope.max){
-                    input.attr('max', parentScope.max);
-                }
-                if (attr.pattern){
-                    input.attr('pattern', scope.$eval(attr.pattern));
-                }
-                parentScope.$watch('isAutofocus', function(newVal, oldVal){
-                    if (newVal){
-                        input.attr('autofocus', 'autofocus');
-                    }else{
-                        input.removeAttr('autofocus');
-                    }
-                });
-
-
             }
         }
     }
-    formInput.$inject = ["$filter"];
+    formInput.$inject = ["$timeout"];
 
     angular.module('sds-angular-controls').directive('formInput', formInput);
 })();
 
 (function () {
     'use strict';
-    function formNumericInput ($filter) {
+    function formNumericInput ($timeout) {
         return{
             restrict: 'EA',
+            require: '^form-field',
             replace: true,
             scope: {
-                log             : '@?',
                 placeholder     : '@?',
-                style           : '@?',
-                layoutCss       : '@?', //default col-md-6
                 rightLabel      : '@?',
-                isReadonly      : '=?'  //boolean
+                style           : '@?',
+                layoutCss       : '@?' //default col-md-6
             },
             templateUrl: 'sds-angular-controls/form-directives/form-numeric-input.html',
-            link: function (scope, element) {
+            link: function (scope, element, attr, container) {
+                var input = element.find('input');
+                scope.container = container.$scope;
 
-                var parentScope = element.parent().scope();
-
-                parentScope.$watch('record', function(newVal, oldVal){
-
-                    scope.record = newVal;
-                });
-
-                parentScope.$watch('field', function(newVal, oldVal){
-
-                    scope.field = newVal;
-                });
-
-                parentScope.$watch('isRequired', function(newVal, oldVal){
-
-                    scope.isRequired = newVal;
-                });
-
-                parentScope.$watch('layout', function(newVal, oldVal){
-
-                    scope.layout = newVal;
-                });
-
-                parentScope.$watch('label', function(newVal, oldVal){
-
-                    scope.label = newVal;
-                    scope.placeholder = scope.placeholder || newVal;
-                });
-
-                parentScope.$watch('isReadonly', function(newVal, oldVal){
-
-                    scope.isReadonly = newVal;
-                });
-
-                scope.isReadonly = scope.isReadonly || false;
-
-                scope.log = scope.log || false;
-
-                switch(scope.layout){
+                // one-time bindings:
+                switch(container.$scope.layout){
                     case "horizontal":
                         scope.layoutCss = scope.layoutCss || "col-md-6";
                         break;
                     default: //stacked
-                        scope.layoutCss = scope.layoutCss || "col-md-4";
+                        scope.layoutCss = scope.layoutCss || "";
                 }
 
-
-
-
-                scope.$watch("isReadonly", function(newVal, oldVal){
-                    if(newVal && oldVal) {
-                        if (newVal !== oldVal) {
-                            checkIfReadonly();
-                        }
-                    }
-                });
-
-                function checkIfReadonly(){
-                    if(scope.isReadonly) {
-                        if (scope.fieldType === 'toggle') {
-                            scope.readOnlyModel = scope.record[scope.field];
-                        }
-                    }
+                if (container.$scope.min){
+                    input.attr('min', container.$scope.min);
+                }
+                if (container.$scope.max){
+                    input.attr('max', container.$scope.max);
+                }
+                if (container.$scope.isAutofocus){
+                    $timeout(input.focus);
                 }
 
-                var input = element.find('input');
-                parentScope.$watch('isAutofocus', function(newVal, oldVal){
-                    if (newVal){
-                        input.attr('autofocus', 'autofocus');
-                    }else{
-                        input.removeAttr('autofocus');
-                    }
-                });
+                if(scope.type === "integer"){
+                    var inputField = element.find(".inputField");
+                    $(inputField).on('keyup', function(ev){
+                        inputField.val(inputField.val().replace(/[^0-9]/g,''));
+                    });
+                }
             }
         }
     }
-    formNumericInput.$inject = ["$filter"];
+    formNumericInput.$inject = ["$timeout"];
 
     angular.module('sds-angular-controls').directive('formNumericInput', formNumericInput);
 })();
 
 (function () {
     'use strict';
-    function formSelect ($filter, $rootScope) {
+    function formSelect ($timeout) {
         return{
             restrict: 'EA',
-            //require: '^formField',
+            require: '^formField',
             replace: true,
             scope: {
                 items           : '=',
                 itemKey         : '@?',
                 itemValue       : '@?',
-                log             : '@?',
                 style           : '@?',
                 layoutCss       : '@?' //default col-md-6
             },
             templateUrl: 'sds-angular-controls/form-directives/form-select.html',
 
-            link: function (scope, element) {
-                // defaults
-                var parentScope = element.parent().scope();
-                parentScope.$watch('record', function(newVal, oldVal){
-                    scope.record = newVal;
-                });
+            link: function (scope, element, attr, container) {
+                var input = element.find('select');
+                scope.container = container.$scope;
 
-                parentScope.$watch('field', function(newVal, oldVal){
+                // one-time bindings:
+                switch(container.$scope.layout){
+                    case "horizontal":
+                        scope.layoutCss = scope.layoutCss || "col-md-6";
+                        break;
+                    default: //stacked
+                        scope.layoutCss = scope.layoutCss || "";
+                }
 
-                    scope.field = newVal;
-                });
+                if (container.$scope.isAutofocus){
+                    $timeout(input.focus);
+                }
 
-                parentScope.$watch('isRequired', function(newVal, oldVal){
+                scope.$watch("container.isReadonly", function(newVal){
+                    if(newVal) {
+                        if (scope.container.record && scope.container.record[scope.container.field]) {
 
-                    scope.isRequired = newVal;
-                });
-
-                parentScope.$watch('layout', function(newVal, oldVal){
-
-                    scope.layout = newVal;
-                });
-
-                parentScope.$watch("isReadonly", function(newVal, oldVal){
-                    scope.isReadonly = newVal;
-
-                    if(scope.isReadonly) {
-                        if (scope.record && scope.record[scope.field]) {
-
-                            var value = scope.items[scope.record[scope.field]];
+                            var value = scope.items[scope.container.record[scope.container.field]];
                             //if using itemKey/itemValue -we need to find it in the array vs. hash:
                             if(scope.itemValue && scope.itemKey){
                                 var arrayItem = _.find(scope.items, function(item){
-                                   return item[scope.field] === scope.record[scope.field];
+                                   return item[scope.itemKey] === scope.container.record[scope.container.field];
                                 });
                                 value = arrayItem[scope.itemValue];
                             }
@@ -788,19 +696,6 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                         }
                     }
                 });
-
-                scope.isReadonly = scope.isReadonly || false;
-
-                scope.log = scope.log || false;
-
-
-                switch(scope.layout){
-                    case "horizontal":
-                        scope.layoutCss = scope.layoutCss || "col-md-6";
-                        break;
-                    default: //stacked
-                        scope.layoutCss = scope.layoutCss || "col-md-4";
-                }
 
                 scope.orderHash = function(obj){
                     if (!obj) {
@@ -837,8 +732,6 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                     } else {
                         return item;
                     }
-
-                    return item;
                 };
 
                 scope.$watch("items", function(newVal, oldVal){
@@ -848,115 +741,56 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                         }
                     }
                 });
-
-                var input = element.find('select');
-                parentScope.$watch('isAutofocus', function(newVal, oldVal){
-                    if (newVal){
-                        input.attr('autofocus', 'autofocus');
-                    }else{
-                        input.removeAttr('autofocus');
-                    }
-                });
             }
         }
     }
-    formSelect.$inject = ["$filter", "$rootScope"];
+    formSelect.$inject = ["$timeout"];
 
     angular.module('sds-angular-controls').directive('formSelect', formSelect);
 })();
 
 (function () {
     'use strict';
-    function formTextArea () {
+    function formTextArea ($timeout) {
         return{
             restrict: 'EA',
             replace: true,
+            require: '^formField',
             scope: {
-                log             : '@?',
                 style           : '@?',
-                layoutCss       : '@?', //default col-md-6
-                isReadonly      : '=?'  //boolean
+                layoutCss       : '@?' //default col-md-6
             },
             templateUrl: 'sds-angular-controls/form-directives/form-text-area.html',
-            link: function (scope, element) {
-                // defaults
-                var parentScope = element.parent().scope();
-                parentScope.$watch('record', function(newVal, oldVal){
+            link: function (scope, element, attr, container) {
+                var input = element.find('input');
+                scope.container = container.$scope;
 
-                    scope.record = newVal;
-                });
-
-                parentScope.$watch('field', function(newVal, oldVal){
-
-                    scope.field = newVal;
-                });
-
-                parentScope.$watch('isRequired', function(newVal, oldVal){
-
-                    scope.isRequired = newVal;
-                });
-
-                parentScope.$watch('layout', function(newVal, oldVal){
-
-                    scope.layout = newVal;
-                });
-
-                parentScope.$watch('label', function(newVal, oldVal){
-
-                    scope.label = newVal;
-                    scope.placeholder = scope.placeholder || newVal;
-                });
-
-                parentScope.$watch('isReadonly', function(newVal, oldVal){
-
-                    scope.isReadonly = newVal;
-                });
-
-                scope.isReadonly = scope.isReadonly || false;
-
-                scope.log = scope.log || false;
-                scope.type = scope.type || "text";
-
-                scope.layoutCss = scope.layoutCss || "col-md-6";
-
-
-
-                scope.$watch("isReadonly", function(newVal, oldVal){
-                    if(newVal && oldVal) {
-                        if (newVal !== oldVal) {
-                            checkIfReadonly();
-                        }
-                    }
-                });
-
-                function checkIfReadonly(){
-                    if(scope.isReadonly) {
-                        if (scope.fieldType === 'toggle') {
-                            scope.readOnlyModel = scope.record[scope.field];
-                        }
-                    }
+                switch(container.$scope.layout){
+                    case "horizontal":
+                        scope.layoutCss = scope.layoutCss || "col-md-6";
+                        break;
+                    default: //stacked
+                        scope.layoutCss = scope.layoutCss || "";
                 }
-                var input = element.find('textarea');
-                parentScope.$watch('isAutofocus', function(newVal, oldVal){
-                    if (newVal){
-                        input.attr('autofocus', 'autofocus');
-                    }else{
-                        input.removeAttr('autofocus');
-                    }
-                });
+
+                if (container.$scope.isAutofocus){
+                    $timeout(input.focus);
+                }
             }
         }
     }
+    formTextArea.$inject = ["$timeout"];
 
     angular.module('sds-angular-controls').directive('formTextArea', formTextArea);
 })();
 
 (function () {
     'use strict';
-    function formTextToggle ($filter) {
+    function formTextToggle ($timeout) {
         return{
             restrict: 'EA',
             replace: true,
+            require: '^form-field',
             scope: {
                 placeholder     : '@?',
                 toggleField     : '@?', //one-way binding
@@ -964,95 +798,69 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                 onLabel         : '@?',
                 offLabel        : '@?',
                 style           : '@?',
-                type            : '@',  //text, email, number etc.. see the InputTypes
-                isReadonly      : '=?'  //boolean
+                layoutCss       : '@?' //default col-md-6
             },
             templateUrl: 'sds-angular-controls/form-directives/form-text-toggle.html',
-            link: function (scope, element) {
-                // defaults
-                var parentScope = element.parent().scope();
-                parentScope.$watch('record', function(newVal, oldVal){
+            link: function (scope, element, attr, container) {
+                var input = element.find('input');
+                scope.container = container.$scope;
 
-                    scope.record = newVal;
-                });
+                switch(container.$scope.layout){
+                    case "horizontal":
+                        scope.layoutCss = scope.layoutCss || "col-md-6";
+                        break;
+                    default: //stacked
+                        scope.layoutCss = scope.layoutCss || "";
+                }
 
-                parentScope.$watch('field', function(newVal, oldVal){
+                if (container.$scope.isAutofocus){
+                    $timeout(input.focus);
+                }
 
-                    scope.field = newVal;
-                });
-
-                parentScope.$watch('isRequired', function(newVal, oldVal){
-
-                    scope.isRequired = newVal;
-                });
-
-                parentScope.$watch('isReadonly', function(newVal, oldVal){
-                    scope.isReadonly = newVal;
-                });
-
-                scope.isReadonly = scope.isReadonly || false;
-
-                scope.log = scope.log || false;
-                scope.type = scope.type || "text";
+                scope.type = attr.type || "text";
 
                 scope.toggleSwitchType = scope.toggleSwitchType || "primary";
                 scope.onLabel = scope.onLabel   || "Yes";
                 scope.offLabel = scope.offLabel || "No";
-
             }
         }
     }
-    formTextToggle.$inject = ["$filter"];
+    formTextToggle.$inject = ["$timeout"];
 
     angular.module('sds-angular-controls').directive('formTextToggle', formTextToggle);
 })();
 
 (function () {
     'use strict';
-    function formTimePicker () {
+    function formTimePicker ($timeout) {
         return{
             restrict: 'E',
             replace: true,
+            require: '^form-field',
             scope: {
-                layoutCss       : '@?', //default col-md-6
-                isReadonly      : '=?'  //boolean
+                layoutCss       : '@?' //default col-md-6
             },
             templateUrl: 'sds-angular-controls/form-directives/form-time-picker.html',
-            link: function (scope, element) {
-                // defaults
+            link: function (scope, element, attr, container) {
+                scope.container = container.$scope;
 
-                var parentScope = element.parent().scope();
+                switch(container.$scope.layout){
+                    case "horizontal":
+                        scope.layoutCss = scope.layoutCss || "col-md-6";
+                        break;
+                    default: //stacked
+                        scope.layoutCss = scope.layoutCss || "";
+                }
 
-                parentScope.$watch('record', function(newVal, oldVal){
-
-                    scope.record = newVal;
+                scope.$watch("container.isReadonly", function(newVal){
+                    if(newVal) {
+                        scope.readOnlyModel = moment(scope.container.record[scope.container.field]).format('h:mm a');
+                    }
                 });
-
-                parentScope.$watch('field', function(newVal, oldVal){
-
-                    scope.field = newVal;
-                });
-
-                parentScope.$watch('isRequired', function(newVal, oldVal){
-
-                    scope.isRequired = newVal;
-                });
-
-                parentScope.$watch('layout', function(newVal, oldVal){
-
-                    scope.layout = newVal;
-                });
-
-                parentScope.$watch('isReadonly', function(newVal, oldVal){
-
-                    scope.isReadonly = newVal;
-                });
-
-                scope.isReadonly = scope.isReadonly || false;
-
             }
         }
     }
+    formTimePicker.$inject = ["$timeout"];
 
     angular.module('sds-angular-controls').directive('formTimePicker', formTimePicker);
 })();
@@ -1063,78 +871,29 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
         return{
             restrict: 'EA',
             replace: true,
+            require: '^form-field',
             scope: {
-                log             : '@?',
-                placeholder     : '@?',
-                toggleField     : '@?', //one-way binding
                 toggleSwitchType: '@?',
                 onLabel         : '@?',
                 offLabel        : '@?',
                 style           : '@?',
-                type            : '@',  //text, email, number etc.. see the InputTypes
-                layoutCss       : '@?', //default col-md-6
-                isReadonly      : '=?'  //boolean
+                layoutCss       : '@?' //default col-md-6
             },
             templateUrl: 'sds-angular-controls/form-directives/form-toggle.html',
-            link: function (scope, element) {
-                // defaults
-                var parentScope = element.parent().scope();
-                parentScope.$watch('record', function(newVal, oldVal){
+            link: function (scope, element, attr, container) {
+                scope.container = container.$scope;
 
-                    scope.record = newVal;
-                });
-
-                parentScope.$watch('field', function(newVal, oldVal){
-
-                    scope.field = newVal;
-                });
-
-                parentScope.$watch('isRequired', function(newVal, oldVal){
-
-                    scope.isRequired = newVal;
-                });
-
-                parentScope.$watch('layout', function(newVal, oldVal){
-
-                    scope.layout = newVal;
-                });
-
-                parentScope.$watch('isReadonly', function(newVal, oldVal){
-
-                    scope.isReadonly = newVal;
-                });
-
-                scope.isReadonly = scope.isReadonly || false;
-
-                scope.log = scope.log || false;
-                scope.type = scope.type || "text";
-
-                scope.toggleSwitchType = scope.toggleSwitchType || "primary";
-                scope.onLabel = scope.onLabel   || "Yes";
-                scope.offLabel = scope.offLabel || "No";
-
-
-                switch(scope.layout){
+                switch(container.$scope.layout){
                     case "horizontal":
                         scope.layoutCss = scope.layoutCss || "col-md-6";
                         break;
                     default: //stacked
-                        scope.layoutCss = scope.layoutCss || "col-md-4";
+                        scope.layoutCss = scope.layoutCss || "";
                 }
 
-                scope.$watch("isReadonly", function(newVal, oldVal){
-                    if(newVal !== oldVal){
-                        checkIfReadonly();
-                    }
-                });
-
-                function checkIfReadonly(){
-                    if(scope.isReadonly) {
-                        if (scope.fieldType === 'toggle') {
-                            scope.readOnlyModel = scope.record[scope.field];
-                        }
-                    }
-                }
+                scope.toggleSwitchType = scope.toggleSwitchType || "primary";
+                scope.onLabel = scope.onLabel   || "Yes";
+                scope.offLabel = scope.offLabel || "No";
             }
         }
     }
@@ -1692,94 +1451,67 @@ angular.module('sds-angular-controls').run(['$templateCache', function($template
   'use strict';
 
   $templateCache.put('sds-angular-controls/form-directives/form-autocomplete.html',
-    "<div> <select ng-if=\"!isReadonly && !hasFilter\" ng-readonly=\"isReadonly\" ng-required=\"isRequired\" name=\"{{::field}}\" selectize=\"options\" options=\"items\" ng-model=\"record[field]\"></select> <!-- optionValue as optionLabel for arrayItem in array --> <input ng-if=\"isReadonly\" style=\"{{::style}}\" ng-readonly=\"isReadonly\" type=\"text\" class=\"form-control inputField {{::inputLayoutCss}}\" ng-model=\"readOnlyModel\"> <div ng-if=\"log\"> form-input value: {{record[field]}}<br> {{isRequired}} </div> </div>"
+    "<div class=\"{{::container.layout === 'horizontal' ? layoutCss : '' }}\"> <select ng-if=\"!container.isReadonly && !hasFilter\" ng-readonly=\"container.isReadonly\" ng-required=\"container.isRequired\" name=\"{{::container.field}}\" selectize=\"options\" options=\"items\" class=\"form-control {{::container.layout !== 'horizontal' ? layoutCss : ''}}\" ng-model=\"container.record[container.field]\"></select> <!-- optionValue as optionLabel for arrayItem in array --> <input ng-if=\"container.isReadonly\" style=\"{{::style}}\" readonly type=\"text\" class=\"form-control {{::container.layout !== 'horizontal' ? layoutCss : ''}}\" ng-model=\"container.record[container.field]\"> </div>"
+  );
+
+
+  $templateCache.put('sds-angular-controls/form-directives/form-date-picker.html',
+    "<div class=\"{{::container.layout === 'horizontal' ? layoutCss : '' }}\"> <span class=\"input-group {{::container.layout !== 'horizontal' ? layoutCss : ''}}\" ng-if=\"!container.isReadonly\"> <input type=\"text\" style=\"{{::style}}\" class=\"form-control datepicker\" placeholder=\"{{placeholder || container.label}}\" ng-model=\"container.record[container.field]\" ng-required=\"::container.isRequired\" min-date=\"::min\" max-date=\"::max\" datepicker-popup=\"{{::dateFormat}}\" is-open=\"calendar.opened\"> <span class=\"input-group-btn\"> <button type=\"button\" class=\"btn btn-default\" ng-click=\"open($event)\"><i class=\"glyphicon glyphicon-calendar\"></i></button> </span> </span> <input ng-if=\"container.isReadonly\" style=\"{{::style}}\" readonly type=\"text\" class=\"form-control {{::container.layout !== 'horizontal' ? layoutCss : ''}}\" ng-model=\"readOnlyModel\"> </div>"
   );
 
 
   $templateCache.put('sds-angular-controls/form-directives/form-date-time-picker.html',
-    "<!DOCTYPE html> <html> <head lang=\"en\"> <meta charset=\"UTF-8\"> <title></title>  <body>  "
-  );
-
-
-  $templateCache.put('sds-angular-controls/form-directives/form-datepicker.html',
-    "<span> <span class=\"input-group {{layout !== 'horizontal' ? layoutCss : ''}}\"> <input type=\"text\" style=\"{{::style}}\" class=\"form-control datepicker\" ng-if=\"!isReadonly\" ng-readonly=\"isReadonly\" placeholder=\"{{placeholder}}\" ng-model=\"record[field]\" ng-required=\"::isRequired\" min-date=\"::min\" max-date=\"::max\" datepicker-popup=\"{{::dateFormat}}\" is-open=\"calendar.opened\"> <span ng-if=\"!isReadonly\" class=\"input-group-btn\"> <button type=\"button\" class=\"btn btn-default\" ng-click=\"open($event)\"><i class=\"glyphicon glyphicon-calendar\"></i></button> </span> </span> <div ng-if=\"log\"> form-datepicker value: {{record[field]}}<br> {{isRequired}} </div> </span>"
+    "<div class=\"{{::container.layout === 'horizontal' ? layoutCss : '' }} datepicker timepicker\"> <span class=\"input-group {{::container.layout !== 'horizontal' ? layoutCss : ''}}\" ng-if=\"!container.isReadonly\"> <input type=\"text\" style=\"{{::style}}\" class=\"form-control datepicker\" placeholder=\"{{placeholder || container.label}}\" ng-model=\"container.record[container.field]\" ng-required=\"::container.isRequired\" min-date=\"::min\" max-date=\"::max\" datepicker-popup=\"{{::dateFormat}}\" is-open=\"calendar.opened\"> <span class=\"input-group-btn\"> <button type=\"button\" class=\"btn btn-default\" ng-click=\"open($event)\"><i class=\"glyphicon glyphicon-calendar\"></i></button> </span> </span> <timepicker ng-if=\"!container.isReadonly\" ng-model=\"container.record[container.field]\" ng-required=\"::container.isRequired\" ng-if=\"!container.isReadonly\" minute-step=\"1\"></timepicker> <input ng-if=\"container.isReadonly\" style=\"{{::style}}\" readonly type=\"text\" class=\"form-control {{::container.layout !== 'horizontal' ? layoutCss : ''}}\" ng-model=\"readOnlyModel\"> </div>"
   );
 
 
   $templateCache.put('sds-angular-controls/form-directives/form-field-validation.html',
-    ""
+    "<div ng-if=\"!hideValidationMessage\" class=\"has-error\" ng-show=\"showError({{field}})\" ng-messages=\"{{field}}.$error\"> <span class=\"control-label\" ng-message=\"required\"> {{ validationFieldName }} is required. </span> <span class=\"control-label\" ng-message=\"text\"> {{ validationFieldName }} should be text. </span> <span class=\"control-label\" ng-message=\"integer\"> {{ validationFieldName }} should be an integer. </span> <span class=\"control-label\" ng-message=\"email\"> {{ validationFieldName }} should be an email address. </span> <span class=\"control-label\" ng-message=\"date\"> {{ validationFieldName}} should be a date. </span> <span class=\"control-label\" ng-message=\"datetime\"> {{ validationFieldName }} should be a datetime. </span> <span class=\"control-label\" ng-message=\"time\"> {{ validationFieldName }} should be a time. </span> <span class=\"control-label\" ng-message=\"month\"> {{ validationFieldName }} should be a month. </span> <span class=\"control-label\" ng-message=\"week\"> {{ validationFieldName }} should be a week. </span> <span class=\"control-label\" ng-message=\"url\"> {{ validationFieldName }} should be an url. </span> <span class=\"control-label\" ng-message=\"zip\"> {{ validationFieldName }} should be a valid zipcode. </span> <span class=\"control-label\" ng-message=\"number\">{{ validationFieldName }} must be a number</span> <span class=\"control-label\" ng-message=\"tel\">{{ validationFieldName }} must be a phone number</span> <span class=\"control-label\" ng-message=\"color\">{{ validationFieldName }} must be a color</span> <span class=\"control-label\" ng-message=\"min\"> {{ validationFieldName }} must be at least {{min}}. </span> <span class=\"control-label\" ng-message=\"max\"> {{ validationFieldName }} must not exceed {{max}} </span> <span class=\"control-label\" ng-repeat=\"(k, v) in types\" ng-message=\"{{k}}\"> {{ validationFieldName }}{{v[1]}}</span> </div>"
   );
 
 
   $templateCache.put('sds-angular-controls/form-directives/form-field.html',
-    "<div> <script type=\"text/ng-template\" id=\"validation.html\"><div ng-if=\"!hideValidationMessage\" class='has-error' ng-show='showError({{field}})'\n" +
-    "             ng-messages='{{field}}.$error'>\n" +
-    "            <span class='control-label' ng-message='required'> {{ validationFieldName }} is required. </span>\n" +
-    "            <span class='control-label' ng-message='text'> {{ validationFieldName }} should be text. </span>\n" +
-    "            <span class='control-label' ng-message='integer'> {{ validationFieldName }} should be an integer. </span>\n" +
-    "            <span class='control-label' ng-message='email'> {{ validationFieldName }} should be an email address. </span>\n" +
-    "            <span class='control-label' ng-message='date'> {{ validationFieldName}} should be a date. </span>\n" +
-    "            <span class='control-label' ng-message='datetime'> {{ validationFieldName }} should be a datetime. </span>\n" +
-    "            <span class='control-label' ng-message='time'> {{ validationFieldName }} should be a time. </span>\n" +
-    "            <span class='control-label' ng-message='month'> {{ validationFieldName }} should be a month. </span>\n" +
-    "            <span class='control-label' ng-message='week'> {{ validationFieldName }} should be a week. </span>\n" +
-    "            <span class='control-label' ng-message='url'> {{ validationFieldName }} should be an url. </span>\n" +
-    "            <span class='control-label' ng-message='zip'> {{ validationFieldName }} should be a valid zipcode. </span>\n" +
-    "            <span class='control-label' ng-message='number'>{{ validationFieldName }} must be a number</span>\n" +
-    "            <span class='control-label' ng-message='tel'>{{ validationFieldName }} must be a phone number</span>\n" +
-    "            <span class='control-label' ng-message='color'>{{ validationFieldName }} must be a color</span>\n" +
-    "            <span class='control-label' ng-message='min'> {{ validationFieldName }} must be at least {{min}}. </span>\n" +
-    "            <span class='control-label' ng-message='max'> {{ validationFieldName }} must not exceed {{max}} </span>\n" +
-    "            <span class='control-label' ng-repeat='(k, v) in types' ng-message='{{k}}'> {{ validationFieldName }}{{v[1]}}</span>\n" +
-    "        </div></script> <div ng-if=\"layout === 'stacked'\" class=\"row\"> <div class=\"form-group clearfix\" ng-form=\"{{field}}\" ng-class=\"{ 'has-error': showError({{field}}) }\"> <div class=\"{{::layoutCss}}\"> <label ng-if=\"showLabel\" class=\"control-label {{labelCss}}\"> {{ label }} <span ng-if=\"isRequired && !isReadonly\">*</span></label> <ng-transclude></ng-transclude> <div ng-if=\"showDefault\"><form-input></form-input></div> <!-- validation --> <div class=\"pull-left\" ng-include=\"'validation.html'\"></div> </div> </div> </div> <div ng-if=\"layout === 'horizontal'\" class=\"row\"> <div class=\"form-group clearfix\" ng-form=\"{{field}}\" ng-class=\"{ 'has-error': showError({{field}}) }\"> <label ng-if=\"showLabel\" class=\"control-label {{labelCss}}\"> {{ label }} <span ng-if=\"isRequired && !isReadonly\">*</span></label> <ng-transclude></ng-transclude> <div ng-if=\"showDefault\"><form-input></form-input></div> <!-- validation --> <div ng-if=\"!hideValidationMessage\" ng-show=\"showError({{field}})\" class=\"popover validation right alert-danger\" style=\"display:inline-block; top:auto; left:auto; margin-top:-4px; min-width:240px\"> <div class=\"arrow\" style=\"top: 20px\"></div> <div class=\"popover-content\" ng-include=\"'validation.html'\"> </div> </div> </div> </div> <div ng-if=\"layout !== 'stacked' && layout !== 'horizontal'\" ng-form=\"{{field}}\" ng-class=\"{ 'has-error': showError({{field}}) }\"> <ng-transclude></ng-transclude> <div ng-if=\"showDefault\"><form-input></form-input></div> </div> </div>"
+    "<div> <div ng-if=\"layout === 'stacked'\" class=\"row\"> <div class=\"form-group clearfix\" ng-form=\"{{field}}\" ng-class=\"{ 'has-error': showError({{field}}) }\"> <div class=\"{{::layoutCss}}\"> <label ng-if=\"showLabel\" class=\"control-label {{labelCss}}\"> {{ label }} <span ng-if=\"isRequired && !isReadonly\">*</span></label> <ng-transclude></ng-transclude> <div ng-if=\"showDefault\"><form-input></form-input></div> <!-- validation --> <div class=\"pull-left\" ng-include=\"'sds-angular-controls/form-directives/form-field-validation.html'\"></div> </div> </div> </div> <div ng-if=\"layout === 'horizontal'\" class=\"row inline-control\"> <div class=\"form-group clearfix\" ng-form=\"{{field}}\" ng-class=\"{ 'has-error': showError({{field}}) }\"> <label ng-if=\"showLabel\" class=\"control-label {{labelCss}}\"> {{ label }} <span ng-if=\"isRequired && !isReadonly\">*</span></label> <ng-transclude></ng-transclude> <div ng-if=\"showDefault\"><form-input></form-input></div> <!-- validation --> <div ng-if=\"!hideValidationMessage\" ng-show=\"showError({{field}})\" class=\"popover validation right alert-danger\" style=\"display:inline-block; top:auto; left:auto; margin-top:-4px; min-width:240px\"> <div class=\"arrow\" style=\"top: 20px\"></div> <div class=\"popover-content\" ng-include=\"'sds-angular-controls/form-directives/form-field-validation.html'\"> </div> </div> </div> </div> <div ng-if=\"layout !== 'stacked' && layout !== 'horizontal'\" ng-form=\"{{field}}\" ng-class=\"{ 'has-error': showError({{field}}) }\"> <ng-transclude></ng-transclude> <div ng-if=\"showDefault\"><form-input></form-input></div> </div> <div ng-if=\"log\"> form-input value: {{record[field]}}<br> {{isRequired}} </div> </div>"
   );
 
 
   $templateCache.put('sds-angular-controls/form-directives/form-input.html',
-    "<div class=\"{{layout === 'horizontal' ? inputLayout : '' }}\"> <input class=\"form-control inputField {{layout !== 'horizontal' ? layoutCss : ''}}\" ng-model=\"record[field]\" name=\"{{::field}}\" type=\"{{::type}}\" ng-required=\"isRequired\" ng-disabled=\"isReadonly\" placeholder=\"{{::placeholder}}\" step=\"{{::step}}\" style=\"{{::style}}\" mask-input=\"{{mask}}\"> <div ng-if=\"::(rightLabel && rightLabel.length > 0)\" class=\"rightLabel\">{{::rightLabel}}</div> <div ng-if=\"log\"> form-input value: {{record[field]}}<br> {{isRequired}} </div> </div>"
+    "<div class=\"{{::container.layout === 'horizontal' ? layoutCss : '' }}\"> <input class=\"form-control inputField {{::container.layout !== 'horizontal' ? layoutCss : ''}}\" ng-model=\"container.record[container.field]\" name=\"{{::container.field}}\" type=\"{{::type}}\" ng-required=\"container.isRequired\" ng-disabled=\"container.isReadonly\" placeholder=\"{{::placeholder || container.label}}\" step=\"{{::step}}\" style=\"{{::style}}\" mask-input=\"{{mask}}\"> <div ng-if=\"::(rightLabel && rightLabel.length > 0)\" class=\"rightLabel\">{{::rightLabel}}</div> </div>"
   );
 
 
   $templateCache.put('sds-angular-controls/form-directives/form-numeric-input.html',
-    "<div> <div class=\"{{layout === 'horizontal' ? layoutCss : '' }}\"> <input class=\"form-control inputField {{layout !== 'horizontal' ? layoutCss : ''}}\" ng-model=\"record[field]\" type=\"text\" name=\"{{::field}}\" ng-required=\"isRequired\" ng-disabled=\"isReadonly\" placeholder=\"{{::placeholder}}\" max=\"{{::max}}\" min=\"{{::min}}\" step=\"any\" style=\"{{::style}}\" mask-input=\"{{::mask}}\" auto-numeric> <div ng-if=\"::(rightLabel && rightLabel.length > 0)\" class=\"rightLabel\">{{::rightLabel}}</div> <div ng-if=\"log\"> form-input value: {{record[field]}}<br> {{isRequired}} </div> </div> </div>"
+    "<div class=\"{{::container.layout === 'horizontal' ? layoutCss : '' }}\"> <input class=\"form-control inputField {{::container.layout !== 'horizontal' ? layoutCss : ''}}\" ng-model=\"container.record[container.field]\" type=\"text\" name=\"{{::container.field}}\" ng-required=\"container.isRequired\" ng-disabled=\"container.isReadonly\" placeholder=\"{{::placeholder || container.label}}\" step=\"any\" style=\"{{::style}}\" mask-input=\"{{::mask}}\" auto-numeric> <div ng-if=\"::(rightLabel && rightLabel.length > 0)\" class=\"rightLabel\">{{::rightLabel}}</div> </div>"
   );
 
 
   $templateCache.put('sds-angular-controls/form-directives/form-select.html',
-    "<div> <select ng-if=\"!isReadonly && !hasFilter\" ng-readonly=\"isReadonly\" class=\"form-control\" name=\"{{::field}}\" ng-model=\"record[field]\" ng-options=\"convertType(key) as items[key] for key in orderHash(items)\" ng-required=\"isRequired\"></select> <!-- optionValue as optionLabel for arrayItem in array --> <input ng-if=\"isReadonly\" style=\"{{::style}}\" ng-readonly=\"isReadonly\" type=\"text\" class=\"form-control inputField {{::inputLayoutCss}}\" ng-model=\"readOnlyModel\"> <div ng-if=\"log\"> form-input value: {{record[field]}}<br> {{isRequired}} </div> </div>"
+    "<div class=\"{{::container.layout === 'horizontal' ? layoutCss : '' }}\"> <select ng-if=\"!container.isReadonly\" class=\"form-control {{::container.layout !== 'horizontal' ? layoutCss : ''}}\" name=\"{{::container.field}}\" ng-model=\"container.record[container.field]\" ng-options=\"convertType(key) as items[key] for key in orderHash(items)\" ng-required=\"container.isRequired\"></select> <!-- optionValue as optionLabel for arrayItem in array --> <input ng-if=\"container.isReadonly\" style=\"{{::style}}\" readonly type=\"text\" class=\"form-control {{::container.layout !== 'horizontal' ? layoutCss : ''}}\" ng-model=\"readOnlyModel\"> </div>"
   );
 
 
   $templateCache.put('sds-angular-controls/form-directives/form-text-area.html',
-    "<div> <div class=\"{{layout === 'horizontal' ? layoutCss : '' }}\"> <textarea class=\"form-control inputField {{layout !== 'horizontal' ? layoutCss : ''}}\" ng-model=\"record[field]\" type=\"{{::type}}\" name=\"{{::field}}\" ng-required=\"isRequired\" ng-disabled=\"isReadonly\" style=\"{{::style}}\">\n" +
-    "\n" +
-    "        <div ng-if=\"log\">\n" +
-    "            form-input value: {{record[field]}}<br>\n" +
-    "            {{isRequired}}\n" +
-    "        </div>\n" +
-    "\n" +
-    "    </div>\n" +
-    "</div>"
+    "<div class=\"{{::container.layout === 'horizontal' ? layoutCss : '' }}\"> <textarea class=\"form-control inputField {{::container.layout !== 'horizontal' ? layoutCss : ''}}\" ng-model=\"container.record[container.field]\" name=\"{{::container.field}}\" ng-required=\"container.isRequired\" ng-disabled=\"container.isReadonly\" style=\"{{::style}}\"></textarea> </div>"
   );
 
 
   $templateCache.put('sds-angular-controls/form-directives/form-text-toggle.html',
-    "<div class=\"text-toggle\"> <input type=\"text\" ng-disabled=\"isReadonly\" type=\"{{::type}}\" class=\"form-control inputField\" ng-required=\"isRequired\" ng-model=\"record[field]\"> <!-- bug in toggle where setting any disabled makes it disabled - so needing an if here --> <toggle-switch ng-if=\"isReadonly\" is-disabled=\"true\" class=\"{{::toggleSwitchType}}\" ng-model=\"record[toggleField]\" on-label=\"{{::onLabel}}\" off-label=\"{{::offLabel}}\"> </toggle-switch> <toggle-switch ng-if=\"!isReadonly\" class=\"{{::toggleSwitchType}}\" ng-model=\"record[toggleField]\" on-label=\"{{::onLabel}}\" off-label=\"{{::offLabel}}\"> </toggle-switch> </div>"
+    "<div class=\"{{::container.layout === 'horizontal' ? layoutCss : '' }} text-toggle\"> <input type=\"text\" ng-disabled=\"container.isReadonly\" type=\"{{::type}}\" class=\"form-control {{::container.layout !== 'horizontal' ? layoutCss : ''}}\" ng-required=\"container.isRequired\" ng-model=\"container.record[container.field]\"> <!-- bug in toggle where setting any disabled makes it disabled - so needing an if here --> <toggle-switch ng-if=\"container.isReadonly\" is-disabled=\"true\" class=\"{{::toggleSwitchType}}\" ng-model=\"container.record[toggleField]\" on-label=\"{{::onLabel}}\" off-label=\"{{::offLabel}}\"> </toggle-switch> <toggle-switch ng-if=\"!container.isReadonly\" class=\"{{::toggleSwitchType}}\" ng-model=\"container.record[toggleField]\" on-label=\"{{::onLabel}}\" off-label=\"{{::offLabel}}\"> </toggle-switch> </div>"
   );
 
 
   $templateCache.put('sds-angular-controls/form-directives/form-time-picker.html',
-    "<div class=\"{{::layoutCss}} timepicker\"> <timepicker ng-model=\"record[field]\" ng-required=\"::isRequired\" ng-if=\"!isReadonly\" minute-step=\"5\"></timepicker> </div>"
+    "<div class=\"{{::container.layout === 'horizontal' ? layoutCss : '' }} timepicker\"> <timepicker ng-model=\"container.record[container.field]\" ng-required=\"::container.isRequired\" ng-if=\"!container.isReadonly\" minute-step=\"1\"></timepicker> <input ng-if=\"container.isReadonly\" style=\"{{::style}}\" readonly type=\"text\" class=\"form-control {{::container.layout !== 'horizontal' ? layoutCss : ''}}\" ng-model=\"readOnlyModel\"> </div>"
   );
 
 
   $templateCache.put('sds-angular-controls/form-directives/form-toggle.html',
-    "<div> <!-- bug in toggle where setting any disabled makes it disabled - so needing an if here --> <toggle-switch ng-if=\"isReadonly\" style=\"{{::style}}\" is-disabled=\"true\" class=\"{{::toggleSwitchType}}\" ng-model=\"record[field]\" on-label=\"{{::onLabel}}\" off-label=\"{{::offLabel}}\"> </toggle-switch> <toggle-switch ng-if=\"!isReadonly\" style=\"{{::style}}\" class=\"{{::toggleSwitchType}}\" ng-model=\"record[field]\" on-label=\"{{::onLabel}}\" off-label=\"{{::offLabel}}\"> </toggle-switch> <div ng-if=\"log\"> form-input value: {{record[field]}}<br> </div> </div>"
+    "<div class=\"{{::container.layout === 'horizontal' ? layoutCss : '' }}\"> <!-- bug in toggle where setting any disabled makes it disabled - so needing an if here --> <toggle-switch ng-if=\"container.isReadonly\" style=\"{{::style}}\" is-disabled=\"true\" class=\"{{::toggleSwitchType}}\" ng-model=\"container.record[container.field]\" on-label=\"{{::onLabel}}\" off-label=\"{{::offLabel}}\"> </toggle-switch> <toggle-switch ng-if=\"!container.isReadonly\" style=\"{{::style}}\" class=\"{{::toggleSwitchType}}\" ng-model=\"container.record[container.field]\" on-label=\"{{::onLabel}}\" off-label=\"{{::offLabel}}\"> </toggle-switch> </div>"
   );
 
 
   $templateCache.put('sds-angular-controls/table-directives/db-grid.html',
-    "<div class=\"table-responsive\"> <div class=\"btn-toolbar\"> <a ng-if=\"_model.showAdvancedFilter\" href=\"\" class=\"btn btn-default\" ng-click=\"_model.clearFilters()\">Clear All Filters <span class=\"big-x\">&times;</span></a> <div ng-if=\"!_model.showAdvancedFilter && _model.filterType !== 'none'\" class=\"toolbar-input\"> <div class=\"form-group has-feedback\"> <input class=\"form-control\" type=\"text\" ng-model=\"_model.filterText\" ng-keyup=\"$grid.refresh()\" placeholder=\"Filter {{_model.label || 'items'}}\" on-enter=\"_model.onEnter()\"> <a href=\"\" ng-click=\"_model.filterText = ''\" class=\"form-control-feedback feedback-link\">&times;</a> </div> </div> <a href=\"\" ng-if=\"_model.filterType === 'advanced'\" class=\"btn btn-default\" ng-class=\"{active: _model.showAdvancedFilter}\" ng-click=\"_model.showAdvancedFilter = !_model.showAdvancedFilter\">{{_model.showAdvancedFilter ? 'Simple' : 'Advanced'}} Filtering</a> <db-transclude></db-transclude> <p ng-if=\"_model.total && _model.label\"><i>{{_model.total}} {{_model.label}}</i></p> </div> <table class=\"table db-grid table-hover {{_model.layoutCss}}\"> <thead> <tr> <th ng-repeat=\"_col in _model.cols\" ng-style=\"{width: _col.width}\"> <div ng-if=\"_model.showAdvancedFilter && _col.sortable\"> <input type=\"text\" class=\"form-control filter-input\" on-enter=\"_model.onEnter()\" ng-keyup=\"$grid.refresh()\" ng-model=\"_col.filter\" placeholder=\"Filter {{::_col.label || _col.key}}\" tooltip=\"{{_col.type ? 'Use a dash (-) to specify a range' : ''}}\" tooltip-trigger=\"focus\" tooltip-placement=\"top\"> </div> <a href=\"\" ng-if=\"::_col.sortable\" ng-click=\"_model.toggleSort($index)\">{{::_col.label || (_col.key | labelCase) }} <i class=\"fa\" ng-class=\"{\n" +
+    "<div class=\"table-responsive\"> <div class=\"btn-toolbar\"> <a ng-if=\"_model.showAdvancedFilter\" href=\"\" class=\"btn btn-default\" ng-click=\"_model.clearFilters()\">Clear All Filters <span class=\"big-x\">&times;</span></a> <div ng-if=\"!_model.showAdvancedFilter && _model.filterType !== 'none'\" class=\"toolbar-input\"> <div class=\"form-group has-feedback\"> <input class=\"form-control\" type=\"text\" ng-model=\"_model.filterText\" ng-keyup=\"$grid.refresh()\" placeholder=\"Filter {{_model.label || 'items'}}\" on-enter=\"_model.onEnter()\"> <a href=\"\" ng-click=\"_model.filterText = ''\" class=\"form-control-feedback feedback-link\">&times;</a> </div> </div> <a href=\"\" ng-if=\"_model.filterType === 'advanced'\" class=\"btn btn-default\" ng-class=\"{'btn-primary': _model.showAdvancedFilter}\" ng-click=\"_model.showAdvancedFilter = !_model.showAdvancedFilter\">{{_model.showAdvancedFilter ? 'Simple' : 'Advanced'}} Filtering</a> <db-transclude></db-transclude> <p ng-if=\"_model.total && _model.label\"><i>{{_model.total}} {{_model.label}}</i></p> </div> <table class=\"table db-grid table-hover {{_model.layoutCss}}\"> <thead> <tr> <th ng-repeat=\"_col in _model.cols\" ng-style=\"{width: _col.width}\"> <div ng-if=\"_model.showAdvancedFilter && _col.sortable\"> <input type=\"text\" class=\"form-control filter-input\" on-enter=\"_model.onEnter()\" ng-keyup=\"$grid.refresh()\" ng-model=\"_col.filter\" placeholder=\"Filter {{::_col.label || _col.key}}\" tooltip=\"{{_col.type ? 'Use a dash (-) to specify a range' : ''}}\" tooltip-trigger=\"focus\" tooltip-placement=\"top\"> </div> <a href=\"\" ng-if=\"::_col.sortable\" ng-click=\"_model.toggleSort($index)\">{{::_col.label || (_col.key | labelCase) }}&nbsp;<i class=\"fa\" style=\"display: inline\" ng-class=\"{\n" +
     "                         'fa-sort'     : _model.sort !== $index,\n" +
     "                         'fa-sort-down': _model.sort === $index &&  _model.sortAsc,\n" +
     "                         'fa-sort-up'  : _model.sort === $index && !_model.sortAsc\n" +

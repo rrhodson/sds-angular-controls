@@ -3,83 +3,31 @@
  */
 (function () {
     'use strict';
-    function formTextArea () {
+    function formTextArea ($timeout) {
         return{
             restrict: 'EA',
             replace: true,
+            require: '^formField',
             scope: {
-                log             : '@?',
                 style           : '@?',
-                layoutCss       : '@?', //default col-md-6
-                isReadonly      : '=?'  //boolean
+                layoutCss       : '@?' //default col-md-6
             },
             templateUrl: 'sds-angular-controls/form-directives/form-text-area.html',
-            link: function (scope, element) {
-                // defaults
-                var parentScope = element.parent().scope();
-                parentScope.$watch('record', function(newVal, oldVal){
+            link: function (scope, element, attr, container) {
+                var input = element.find('input');
+                scope.container = container.$scope;
 
-                    scope.record = newVal;
-                });
-
-                parentScope.$watch('field', function(newVal, oldVal){
-
-                    scope.field = newVal;
-                });
-
-                parentScope.$watch('isRequired', function(newVal, oldVal){
-
-                    scope.isRequired = newVal;
-                });
-
-                parentScope.$watch('layout', function(newVal, oldVal){
-
-                    scope.layout = newVal;
-                });
-
-                parentScope.$watch('label', function(newVal, oldVal){
-
-                    scope.label = newVal;
-                    scope.placeholder = scope.placeholder || newVal;
-                });
-
-                parentScope.$watch('isReadonly', function(newVal, oldVal){
-
-                    scope.isReadonly = newVal;
-                });
-
-                scope.isReadonly = scope.isReadonly || false;
-
-                scope.log = scope.log || false;
-                scope.type = scope.type || "text";
-
-                scope.layoutCss = scope.layoutCss || "col-md-6";
-
-
-
-                scope.$watch("isReadonly", function(newVal, oldVal){
-                    if(newVal && oldVal) {
-                        if (newVal !== oldVal) {
-                            checkIfReadonly();
-                        }
-                    }
-                });
-
-                function checkIfReadonly(){
-                    if(scope.isReadonly) {
-                        if (scope.fieldType === 'toggle') {
-                            scope.readOnlyModel = scope.record[scope.field];
-                        }
-                    }
+                switch(container.$scope.layout){
+                    case "horizontal":
+                        scope.layoutCss = scope.layoutCss || "col-md-6";
+                        break;
+                    default: //stacked
+                        scope.layoutCss = scope.layoutCss || "";
                 }
-                var input = element.find('textarea');
-                parentScope.$watch('isAutofocus', function(newVal, oldVal){
-                    if (newVal){
-                        input.attr('autofocus', 'autofocus');
-                    }else{
-                        input.removeAttr('autofocus');
-                    }
-                });
+
+                if (container.$scope.isAutofocus){
+                    $timeout(input.focus);
+                }
             }
         }
     }

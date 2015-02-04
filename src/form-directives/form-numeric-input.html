@@ -1,25 +1,16 @@
-<div>
-    <div class="{{layout === 'horizontal' ? layoutCss : '' }}">
-        <input class="form-control inputField {{layout !== 'horizontal' ? layoutCss : ''}}"
-               ng-model='record[field]'
-               type='text'
-               name='{{::field}}'
-               ng-required='isRequired'
-               ng-disabled="isReadonly"
-               placeholder='{{::placeholder}}'
-               max="{{::max}}"
-               min="{{::min}}"
-               step="any"
-               style="{{::style}}"
-               mask-input="{{::mask}}"
-               auto-numeric
-                />
-        <div ng-if="::(rightLabel && rightLabel.length > 0)" class="rightLabel">{{::rightLabel}}</div>
-
-        <div ng-if="log">
-            form-input value: {{record[field]}}<br>
-            {{isRequired}}
-        </div>
-
-    </div>
+<div class="{{::container.layout === 'horizontal' ? layoutCss : '' }}">
+    <input class="form-control inputField {{::container.layout !== 'horizontal' ? layoutCss : ''}}"
+           ng-model='container.record[container.field]'
+           type='text'
+           name='{{::container.field}}'
+           ng-required='container.isRequired'
+           ng-disabled="container.isReadonly"
+           placeholder='{{::placeholder || container.label}}'
+           step="any"
+           style="{{::style}}"
+           mask-input="{{::mask}}"
+           auto-numeric
+            />
+    <div ng-if="::(rightLabel && rightLabel.length > 0)" class="rightLabel">{{::rightLabel}}</div>
 </div>
+

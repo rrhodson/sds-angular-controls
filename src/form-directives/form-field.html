@@ -1,26 +1,4 @@
 <div>
-    <script type="text/ng-template" id="validation.html">
-        <div ng-if="!hideValidationMessage" class='has-error' ng-show='showError({{field}})'
-             ng-messages='{{field}}.$error'>
-            <span class='control-label' ng-message='required'> {{ validationFieldName }} is required. </span>
-            <span class='control-label' ng-message='text'> {{ validationFieldName }} should be text. </span>
-            <span class='control-label' ng-message='integer'> {{ validationFieldName }} should be an integer. </span>
-            <span class='control-label' ng-message='email'> {{ validationFieldName }} should be an email address. </span>
-            <span class='control-label' ng-message='date'> {{ validationFieldName}} should be a date. </span>
-            <span class='control-label' ng-message='datetime'> {{ validationFieldName }} should be a datetime. </span>
-            <span class='control-label' ng-message='time'> {{ validationFieldName }} should be a time. </span>
-            <span class='control-label' ng-message='month'> {{ validationFieldName }} should be a month. </span>
-            <span class='control-label' ng-message='week'> {{ validationFieldName }} should be a week. </span>
-            <span class='control-label' ng-message='url'> {{ validationFieldName }} should be an url. </span>
-            <span class='control-label' ng-message='zip'> {{ validationFieldName }} should be a valid zipcode. </span>
-            <span class='control-label' ng-message='number'>{{ validationFieldName }} must be a number</span>
-            <span class='control-label' ng-message='tel'>{{ validationFieldName }} must be a phone number</span>
-            <span class='control-label' ng-message='color'>{{ validationFieldName }} must be a color</span>
-            <span class='control-label' ng-message='min'> {{ validationFieldName }} must be at least {{min}}. </span>
-            <span class='control-label' ng-message='max'> {{ validationFieldName }} must not exceed {{max}} </span>
-            <span class='control-label' ng-repeat='(k, v) in types' ng-message='{{k}}'> {{ validationFieldName }}{{v[1]}}</span>
-        </div>
-    </script>
     <div ng-if="layout === 'stacked'" class="row">
          <div class='form-group clearfix' ng-form="{{field}}"
          ng-class="{ 'has-error': showError({{field}}) }">
@@ -32,12 +10,12 @@
             <div ng-if="showDefault"><form-input></form-input></div>
 
             <!-- validation -->
-            <div class="pull-left" ng-include="'validation.html'"></div>
+            <div class="pull-left" ng-include="'sds-angular-controls/form-directives/form-field-validation.html'"></div>
         </div>
          </div>
     </div>
 
-    <div ng-if="layout === 'horizontal'" class="row">
+    <div ng-if="layout === 'horizontal'" class="row inline-control">
         <div class='form-group clearfix' ng-form="{{field}}"
          ng-class="{ 'has-error': showError({{field}}) }">
 
@@ -50,7 +28,7 @@
             <div ng-if="!hideValidationMessage" ng-show='showError({{field}})' class="popover validation right alert-danger"
                  style="display:inline-block; top:auto; left:auto; margin-top:-4px; min-width:240px;">
                 <div class="arrow" style="top: 20px"></div>
-                <div class="popover-content" ng-include="'validation.html'" >
+                <div class="popover-content" ng-include="'sds-angular-controls/form-directives/form-field-validation.html'" >
                 </div>
             </div>
         </div>
@@ -61,5 +39,10 @@
 
         <ng-transclude></ng-transclude>
         <div ng-if="showDefault"><form-input></form-input></div>
+    </div>
+
+    <div ng-if="log">
+        form-input value: {{record[field]}}<br>
+        {{isRequired}}
     </div>
 </div>

@@ -1,13 +1,9 @@
-<div>
+<div class="{{::container.layout === 'horizontal' ? layoutCss : '' }}">
     <!-- bug in toggle where setting any disabled makes it disabled - so needing an if here -->
-    <toggle-switch ng-if="isReadonly" style="{{::style}}" is-disabled="true" class="{{::toggleSwitchType}}" ng-model="record[field]"
+    <toggle-switch ng-if="container.isReadonly" style="{{::style}}" is-disabled="true" class="{{::toggleSwitchType}}" ng-model="container.record[container.field]"
                    on-label="{{::onLabel}}" off-label="{{::offLabel}}">
     </toggle-switch>
-    <toggle-switch ng-if="!isReadonly" style="{{::style}}" class="{{::toggleSwitchType}}" ng-model="record[field]"
+    <toggle-switch ng-if="!container.isReadonly" style="{{::style}}" class="{{::toggleSwitchType}}" ng-model="container.record[container.field]"
                    on-label="{{::onLabel}}" off-label="{{::offLabel}}">
     </toggle-switch>
-
-    <div ng-if="log">
-        form-input value: {{record[field]}}<br>
-    </div>
 </div>

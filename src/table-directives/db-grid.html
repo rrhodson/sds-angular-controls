@@ -11,7 +11,7 @@
             </div>
         </div>
 
-        <a href="" ng-if="_model.filterType === 'advanced'" class="btn btn-default" ng-class="{active: _model.showAdvancedFilter}"
+        <a href="" ng-if="_model.filterType === 'advanced'" class="btn btn-default" ng-class="{'btn-primary': _model.showAdvancedFilter}"
            ng-click="_model.showAdvancedFilter = !_model.showAdvancedFilter">{{_model.showAdvancedFilter ? 'Simple' : 'Advanced'}} Filtering</a>
 
         <db-transclude></db-transclude>
@@ -30,8 +30,8 @@
                                tooltip-placement="top">
                     </div>
                     <a href="" ng-if="::_col.sortable"
-                       ng-click="_model.toggleSort($index)">{{::_col.label || (_col.key | labelCase) }}
-                        <i class="fa" ng-class="{
+                       ng-click="_model.toggleSort($index)">{{::_col.label || (_col.key | labelCase)
+                        }}&nbsp;<i class="fa" style="display: inline;" ng-class="{
                          'fa-sort'     : _model.sort !== $index,
                          'fa-sort-down': _model.sort === $index &&  _model.sortAsc,
                          'fa-sort-up'  : _model.sort === $index && !_model.sortAsc

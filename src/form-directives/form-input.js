@@ -3,66 +3,48 @@
  */
 (function () {
     'use strict';
-    function formInput ($filter) {
+    function formInput ($timeout) {
         return{
             restrict: 'E',
+            require: '^form-field',
             replace: true,
             scope: {
-                log             : '@?',
                 placeholder     : '@?',
-                mask            : '@?', //todo
-                style           : '@?',
-                max             : '@?',
-                min             : '@?',
-                type            : '@',  //text, email, number etc.. see the InputTypes
-                layoutCss       : '@?', //default col-md-6
-                inputLayout     : '@?',
                 rightLabel      : '@?',
-                isReadonly      : '=?'  //boolean
+                style           : '@?',
+                layoutCss       : '@?' //default col-md-6
             },
             templateUrl: 'sds-angular-controls/form-directives/form-input.html',
-            link: function (scope, element, attr) {
-                // defaults
-                var parentScope = element.parent().scope();
+            link: function (scope, element, attr, container) {
+                var input = element.find('input');
+                scope.container = container.$scope;
 
-                parentScope.$watch('record', function(newVal, oldVal){
-                    scope.record = newVal;
-                });
+                // one-time bindings:
+                switch(container.$scope.layout){
+                    case "horizontal":
+                        scope.layoutCss = scope.layoutCss || "col-md-6";
+                        break;
+                    default: //stacked
+                        scope.layoutCss = scope.layoutCss || "";
+                }
 
-                parentScope.$watch('field', function(newVal, oldVal){
-                    scope.field = newVal;
-                });
+                if (container.$scope.isAutofocus){
+                    $timeout(input.focus);
+                }
+                if (attr.min){
+                    container.$scope.min = scope.$eval(attr.min);
+                    input.attr('min', container.$scope.min);
+                }
+                if (attr.max){
+                    container.$scope.max = scope.$eval(attr.max);
+                    input.attr('max', container.$scope.max);
+                }
+                if (attr.pattern){
+                    input.attr('pattern', attr.pattern);
+                }
 
-                parentScope.$watch('isRequired', function(newVal, oldVal){
-                    scope.isRequired = newVal;
-                });
-
-                parentScope.$watch('layout', function(newVal, oldVal){
-                    scope.layout = newVal;
-                    switch(scope.layout){
-                        case "horizontal":
-                            scope.inputLayout = scope.inputLayout || "col-md-6";
-                            break;
-                        default: //stacked
-                            scope.inputLayout = scope.inputLayout || "col-md-4";
-                    }
-                });
-
-                parentScope.$watch('isReadonly', function(newVal, oldVal){
-                    scope.isReadonly = newVal;
-                });
-
-
-
-                scope.isReadonly = scope.isReadonly || false;
-
-                parentScope.$watch('label', function(newVal, oldVal){
-                    scope.label = newVal;
-                    scope.placeholder = scope.placeholder || newVal;
-                });
-
-                scope.log = scope.log || false;
-                scope.type = scope.type || "text";
+                scope.step = attr.step || "any";
+                scope.type = attr.type || "text";
 
                 if(scope.type === "integer"){
                     var inputField = element.find(".inputField");
@@ -70,27 +52,6 @@
                         inputField.val(inputField.val().replace(/[^0-9]/g,''));
                     });
                 }
-                scope.step = attr.step || "any";
-
-                var input = element.find('input');
-                if (parentScope.min){
-                    input.attr('min', parentScope.min);
-                }
-                if (parentScope.max){
-                    input.attr('max', parentScope.max);
-                }
-                if (attr.pattern){
-                    input.attr('pattern', scope.$eval(attr.pattern));
-                }
-                parentScope.$watch('isAutofocus', function(newVal, oldVal){
-                    if (newVal){
-                        input.attr('autofocus', 'autofocus');
-                    }else{
-                        input.removeAttr('autofocus');
-                    }
-                });
-
-
             }
         }
     }

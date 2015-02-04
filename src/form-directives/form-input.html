@@ -1,19 +1,14 @@
-<div class="{{layout === 'horizontal' ? inputLayout : '' }}">
-        <input class="form-control inputField {{layout !== 'horizontal' ? layoutCss : ''}}"
-            ng-model='record[field]'
-            name='{{::field}}'
+<div class="{{::container.layout === 'horizontal' ? layoutCss : '' }}">
+        <input class="form-control inputField {{::container.layout !== 'horizontal' ? layoutCss : ''}}"
+            ng-model='container.record[container.field]'
+            name='{{::container.field}}'
             type='{{::type}}'
-            ng-required='isRequired'
-            ng-disabled='isReadonly'
-            placeholder='{{::placeholder}}'
+            ng-required='container.isRequired'
+            ng-disabled='container.isReadonly'
+            placeholder='{{::placeholder || container.label}}'
             step="{{::step}}"
             style="{{::style}}"
             mask-input="{{mask}}"
         />
         <div ng-if="::(rightLabel && rightLabel.length > 0)" class="rightLabel">{{::rightLabel}}</div>
-        <div ng-if="log">
-            form-input value: {{record[field]}}<br>
-            {{isRequired}}
-        </div>
-
 </div>

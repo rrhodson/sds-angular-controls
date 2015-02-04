@@ -3,10 +3,11 @@
  */
 (function () {
     'use strict';
-    function formTextToggle ($filter) {
+    function formTextToggle ($timeout) {
         return{
             restrict: 'EA',
             replace: true,
+            require: '^form-field',
             scope: {
                 placeholder     : '@?',
                 toggleField     : '@?', //one-way binding
@@ -14,41 +15,30 @@
                 onLabel         : '@?',
                 offLabel        : '@?',
                 style           : '@?',
-                type            : '@',  //text, email, number etc.. see the InputTypes
-                isReadonly      : '=?'  //boolean
+                layoutCss       : '@?' //default col-md-6
             },
             templateUrl: 'sds-angular-controls/form-directives/form-text-toggle.html',
-            link: function (scope, element) {
-                // defaults
-                var parentScope = element.parent().scope();
-                parentScope.$watch('record', function(newVal, oldVal){
+            link: function (scope, element, attr, container) {
+                var input = element.find('input');
+                scope.container = container.$scope;
 
-                    scope.record = newVal;
-                });
+                switch(container.$scope.layout){
+                    case "horizontal":
+                        scope.layoutCss = scope.layoutCss || "col-md-6";
+                        break;
+                    default: //stacked
+                        scope.layoutCss = scope.layoutCss || "";
+                }
 
-                parentScope.$watch('field', function(newVal, oldVal){
+                if (container.$scope.isAutofocus){
+                    $timeout(input.focus);
+                }
 
-                    scope.field = newVal;
-                });
-
-                parentScope.$watch('isRequired', function(newVal, oldVal){
-
-                    scope.isRequired = newVal;
-                });
-
-                parentScope.$watch('isReadonly', function(newVal, oldVal){
-                    scope.isReadonly = newVal;
-                });
-
-                scope.isReadonly = scope.isReadonly || false;
-
-                scope.log = scope.log || false;
-                scope.type = scope.type || "text";
+                scope.type = attr.type || "text";
 
                 scope.toggleSwitchType = scope.toggleSwitchType || "primary";
                 scope.onLabel = scope.onLabel   || "Yes";
                 scope.offLabel = scope.offLabel || "No";
-
             }
         }
     }

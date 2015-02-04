@@ -1,18 +1,8 @@
-<div>
-    <div class="{{layout === 'horizontal' ? layoutCss : '' }}">
-        <textarea class="form-control inputField {{layout !== 'horizontal' ? layoutCss : ''}}"
-               ng-model='record[field]'
-               type='{{::type}}'
-               name='{{::field}}'
-               ng-required='isRequired'
-               ng-disabled="isReadonly"
-               style="{{::style}}"
-                />
-
-        <div ng-if="log">
-            form-input value: {{record[field]}}<br>
-            {{isRequired}}
-        </div>
-
-    </div>
+<div class="{{::container.layout === 'horizontal' ? layoutCss : '' }}">
+    <textarea class="form-control inputField {{::container.layout !== 'horizontal' ? layoutCss : ''}}"
+           ng-model='container.record[container.field]'
+           name='{{::container.field}}'
+           ng-required='container.isRequired'
+           ng-disabled="container.isReadonly"
+           style="{{::style}}"></textarea>
 </div>

@@ -3,47 +3,31 @@
  */
 (function () {
     'use strict';
-    function formTimePicker () {
+    function formTimePicker ($timeout) {
         return{
             restrict: 'E',
             replace: true,
+            require: '^form-field',
             scope: {
-                layoutCss       : '@?', //default col-md-6
-                isReadonly      : '=?'  //boolean
+                layoutCss       : '@?' //default col-md-6
             },
             templateUrl: 'sds-angular-controls/form-directives/form-time-picker.html',
-            link: function (scope, element) {
-                // defaults
+            link: function (scope, element, attr, container) {
+                scope.container = container.$scope;
 
-                var parentScope = element.parent().scope();
+                switch(container.$scope.layout){
+                    case "horizontal":
+                        scope.layoutCss = scope.layoutCss || "col-md-6";
+                        break;
+                    default: //stacked
+                        scope.layoutCss = scope.layoutCss || "";
+                }
 
-                parentScope.$watch('record', function(newVal, oldVal){
-
-                    scope.record = newVal;
+                scope.$watch("container.isReadonly", function(newVal){
+                    if(newVal) {
+                        scope.readOnlyModel = moment(scope.container.record[scope.container.field]).format('h:mm a');
+                    }
                 });
-
-                parentScope.$watch('field', function(newVal, oldVal){
-
-                    scope.field = newVal;
-                });
-
-                parentScope.$watch('isRequired', function(newVal, oldVal){
-
-                    scope.isRequired = newVal;
-                });
-
-                parentScope.$watch('layout', function(newVal, oldVal){
-
-                    scope.layout = newVal;
-                });
-
-                parentScope.$watch('isReadonly', function(newVal, oldVal){
-
-                    scope.isReadonly = newVal;
-                });
-
-                scope.isReadonly = scope.isReadonly || false;
-
             }
         }
     }

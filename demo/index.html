@@ -53,6 +53,13 @@
           <form-field record="vm.testForm" field="Email" is-required="true" layout-css="col-md-8">
               <form-input type="email"></form-input>
           </form-field>
+          <form-field record="vm.testForm" field="dateTime" is-required="true" log="true">
+              <form-date-time-picker></form-date-time-picker>
+          </form-field>
+
+          <form-field record="vm.testForm" field="timeOnly" is-required="true" log="true">
+              <form-time-picker></form-time-picker>
+          </form-field>
           <form-field label="Weight" record="vm.testForm" field="weight">
               <form-text-toggle on-label="kg" off-label="lb" toggle-field="weightUnit" toggle-switch-type="inverse"></form-text-toggle>
           </form-field>
