@@ -26,10 +26,10 @@
 
                 return function ($scope, $element, $attrs, dbGrid) {
                     var templateFunc = null;
-                    if (!templateText && $attrs.key){
-                        templateText = '{{' + $scope.$parent._model.rowName + '.' + $attrs.key + '}}'
-                    }
 
+                    if (!templateText && $attrs.key){
+                        templateText = '{{' + dbGrid.rowName + '.' + $attrs.key + '}}'
+                    }
                     if ($attrs.bind === 'true'){
                         templateFunc = templateText;
                     }else{

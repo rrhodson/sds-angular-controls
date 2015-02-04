@@ -69,7 +69,7 @@
 
 
                 var loop = $attrs.for.split(' ');
-                $scope._model.rowName = loop[0];
+                this.rowName = loop[0];
                 if (loop[2]) {
                     $scope.$watchCollection(loop.slice(2).join(' '), function (items) {
                         $scope._model.currentPage = 1;
