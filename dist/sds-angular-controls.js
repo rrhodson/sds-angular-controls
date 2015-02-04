@@ -1,7 +1,7 @@
 /*! 
  * sds-angular-controls
  * Angular Directives used with sds-angular generator
- * @version 0.3.8 
+ * @version 0.3.9 
  * 
  * Copyright (c) 2015 Steve Gentile, David Benson 
  * @link https://github.com/SMARTDATASYSTEMSLLC/sds-angular-controls 
@@ -343,6 +343,7 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
 
     angular.module('sds-angular-controls').directive('formAutocomplete', formAutocomplete);
 })();
+
 
 (function () {
     'use strict';
@@ -1451,10 +1452,10 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
 
                 return function ($scope, $element, $attrs, dbGrid) {
                     var templateFunc = null;
-                    if (!templateText && $attrs.key){
-                        templateText = '{{' + $scope.$parent._model.rowName + '.' + $attrs.key + '}}'
-                    }
 
+                    if (!templateText && $attrs.key){
+                        templateText = '{{' + dbGrid.rowName + '.' + $attrs.key + '}}'
+                    }
                     if ($attrs.bind === 'true'){
                         templateFunc = templateText;
                     }else{
@@ -1567,7 +1568,7 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
 
 
                 var loop = $attrs.for.split(' ');
-                $scope._model.rowName = loop[0];
+                this.rowName = loop[0];
                 if (loop[2]) {
                     $scope.$watchCollection(loop.slice(2).join(' '), function (items) {
                         $scope._model.currentPage = 1;
@@ -1695,8 +1696,18 @@ angular.module('sds-angular-controls').run(['$templateCache', function($template
   );
 
 
+  $templateCache.put('sds-angular-controls/form-directives/form-date-time-picker.html',
+    "<!DOCTYPE html> <html> <head lang=\"en\"> <meta charset=\"UTF-8\"> <title></title>  <body>  "
+  );
+
+
   $templateCache.put('sds-angular-controls/form-directives/form-datepicker.html',
     "<span> <span class=\"input-group {{layout !== 'horizontal' ? layoutCss : ''}}\"> <input type=\"text\" style=\"{{::style}}\" class=\"form-control datepicker\" ng-if=\"!isReadonly\" ng-readonly=\"isReadonly\" placeholder=\"{{placeholder}}\" ng-model=\"record[field]\" ng-required=\"::isRequired\" min-date=\"::min\" max-date=\"::max\" datepicker-popup=\"{{::dateFormat}}\" is-open=\"calendar.opened\"> <span ng-if=\"!isReadonly\" class=\"input-group-btn\"> <button type=\"button\" class=\"btn btn-default\" ng-click=\"open($event)\"><i class=\"glyphicon glyphicon-calendar\"></i></button> </span> </span> <div ng-if=\"log\"> form-datepicker value: {{record[field]}}<br> {{isRequired}} </div> </span>"
+  );
+
+
+  $templateCache.put('sds-angular-controls/form-directives/form-field-validation.html',
+    ""
   );
 
 
