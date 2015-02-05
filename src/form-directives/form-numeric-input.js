@@ -36,7 +36,7 @@
                     input.attr('max', container.$scope.max);
                 }
                 if (container.$scope.isAutofocus){
-                    $timeout(input.focus);
+                    $timeout(function (){input.focus(); });
                 }
 
                 if(scope.type === "integer"){

@@ -27,7 +27,7 @@
                 }
 
                 if (container.$scope.isAutofocus){
-                    $timeout(input.focus);
+                    $timeout(function (){input.focus(); });
                 }
 
                 scope.dateFormat = scope.dateFormat || "MM-dd-yyyy";

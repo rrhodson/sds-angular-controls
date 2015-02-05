@@ -31,7 +31,7 @@
                 }
 
                 if (container.$scope.isAutofocus){
-                    $timeout(input.focus);
+                    $timeout(function (){input.focus(); });
                 }
 
                 scope.$watch("container.isReadonly", function(newVal){

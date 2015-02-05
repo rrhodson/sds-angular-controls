@@ -1,7 +1,7 @@
 /*! 
  * sds-angular-controls
  * Angular Directives used with sds-angular generator
- * @version 0.3.15 
+ * @version 0.3.17 
  * 
  * Copyright (c) 2015 Steve Gentile, David Benson 
  * @link https://github.com/SMARTDATASYSTEMSLLC/sds-angular-controls 
@@ -278,7 +278,7 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                 }
 
                 if (container.$scope.isAutofocus){
-                    $timeout(input.focus);
+                    $timeout(function (){input.focus(); });
                 }
 
                 scope.$watch("container.isReadonly", function(newVal){
@@ -355,7 +355,7 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                 }
 
                 if (container.$scope.isAutofocus){
-                    $timeout(input.focus);
+                    $timeout(function (){input.focus(); });
                 }
                 
                 scope.dateFormat = scope.dateFormat || "MM-dd-yyyy";
@@ -433,7 +433,7 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                 }
 
                 if (container.$scope.isAutofocus){
-                    $timeout(input.focus);
+                    $timeout(function (){input.focus(); });
                 }
 
                 scope.dateFormat = scope.dateFormat || "MM-dd-yyyy";
@@ -563,6 +563,7 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
             scope: {
                 placeholder     : '@?',
                 rightLabel      : '@?',
+                mask            : '@?',
                 style           : '@?',
                 layoutCss       : '@?' //default col-md-6
             },
@@ -581,7 +582,7 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                 }
 
                 if (container.$scope.isAutofocus){
-                    $timeout(input.focus);
+                    $timeout(function (){input.focus(); });
                 }
                 if (attr.min){
                     container.$scope.min = scope.$eval(attr.min);
@@ -646,7 +647,7 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                 }
 
                 if (container.$scope.isAutofocus){
-                    $timeout(input.focus);
+                    $timeout(function (){input.focus(); });
                 }
 
                 scope.$watch("container.isReadonly", function(newVal){
@@ -705,6 +706,7 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
             scope: {
                 placeholder     : '@?',
                 rightLabel      : '@?',
+                mask            : '@?',
                 style           : '@?',
                 layoutCss       : '@?' //default col-md-6
             },
@@ -729,7 +731,7 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                     input.attr('max', container.$scope.max);
                 }
                 if (container.$scope.isAutofocus){
-                    $timeout(input.focus);
+                    $timeout(function (){input.focus(); });
                 }
 
                 if(scope.type === "integer"){
@@ -776,7 +778,7 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                 }
 
                 if (container.$scope.isAutofocus){
-                    $timeout(input.focus);
+                    $timeout(function (){input.focus(); });
                 }
 
                 scope.$watch("container.isReadonly", function(newVal){
@@ -861,7 +863,7 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
             },
             templateUrl: 'sds-angular-controls/form-directives/form-text-area.html',
             link: function (scope, element, attr, container) {
-                var input = element.find('input');
+                var input = element.find('textarea');
                 scope.container = container.$scope;
 
                 switch(container.$scope.layout){
@@ -873,7 +875,7 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                 }
 
                 if (container.$scope.isAutofocus){
-                    $timeout(input.focus);
+                    $timeout(function (){input.focus(); });
                 }
             }
         }
@@ -913,7 +915,7 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                 }
 
                 if (container.$scope.isAutofocus){
-                    $timeout(input.focus);
+                    $timeout(function (){input.focus(); });
                 }
 
                 scope.type = attr.type || "text";

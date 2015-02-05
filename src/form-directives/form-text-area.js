@@ -14,7 +14,7 @@
             },
             templateUrl: 'sds-angular-controls/form-directives/form-text-area.html',
             link: function (scope, element, attr, container) {
-                var input = element.find('input');
+                var input = element.find('textarea');
                 scope.container = container.$scope;
 
                 switch(container.$scope.layout){
@@ -26,7 +26,7 @@
                 }
 
                 if (container.$scope.isAutofocus){
-                    $timeout(input.focus);
+                    $timeout(function (){input.focus(); });
                 }
             }
         }

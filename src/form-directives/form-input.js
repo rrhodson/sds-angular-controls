@@ -30,7 +30,7 @@
                 }
 
                 if (container.$scope.isAutofocus){
-                    $timeout(input.focus);
+                    $timeout(function (){input.focus(); });
                 }
                 if (attr.min){
                     container.$scope.min = scope.$eval(attr.min);
