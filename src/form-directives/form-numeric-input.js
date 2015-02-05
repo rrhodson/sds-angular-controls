@@ -11,6 +11,7 @@
             scope: {
                 placeholder     : '@?',
                 rightLabel      : '@?',
+                mask            : '@?',
                 style           : '@?',
                 layoutCss       : '@?' //default col-md-6
             },
