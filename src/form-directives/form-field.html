@@ -35,7 +35,7 @@
     </div>
 
     <div ng-if="layout !== 'stacked' && layout !== 'horizontal'" ng-form="{{field}}"
-         ng-class="{ 'has-error': showError({{field}}) }">
+         ng-class="{ 'has-error': showError({{field}}) }" class="grid-control {{::layoutCss}}">
 
         <ng-transclude></ng-transclude>
         <div ng-if="showDefault"><form-input></form-input></div>

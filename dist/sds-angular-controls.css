@@ -17,6 +17,7 @@
 }
 .datepicker.timepicker .input-group {
   width: 40%;
+  min-width: 140px;
   float: left;
   margin-top: 20px;
   margin-right: 6px;
@@ -105,6 +106,10 @@ input.datepicker + ul {
   width: 300px;
   display: inline-block;
   margin-left: 5px;
+  vertical-align: top;
+}
+.btn-toolbar > db-transclude > div {
+  display: inline-block;
   vertical-align: top;
 }
 .btn-toolbar p {
