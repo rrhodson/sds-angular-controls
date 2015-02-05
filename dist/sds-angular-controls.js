@@ -1,7 +1,7 @@
 /*! 
  * sds-angular-controls
  * Angular Directives used with sds-angular generator
- * @version 0.3.12 
+ * @version 0.3.15 
  * 
  * Copyright (c) 2015 Steve Gentile, David Benson 
  * @link https://github.com/SMARTDATASYSTEMSLLC/sds-angular-controls 
@@ -281,6 +281,23 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                     $timeout(input.focus);
                 }
 
+                scope.$watch("container.isReadonly", function(newVal){
+                    if(newVal) {
+                        if (scope.container.record && scope.container.record[scope.container.field]) {
+
+                            var value = scope.items[scope.container.record[scope.container.field]];
+                            //if using itemKey/itemValue -we need to find it in the array vs. hash:
+                            if(scope.itemValue && scope.itemKey){
+                                var arrayItem = _.find(scope.items, function(item){
+                                    return item[scope.itemKey] === scope.container.record[scope.container.field];
+                                });
+                                value = arrayItem[scope.itemValue];
+                            }
+                            scope.readOnlyModel = value;
+                        }
+                    }
+                });
+
                 var options = {
                     valueField: scope.itemKey,
                     labelField: scope.itemValue,
@@ -491,7 +508,6 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                 //include a default form-input if no transclude included
                 $scope.showDefault = false;
                 $timeout(function(){
-                    console.log(element.find('ng-transclude *'));
                     if(element.find('ng-transclude *').length === 0){
                         $scope.showDefault = true;
                     }
@@ -632,6 +648,23 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                 if (container.$scope.isAutofocus){
                     $timeout(input.focus);
                 }
+
+                scope.$watch("container.isReadonly", function(newVal){
+                    if(newVal) {
+                        if (scope.container.record && scope.container.record[scope.container.field]) {
+
+                            var value = scope.items[scope.container.record[scope.container.field]];
+                            //if using itemKey/itemValue -we need to find it in the array vs. hash:
+                            if(scope.itemValue && scope.itemKey){
+                                var arrayItem = _.find(scope.items, function(item){
+                                    return item[scope.itemKey] === scope.container.record[scope.container.field];
+                                });
+                                value = arrayItem[scope.itemValue];
+                            }
+                            scope.readOnlyModel = value;
+                        }
+                    }
+                });
 
                 var options = {
                     plugins: ['remove_button'],
@@ -1517,7 +1550,7 @@ angular.module('sds-angular-controls').run(['$templateCache', function($template
   'use strict';
 
   $templateCache.put('sds-angular-controls/form-directives/form-autocomplete.html',
-    "<div class=\"{{::container.layout === 'horizontal' ? layoutCss : '' }}\"> <select ng-if=\"!container.isReadonly\" ng-readonly=\"container.isReadonly\" ng-required=\"container.isRequired\" name=\"{{::container.field}}\" selectize=\"options\" options=\"items\" class=\"{{::container.layout !== 'horizontal' ? layoutCss : ''}}\" ng-model=\"container.record[container.field]\"></select> <!-- optionValue as optionLabel for arrayItem in array --> <input ng-if=\"container.isReadonly\" style=\"{{::style}}\" readonly type=\"text\" class=\"form-control {{::container.layout !== 'horizontal' ? layoutCss : ''}}\" ng-model=\"container.record[container.field]\"> </div>"
+    "<div class=\"{{::container.layout === 'horizontal' ? layoutCss : '' }}\"> <select ng-if=\"!container.isReadonly\" ng-readonly=\"container.isReadonly\" ng-required=\"container.isRequired\" name=\"{{::container.field}}\" selectize=\"options\" options=\"items\" class=\"{{::container.layout !== 'horizontal' ? layoutCss : ''}}\" ng-model=\"container.record[container.field]\"></select> <!-- optionValue as optionLabel for arrayItem in array --> <input ng-if=\"container.isReadonly\" style=\"{{::style}}\" readonly type=\"text\" class=\"form-control {{::container.layout !== 'horizontal' ? layoutCss : ''}}\" ng-model=\"readOnlyModel\"> </div>"
   );
 
 
@@ -1547,7 +1580,7 @@ angular.module('sds-angular-controls').run(['$templateCache', function($template
 
 
   $templateCache.put('sds-angular-controls/form-directives/form-multi-select.html',
-    "<div class=\"{{::container.layout === 'horizontal' ? layoutCss : '' }}\"> <input ng-if=\"!container.isReadonly\" ng-readonly=\"container.isReadonly\" ng-required=\"container.isRequired\" name=\"{{::container.field}}\" selectize=\"options\" options=\"items\" class=\"{{::container.layout !== 'horizontal' ? layoutCss : ''}}\" ng-model=\"container.record[container.field]\"> <!-- optionValue as optionLabel for arrayItem in array --> <input ng-if=\"container.isReadonly\" style=\"{{::style}}\" readonly type=\"text\" class=\"form-control {{::container.layout !== 'horizontal' ? layoutCss : ''}}\" ng-model=\"container.record[container.field]\"> </div>"
+    "<div class=\"{{::container.layout === 'horizontal' ? layoutCss : '' }}\"> <input ng-if=\"!container.isReadonly\" ng-readonly=\"container.isReadonly\" ng-required=\"container.isRequired\" name=\"{{::container.field}}\" selectize=\"options\" options=\"items\" class=\"{{::container.layout !== 'horizontal' ? layoutCss : ''}}\" ng-model=\"container.record[container.field]\"> <!-- optionValue as optionLabel for arrayItem in array --> <input ng-if=\"container.isReadonly\" style=\"{{::style}}\" readonly type=\"text\" class=\"form-control {{::container.layout !== 'horizontal' ? layoutCss : ''}}\" ng-model=\"readOnlyModel\"> </div>"
   );
 
 

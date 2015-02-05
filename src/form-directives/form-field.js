@@ -36,7 +36,6 @@
                 //include a default form-input if no transclude included
                 $scope.showDefault = false;
                 $timeout(function(){
-                    console.log(element.find('ng-transclude *'));
                     if(element.find('ng-transclude *').length === 0){
                         $scope.showDefault = true;
                     }
