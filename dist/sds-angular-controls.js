@@ -1,7 +1,7 @@
 /*! 
  * sds-angular-controls
  * Angular Directives used with sds-angular generator
- * @version 0.3.17 
+ * @version 0.3.18 
  * 
  * Copyright (c) 2015 Steve Gentile, David Benson 
  * @link https://github.com/SMARTDATASYSTEMSLLC/sds-angular-controls 
@@ -1092,6 +1092,10 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                     return str.charAt(0).toUpperCase() + str.slice(1);
                 }
 
+                function isNumeric (obj){
+                   return (obj - parseFloat( obj ) + 1) >= 0;
+                }
+
                 function getData(filter, sortKey, sortAsc, currentPage, pageSize, cols){
                     var query = {
                         page: currentPage,
@@ -1109,11 +1113,14 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                     _.extend(query, scope.postParams);
 
                     $rootScope.$broadcast('db-api:start');
+                    dbGrid.setWaiting(true);
                     return $http.post(scope.api, query).then(function (response) {
                         $rootScope.$broadcast('db-api:complete');
                         dbGrid.setTotal(response.data.total);
+                        dbGrid.setWaiting(false);
                         return response.data.tableData;
                     }, function (){
+                        dbGrid.setWaiting(false);
                         $rootScope.$broadcast('db-api:complete');
                     });
                 }
@@ -1136,7 +1143,7 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                                     n.slice(1,1);
                                     n[1] *= -1;
                                 }
-                                if (_.isNumber(n[0]) && _.isNumber(n[1])) {
+                                if (isNumeric(n[0]) && isNumeric(n[1])) {
                                     r.push({
                                         fieldType: 'decimal',
                                         fieldOperator: 'gte',
@@ -1158,18 +1165,18 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                                     r.push({
                                         fieldType: 'date',
                                         fieldOperator: 'gte',
-                                        fieldValue: n[0],
+                                        fieldValue: n[1],
                                         field: capitalize(item.key)
                                     });
                                     r.push({
                                         fieldType: 'date',
                                         fieldOperator: 'lte',
-                                        fieldValue: n[1],
+                                        fieldValue: n[3],
                                         field: capitalize(item.key)
                                     });
                                 }
                             }else if (item.key && item.filter && item.type === 'number'){
-                                if (_.isNumber(item.filter)) {
+                                if (isNumeric(item.filter)) {
                                     r.push({
                                         fieldType: 'decimal',
                                         fieldOperator: 'eq',
@@ -1201,7 +1208,7 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                         result.logic = 'or';
                         result.filters = _.reduce(cols, function (r, item){
                             if (item.key && item.sortable && item.type === 'number'){
-                                if (_.isNumber(filter)) {
+                                if (isNumeric(filter)) {
                                     r.push({
                                         fieldType: 'decimal',
                                         fieldOperator: 'eq',
@@ -1413,7 +1420,8 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                     toggleSort: toggleSort,
                     clearFilters: clearFilters,
                     onEnter: onEnter,
-                    refresh: _.debounce(refresh, 250)
+                    refresh: _.debounce(refresh, 250),
+                    waiting: false
                 };
                 $scope.$grid = {
                     refresh: _.debounce(function(){
@@ -1421,7 +1429,7 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                         $scope._model.currentPage = 1;
                         $scope._model.filteredItems = null;
                         $timeout(refresh);
-                    }, 250),
+                    }, 500),
                     items: function (){ return $scope._model.filteredItems; }
                 };
 
@@ -1517,6 +1525,10 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
 
                 this.setTotal = function (total){
                     $scope._model.total = total;
+                };
+
+                this.setWaiting = function (waiting){
+                    $scope._model.waiting = waiting;
                 };
 
                 this.refresh = function (total){
@@ -1621,7 +1633,7 @@ angular.module('sds-angular-controls').run(['$templateCache', function($template
     "                         'fa-sort'     : _model.sort !== $index,\n" +
     "                         'fa-sort-down': _model.sort === $index &&  _model.sortAsc,\n" +
     "                         'fa-sort-up'  : _model.sort === $index && !_model.sortAsc\n" +
-    "                         }\"></i> </a> <span ng-if=\"::!_col.sortable\"> {{::_col.label || (_col.key | labelCase)}} </span>    <tbody> <tr> <td ng-repeat=\"_col in _model.cols\" db-bind-cell>   </table> <div ng-if=\"_model.filteredItems && _model.filteredItems.length === 0 && _model.label\" class=\"db-summary\"> No {{_model.label}}. </div> <pagination ng-if=\"_model.total > _model.pageSize\" total-items=\"_model.total\" items-per-page=\"_model.pageSize\" max-size=\"10\" rotate=\"false\" ng-model=\"_model.currentPage\"></pagination> </div>"
+    "                         }\"></i> </a> <span ng-if=\"::!_col.sortable\"> {{::_col.label || (_col.key | labelCase)}} </span>    <tbody ng-show=\"!_model.waiting\"> <tr> <td ng-repeat=\"_col in _model.cols\" db-bind-cell>   </table> <div ng-if=\"_model.filteredItems && _model.filteredItems.length === 0 && _model.label && !_model.waiting\" class=\"db-summary\"> No {{_model.label}}. </div> <pagination ng-if=\"_model.total > _model.pageSize && !_model.waiting\" total-items=\"_model.total\" items-per-page=\"_model.pageSize\" max-size=\"10\" rotate=\"false\" ng-model=\"_model.currentPage\"></pagination> <div ng-show=\"_model.waiting\"> <i class=\"fa fa-circle-o-notch fa-spin\"></i> Please Wait... </div> </div>"
   );
 
 }]);

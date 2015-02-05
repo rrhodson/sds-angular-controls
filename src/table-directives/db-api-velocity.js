@@ -17,6 +17,10 @@
                     return str.charAt(0).toUpperCase() + str.slice(1);
                 }
 
+                function isNumeric (obj){
+                   return (obj - parseFloat( obj ) + 1) >= 0;
+                }
+
                 function getData(filter, sortKey, sortAsc, currentPage, pageSize, cols){
                     var query = {
                         page: currentPage,
@@ -34,11 +38,14 @@
                     _.extend(query, scope.postParams);
 
                     $rootScope.$broadcast('db-api:start');
+                    dbGrid.setWaiting(true);
                     return $http.post(scope.api, query).then(function (response) {
                         $rootScope.$broadcast('db-api:complete');
                         dbGrid.setTotal(response.data.total);
+                        dbGrid.setWaiting(false);
                         return response.data.tableData;
                     }, function (){
+                        dbGrid.setWaiting(false);
                         $rootScope.$broadcast('db-api:complete');
                     });
                 }
@@ -61,7 +68,7 @@
                                     n.slice(1,1);
                                     n[1] *= -1;
                                 }
-                                if (_.isNumber(n[0]) && _.isNumber(n[1])) {
+                                if (isNumeric(n[0]) && isNumeric(n[1])) {
                                     r.push({
                                         fieldType: 'decimal',
                                         fieldOperator: 'gte',
@@ -83,18 +90,18 @@
                                     r.push({
                                         fieldType: 'date',
                                         fieldOperator: 'gte',
-                                        fieldValue: n[0],
+                                        fieldValue: n[1],
                                         field: capitalize(item.key)
                                     });
                                     r.push({
                                         fieldType: 'date',
                                         fieldOperator: 'lte',
-                                        fieldValue: n[1],
+                                        fieldValue: n[3],
                                         field: capitalize(item.key)
                                     });
                                 }
                             }else if (item.key && item.filter && item.type === 'number'){
-                                if (_.isNumber(item.filter)) {
+                                if (isNumeric(item.filter)) {
                                     r.push({
                                         fieldType: 'decimal',
                                         fieldOperator: 'eq',
@@ -126,7 +133,7 @@
                         result.logic = 'or';
                         result.filters = _.reduce(cols, function (r, item){
                             if (item.key && item.sortable && item.type === 'number'){
-                                if (_.isNumber(filter)) {
+                                if (isNumeric(filter)) {
                                     r.push({
                                         fieldType: 'decimal',
                                         fieldOperator: 'eq',

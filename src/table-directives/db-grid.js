@@ -54,7 +54,8 @@
                     toggleSort: toggleSort,
                     clearFilters: clearFilters,
                     onEnter: onEnter,
-                    refresh: _.debounce(refresh, 250)
+                    refresh: _.debounce(refresh, 250),
+                    waiting: false
                 };
                 $scope.$grid = {
                     refresh: _.debounce(function(){
@@ -62,7 +63,7 @@
                         $scope._model.currentPage = 1;
                         $scope._model.filteredItems = null;
                         $timeout(refresh);
-                    }, 250),
+                    }, 500),
                     items: function (){ return $scope._model.filteredItems; }
                 };
 
@@ -158,6 +159,10 @@
 
                 this.setTotal = function (total){
                     $scope._model.total = total;
+                };
+
+                this.setWaiting = function (waiting){
+                    $scope._model.waiting = waiting;
                 };
 
                 this.refresh = function (total){
