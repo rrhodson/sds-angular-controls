@@ -42,7 +42,6 @@
                 }, 0);
                 //end include
 
-
                 if(!$scope.label){
                     $scope.label = $filter("labelCase")($scope.field);
                 }

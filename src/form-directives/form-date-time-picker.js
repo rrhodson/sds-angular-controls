@@ -49,7 +49,7 @@
                 scope.$watch("container.isReadonly", function(newVal){
                     if(newVal) {
                         var date = moment(scope.container.record[scope.container.field]);
-                        scope.readOnlyModel = date.format(scope.dateFormat) + date.format(' h:mm a');
+                        scope.readOnlyModel = date.format(scope.dateFormat.toUpperCase()) + date.format(' h:mm a');
                     }
                 });
 

@@ -1,7 +1,7 @@
 /*! 
  * sds-angular-controls
  * Angular Directives used with sds-angular generator
- * @version 0.3.11 
+ * @version 0.3.12 
  * 
  * Copyright (c) 2015 Steve Gentile, David Benson 
  * @link https://github.com/SMARTDATASYSTEMSLLC/sds-angular-controls 
@@ -358,7 +358,7 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
 
                 scope.$watch("container.isReadonly", function(newVal){
                     if(newVal) {
-                        scope.readOnlyModel = moment(scope.container.record[scope.container.field]).format(scope.dateFormat);
+                        scope.readOnlyModel = moment(scope.container.record[scope.container.field]).format(scope.dateFormat.toUpperCase());
                     }
                 });
 
@@ -438,7 +438,7 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                 scope.$watch("container.isReadonly", function(newVal){
                     if(newVal) {
                         var date = moment(scope.container.record[scope.container.field]);
-                        scope.readOnlyModel = date.format(scope.dateFormat) + date.format(' h:mm a');
+                        scope.readOnlyModel = date.format(scope.dateFormat.toUpperCase()) + date.format(' h:mm a');
                     }
                 });
 
@@ -496,7 +496,6 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                     }
                 }, 0);
                 //end include
-
 
                 if(!$scope.label){
                     $scope.label = $filter("labelCase")($scope.field);
