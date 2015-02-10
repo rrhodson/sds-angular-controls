@@ -5,8 +5,8 @@
                placeholder="{{placeholder || container.label}}"
                ng-model="container.record[container.field]"
                ng-required="::container.isRequired"
-               min-date="::min"
-               max-date="::max"
+               min-date="min"
+               max-date="max"
                datepicker-popup="{{::dateFormat}}"
                is-open="calendar.opened">
         <span class="input-group-btn">
