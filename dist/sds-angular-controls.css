@@ -79,15 +79,6 @@ input.datepicker + ul {
 .inline-control .control-label {
   margin-top: 5px;
 }
-.feedback-link {
-  font-size: 20px;
-  pointer-events: auto;
-  font-weight: normal;
-}
-.feedback-link:hover {
-  text-decoration: none;
-  font-weight: bold;
-}
 @media (max-width: 992px) {
   .popover.validation {
     position: static;
@@ -138,4 +129,13 @@ input.datepicker + ul {
   margin-left: -10px;
   border-radius: 0;
   box-shadow: inset 0px -1px 1px #d7d7d7 !important;
+}
+.form-control-feedback.feedback-link {
+  font-size: 20px;
+  pointer-events: auto;
+  font-weight: normal;
+}
+.form-control-feedback.feedback-link:hover {
+  text-decoration: none;
+  font-weight: bold;
 }

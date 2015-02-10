@@ -37,10 +37,10 @@
 
                     _.extend(query, scope.postParams);
 
-                    $rootScope.$broadcast('db-api:start');
+                    $rootScope.$broadcast('db-api:start', query);
                     dbGrid.setWaiting(true);
                     return $http.post(scope.api, query).then(function (response) {
-                        $rootScope.$broadcast('db-api:complete');
+                        $rootScope.$broadcast('db-api:complete', response.data);
                         dbGrid.setTotal(response.data.total);
                         dbGrid.setWaiting(false);
                         return response.data.tableData;
@@ -58,7 +58,28 @@
                         var n;
                         result.logic = 'and';
                         result.filters = _.reduce(cols, function (r, item){
-                            if (item.key && item.filter && item.type === 'number' && item.filter.indexOf('-') > 0){
+                            if (item.key && item.filter && item.type === 'number' && item.filter[0] === '-'){
+                                n = item.filter.slice(1);
+                                if (isNumeric(n)) {
+                                    r.push({
+                                        fieldType: 'decimal',
+                                        fieldOperator: 'lt',
+                                        fieldValue: parseFloat(n),
+                                        field: capitalize(item.key)
+                                    });
+                                }
+
+                            }else if (item.key && item.filter && item.type === 'date' && item.filter[0] === '-'){
+                                n = item.filter.slice(1);
+                                if (moment(n).isValid()) {
+                                    r.push({
+                                        fieldType: 'date',
+                                        fieldOperator: 'lt',
+                                        fieldValue: n,
+                                        field: capitalize(item.key)
+                                    });
+                                }
+                            }else if (item.key && item.filter && item.type === 'number' && item.filter.indexOf('-') > 0){
                                 n = item.filter.split('-');
                                 if(!n[0] && n[1]){
                                     n.slice(0,1);

@@ -7,7 +7,7 @@
             <div class="form-group has-feedback">
                 <input class="form-control" type="text" ng-model="_model.filterText" ng-keyup="$grid.refresh()"
                        placeholder="Filter {{_model.label || 'items'}}" on-enter="_model.onEnter()" />
-                <a href="" ng-click="_model.filterText = ''" class="form-control-feedback feedback-link">&times;</a>
+                <a href="" ng-click="_model.filterText = ''; $grid.refresh()" class="form-control-feedback feedback-link">&times;</a>
             </div>
         </div>
 

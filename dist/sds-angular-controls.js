@@ -805,14 +805,22 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                     return obj.orderedKeys || Object.keys(obj);
                 };
 
+                function getChild (obj, key){
+                    var arr = key.split(".");
+                    while(arr.length && (obj = obj[arr.shift()])); // jshint ignore:line
+                    return obj;
+                }
+
                 function convertToHash(items, itemKey, itemValue){
                     var OrderedDictionary = function (){};
                     OrderedDictionary.prototype.orderedKeys = [];
                     return _.reduce(items, function (result, item) {
-                        result[item[itemKey]] = item[itemValue];
+                        var key = getChild(item, itemKey);
+                        var val = getChild(item, itemValue);
+                        result[key] = val;
 
                         // set the ordered keys value
-                        result.orderedKeys.push(item[itemKey]);
+                        result.orderedKeys.push(key);
                         return result;
                     }, new OrderedDictionary());
                 }
@@ -1112,10 +1120,10 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
 
                     _.extend(query, scope.postParams);
 
-                    $rootScope.$broadcast('db-api:start');
+                    $rootScope.$broadcast('db-api:start', query);
                     dbGrid.setWaiting(true);
                     return $http.post(scope.api, query).then(function (response) {
-                        $rootScope.$broadcast('db-api:complete');
+                        $rootScope.$broadcast('db-api:complete', response.data);
                         dbGrid.setTotal(response.data.total);
                         dbGrid.setWaiting(false);
                         return response.data.tableData;
@@ -1133,7 +1141,28 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                         var n;
                         result.logic = 'and';
                         result.filters = _.reduce(cols, function (r, item){
-                            if (item.key && item.filter && item.type === 'number' && item.filter.indexOf('-') > 0){
+                            if (item.key && item.filter && item.type === 'number' && item.filter[0] === '-'){
+                                n = item.filter.slice(1);
+                                if (isNumeric(n)) {
+                                    r.push({
+                                        fieldType: 'decimal',
+                                        fieldOperator: 'lt',
+                                        fieldValue: parseFloat(n),
+                                        field: capitalize(item.key)
+                                    });
+                                }
+
+                            }else if (item.key && item.filter && item.type === 'date' && item.filter[0] === '-'){
+                                n = item.filter.slice(1);
+                                if (moment(n).isValid()) {
+                                    r.push({
+                                        fieldType: 'date',
+                                        fieldOperator: 'lt',
+                                        fieldValue: n,
+                                        field: capitalize(item.key)
+                                    });
+                                }
+                            }else if (item.key && item.filter && item.type === 'number' && item.filter.indexOf('-') > 0){
                                 n = item.filter.split('-');
                                 if(!n[0] && n[1]){
                                     n.slice(0,1);
@@ -1629,7 +1658,7 @@ angular.module('sds-angular-controls').run(['$templateCache', function($template
 
 
   $templateCache.put('sds-angular-controls/table-directives/db-grid.html',
-    "<div class=\"table-responsive\"> <div class=\"btn-toolbar\"> <a ng-if=\"_model.showAdvancedFilter\" href=\"\" class=\"btn btn-default\" ng-click=\"_model.clearFilters()\">Clear All Filters <span class=\"big-x\">&times;</span></a> <div ng-if=\"!_model.showAdvancedFilter && _model.filterType !== 'none'\" class=\"toolbar-input\"> <div class=\"form-group has-feedback\"> <input class=\"form-control\" type=\"text\" ng-model=\"_model.filterText\" ng-keyup=\"$grid.refresh()\" placeholder=\"Filter {{_model.label || 'items'}}\" on-enter=\"_model.onEnter()\"> <a href=\"\" ng-click=\"_model.filterText = ''\" class=\"form-control-feedback feedback-link\">&times;</a> </div> </div> <a href=\"\" ng-if=\"_model.filterType === 'advanced'\" class=\"btn btn-default\" ng-class=\"{'btn-primary': _model.showAdvancedFilter}\" ng-click=\"_model.showAdvancedFilter = !_model.showAdvancedFilter\">{{_model.showAdvancedFilter ? 'Simple' : 'Advanced'}} Filtering</a> <db-transclude></db-transclude> <p ng-if=\"_model.total && _model.label\"><i>{{_model.total}} {{_model.label}}</i></p> </div> <table class=\"table db-grid table-hover {{_model.layoutCss}}\"> <thead> <tr> <th ng-repeat=\"_col in _model.cols\" ng-style=\"{width: _col.width}\"> <div ng-if=\"_model.showAdvancedFilter && _col.sortable\"> <input type=\"text\" class=\"form-control filter-input\" on-enter=\"_model.onEnter()\" ng-keyup=\"$grid.refresh()\" ng-model=\"_col.filter\" placeholder=\"Filter {{::_col.label || _col.key}}\" tooltip=\"{{_col.type ? 'Use a dash (-) to specify a range' : ''}}\" tooltip-trigger=\"focus\" tooltip-placement=\"top\"> </div> <a href=\"\" ng-if=\"::_col.sortable\" ng-click=\"_model.toggleSort($index)\">{{::_col.label || (_col.key | labelCase) }}&nbsp;<i class=\"fa\" style=\"display: inline\" ng-class=\"{\n" +
+    "<div class=\"table-responsive\"> <div class=\"btn-toolbar\"> <a ng-if=\"_model.showAdvancedFilter\" href=\"\" class=\"btn btn-default\" ng-click=\"_model.clearFilters()\">Clear All Filters <span class=\"big-x\">&times;</span></a> <div ng-if=\"!_model.showAdvancedFilter && _model.filterType !== 'none'\" class=\"toolbar-input\"> <div class=\"form-group has-feedback\"> <input class=\"form-control\" type=\"text\" ng-model=\"_model.filterText\" ng-keyup=\"$grid.refresh()\" placeholder=\"Filter {{_model.label || 'items'}}\" on-enter=\"_model.onEnter()\"> <a href=\"\" ng-click=\"_model.filterText = ''; $grid.refresh()\" class=\"form-control-feedback feedback-link\">&times;</a> </div> </div> <a href=\"\" ng-if=\"_model.filterType === 'advanced'\" class=\"btn btn-default\" ng-class=\"{'btn-primary': _model.showAdvancedFilter}\" ng-click=\"_model.showAdvancedFilter = !_model.showAdvancedFilter\">{{_model.showAdvancedFilter ? 'Simple' : 'Advanced'}} Filtering</a> <db-transclude></db-transclude> <p ng-if=\"_model.total && _model.label\"><i>{{_model.total}} {{_model.label}}</i></p> </div> <table class=\"table db-grid table-hover {{_model.layoutCss}}\"> <thead> <tr> <th ng-repeat=\"_col in _model.cols\" ng-style=\"{width: _col.width}\"> <div ng-if=\"_model.showAdvancedFilter && _col.sortable\"> <input type=\"text\" class=\"form-control filter-input\" on-enter=\"_model.onEnter()\" ng-keyup=\"$grid.refresh()\" ng-model=\"_col.filter\" placeholder=\"Filter {{::_col.label || _col.key}}\" tooltip=\"{{_col.type ? 'Use a dash (-) to specify a range' : ''}}\" tooltip-trigger=\"focus\" tooltip-placement=\"top\"> </div> <a href=\"\" ng-if=\"::_col.sortable\" ng-click=\"_model.toggleSort($index)\">{{::_col.label || (_col.key | labelCase) }}&nbsp;<i class=\"fa\" style=\"display: inline\" ng-class=\"{\n" +
     "                         'fa-sort'     : _model.sort !== $index,\n" +
     "                         'fa-sort-down': _model.sort === $index &&  _model.sortAsc,\n" +
     "                         'fa-sort-up'  : _model.sort === $index && !_model.sortAsc\n" +

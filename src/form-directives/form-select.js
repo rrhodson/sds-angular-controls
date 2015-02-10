@@ -58,14 +58,22 @@
                     return obj.orderedKeys || Object.keys(obj);
                 };
 
+                function getChild (obj, key){
+                    var arr = key.split(".");
+                    while(arr.length && (obj = obj[arr.shift()])); // jshint ignore:line
+                    return obj;
+                }
+
                 function convertToHash(items, itemKey, itemValue){
                     var OrderedDictionary = function (){};
                     OrderedDictionary.prototype.orderedKeys = [];
                     return _.reduce(items, function (result, item) {
-                        result[item[itemKey]] = item[itemValue];
+                        var key = getChild(item, itemKey);
+                        var val = getChild(item, itemValue);
+                        result[key] = val;
 
                         // set the ordered keys value
-                        result.orderedKeys.push(item[itemKey]);
+                        result.orderedKeys.push(key);
                         return result;
                     }, new OrderedDictionary());
                 }
