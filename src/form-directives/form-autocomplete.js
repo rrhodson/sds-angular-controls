@@ -59,7 +59,7 @@
                     valueField: scope.itemKey,
                     labelField: scope.itemValue,
                     searchField: [scope.itemValue],
-                    maxOptions: 10
+                    maxOptions: 1200
                 };
 
                 if (scope.allowCustom){
