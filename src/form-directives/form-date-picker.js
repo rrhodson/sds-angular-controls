@@ -50,7 +50,9 @@
 
                 scope.$watch("container.isReadonly", function(newVal){
                     if(newVal) {
-                        scope.readOnlyModel = moment(scope.container.record[scope.container.field]).format(scope.dateFormat.toUpperCase());
+                        if(scope.container.record[scope.container.field]) {
+                            scope.readOnlyModel = moment(scope.container.record[scope.container.field]).format(scope.dateFormat.toUpperCase());
+                        }
                     }
                 });
 
