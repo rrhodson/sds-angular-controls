@@ -53,7 +53,6 @@
                     if (scope.type === "number"){
                         element.find(".inputField").on('keydown', function (e) {
                             var key = e.which || e.keyCode;
-                            console.log(key, e);
 
                             return e.metaKey || e.ctrlKey || (!e.shiftKey &&
                                 // numbers
