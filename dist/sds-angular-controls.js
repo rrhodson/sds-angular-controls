@@ -1,7 +1,7 @@
 /*! 
  * sds-angular-controls
  * Angular Directives used with sds-angular generator
- * @version 0.3.22 
+ * @version 0.3.23 
  * 
  * Copyright (c) 2015 Steve Gentile, David Benson 
  * @link https://github.com/SMARTDATASYSTEMSLLC/sds-angular-controls 
@@ -566,6 +566,8 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                 placeholder     : '@?',
                 rightLabel      : '@?',
                 mask            : '@?',
+                max             : '@?',
+                min             : '@?',
                 style           : '@?',
                 layoutCss       : '@?' //default col-md-6
             },
@@ -586,33 +588,56 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                 if (container.$scope.isAutofocus){
                     $timeout(function (){input.focus(); });
                 }
-                if (attr.min){
-                    container.$scope.min = scope.$eval(attr.min);
-                    input.attr('min', container.$scope.min);
+                if (scope.min){
+                    container.$scope.min = scope.min;
                 }
-                if (attr.max){
-                    container.$scope.max = scope.$eval(attr.max);
-                    input.attr('max', container.$scope.max);
+                if (scope.max){
+                    container.$scope.max = scope.max;
                 }
                 if (attr.pattern){
                     input.attr('pattern', attr.pattern);
                 }
 
+
                 scope.step = attr.step || "any";
                 scope.type = attr.type || "text";
 
-                if(scope.type === "integer"){
-                    var inputField = element.find(".inputField");
-                    $(inputField).on('keyup', function(ev){
-                        inputField.val(inputField.val().replace(/[^0-9]/g,''));
-                    });
-                }
+                $timeout(function (){
+                    var isIntegerStep = scope.step.match(/^\d+$/);
+                    if (scope.type === "number"){
+                        element.find(".inputField").on('keydown', function (e) {
+                            var key = e.which || e.keyCode;
+                            console.log(key, e);
+
+                            return e.metaKey || e.ctrlKey || (!e.shiftKey &&
+                                // numbers
+                            key >= 48 && key <= 57 ||
+                                // Numeric keypad
+                            key >= 96 && key <= 105 ||
+                                // Minus
+                            key == 109 || key == 189 ||
+                                // decimal points
+                            (!isIntegerStep && key == 190 || key == 110) ||
+                                // Backspace and Tab and Enter
+                            key == 8 || key == 9 || key == 13 ||
+                                // Home and End
+                            key == 35 || key == 36 ||
+                                // left and right arrows
+                            key == 37 || key == 39 ||
+                                // Del and Ins
+                            key == 46 || key == 45);
+
+
+                        });
+                    }
+                });
             }
         }
     }
     formInput.$inject = ["$timeout"];
 
-    angular.module('sds-angular-controls').directive('formInput', formInput);
+    angular.module('sds-angular-controls').directive('formInput', formInput)
+
 })();
 
 (function () {
@@ -709,6 +734,8 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                 placeholder     : '@?',
                 rightLabel      : '@?',
                 mask            : '@?',
+                max             : '@?',
+                min             : '@?',
                 style           : '@?',
                 layoutCss       : '@?' //default col-md-6
             },
@@ -726,22 +753,45 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                         scope.layoutCss = scope.layoutCss || "";
                 }
 
-                if (container.$scope.min){
-                    input.attr('min', container.$scope.min);
+                if (scope.min){
+                    container.$scope.min = scope.min;
                 }
-                if (container.$scope.max){
-                    input.attr('max', container.$scope.max);
+                if (scope.max){
+                    container.$scope.max = scope.max;
                 }
                 if (container.$scope.isAutofocus){
                     $timeout(function (){input.focus(); });
                 }
 
-                if(scope.type === "integer"){
-                    var inputField = element.find(".inputField");
-                    $(inputField).on('keyup', function(ev){
-                        inputField.val(inputField.val().replace(/[^0-9]/g,''));
-                    });
-                }
+                $timeout(function (){
+                    var isIntegerStep = false;
+                    if (scope.type === "number"){
+                        element.find(".inputField").on('keydown', function (e) {
+                            var key = e.which || e.keyCode;
+                            console.log(key, e);
+
+                            return e.metaKey || e.ctrlKey || (!e.shiftKey &&
+                                    // numbers
+                                key >= 48 && key <= 57 ||
+                                    // Numeric keypad
+                                key >= 96 && key <= 105 ||
+                                    // Minus
+                                key == 109 || key == 189 ||
+                                    // decimal points
+                                (!isIntegerStep && key == 190 || key == 110) ||
+                                    // Backspace and Tab and Enter
+                                key == 8 || key == 9 || key == 13 ||
+                                    // Home and End
+                                key == 35 || key == 36 ||
+                                    // left and right arrows
+                                key == 37 || key == 39 ||
+                                    // Del and Ins
+                                key == 46 || key == 45);
+
+
+                        });
+                    }
+                });
             }
         }
     }
@@ -1620,7 +1670,7 @@ angular.module('sds-angular-controls').run(['$templateCache', function($template
 
 
   $templateCache.put('sds-angular-controls/form-directives/form-input.html',
-    "<div class=\"{{::container.layout === 'horizontal' ? layoutCss : '' }}\"> <input class=\"form-control inputField {{::container.layout !== 'horizontal' ? layoutCss : ''}}\" ng-model=\"container.record[container.field]\" name=\"{{::container.field}}\" type=\"{{::type}}\" ng-required=\"container.isRequired\" ng-disabled=\"container.isReadonly\" placeholder=\"{{::placeholder || container.label}}\" step=\"{{::step}}\" style=\"{{::style}}\" mask-input=\"{{mask}}\"> <div ng-if=\"::(rightLabel && rightLabel.length > 0)\" class=\"rightLabel\">{{::rightLabel}}</div> </div>"
+    "<div class=\"{{::container.layout === 'horizontal' ? layoutCss : '' }}\"> <input class=\"form-control inputField {{::container.layout !== 'horizontal' ? layoutCss : ''}}\" ng-model=\"container.record[container.field]\" name=\"{{::container.field}}\" type=\"{{::type}}\" ng-if=\"type !== 'number'\" ng-required=\"container.isRequired\" ng-disabled=\"container.isReadonly\" placeholder=\"{{::placeholder || container.label}}\" style=\"{{::style}}\" mask-input=\"{{mask}}\"> <input class=\"form-control inputField {{::container.layout !== 'horizontal' ? layoutCss : ''}}\" ng-model=\"container.record[container.field]\" name=\"{{::container.field}}\" type=\"number\" ng-if=\"type === 'number'\" ng-required=\"container.isRequired\" ng-disabled=\"container.isReadonly\" placeholder=\"{{::placeholder || container.label}}\" min=\"{{::min}}\" max=\"{{::max}}\" step=\"{{::step}}\" style=\"{{::style}}\" mask-input=\"{{mask}}\"> <div ng-if=\"::(rightLabel && rightLabel.length > 0)\" class=\"rightLabel\">{{::rightLabel}}</div> </div>"
   );
 
 

@@ -12,6 +12,8 @@
                 placeholder     : '@?',
                 rightLabel      : '@?',
                 mask            : '@?',
+                max             : '@?',
+                min             : '@?',
                 style           : '@?',
                 layoutCss       : '@?' //default col-md-6
             },
@@ -29,22 +31,45 @@
                         scope.layoutCss = scope.layoutCss || "";
                 }
 
-                if (container.$scope.min){
-                    input.attr('min', container.$scope.min);
+                if (scope.min){
+                    container.$scope.min = scope.min;
                 }
-                if (container.$scope.max){
-                    input.attr('max', container.$scope.max);
+                if (scope.max){
+                    container.$scope.max = scope.max;
                 }
                 if (container.$scope.isAutofocus){
                     $timeout(function (){input.focus(); });
                 }
 
-                if(scope.type === "integer"){
-                    var inputField = element.find(".inputField");
-                    $(inputField).on('keyup', function(ev){
-                        inputField.val(inputField.val().replace(/[^0-9]/g,''));
-                    });
-                }
+                $timeout(function (){
+                    var isIntegerStep = false;
+                    if (scope.type === "number"){
+                        element.find(".inputField").on('keydown', function (e) {
+                            var key = e.which || e.keyCode;
+                            console.log(key, e);
+
+                            return e.metaKey || e.ctrlKey || (!e.shiftKey &&
+                                    // numbers
+                                key >= 48 && key <= 57 ||
+                                    // Numeric keypad
+                                key >= 96 && key <= 105 ||
+                                    // Minus
+                                key == 109 || key == 189 ||
+                                    // decimal points
+                                (!isIntegerStep && key == 190 || key == 110) ||
+                                    // Backspace and Tab and Enter
+                                key == 8 || key == 9 || key == 13 ||
+                                    // Home and End
+                                key == 35 || key == 36 ||
+                                    // left and right arrows
+                                key == 37 || key == 39 ||
+                                    // Del and Ins
+                                key == 46 || key == 45);
+
+
+                        });
+                    }
+                });
             }
         }
     }
