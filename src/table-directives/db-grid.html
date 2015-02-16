@@ -22,7 +22,7 @@
     <table class="table db-grid table-hover {{_model.layoutCss}}">
         <thead>
             <tr>
-                <th ng-repeat="_col in _model.cols" ng-style="{width: _col.width}">
+                <th ng-repeat="_col in _model.cols" ng-style="{width: _col.width}" class="{{_col.layoutCss}}">
                     <div ng-if="_model.showAdvancedFilter && _col.sortable">
                         <input type="text" class="form-control filter-input" on-enter="_model.onEnter()"
                                ng-keyup="$grid.refresh()" ng-model="_col.filter" placeholder="Filter {{::_col.label || _col.key}}"
