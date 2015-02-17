@@ -1,7 +1,7 @@
 /*! 
  * sds-angular-controls
  * Angular Directives used with sds-angular generator
- * @version 0.3.24 
+ * @version 0.3.25 
  * 
  * Copyright (c) 2015 Steve Gentile, David Benson 
  * @link https://github.com/SMARTDATASYSTEMSLLC/sds-angular-controls 
@@ -256,6 +256,7 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                 groups          : '=?',
                 itemKey         : '@?',
                 itemValue       : '@?',
+                itemSort        : '@?',
                 itemGroupKey    : '@?',
                 itemGroupValue  : '@?',
                 allowCustom     : '=?',
@@ -301,6 +302,7 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                 var options = {
                     valueField: scope.itemKey,
                     labelField: scope.itemValue,
+                    sortField : scope.itemSort || scope.itemValue,
                     searchField: [scope.itemValue],
                     maxOptions: 1200
                 };

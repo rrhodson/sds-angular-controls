@@ -13,6 +13,7 @@
                 groups          : '=?',
                 itemKey         : '@?',
                 itemValue       : '@?',
+                itemSort        : '@?',
                 itemGroupKey    : '@?',
                 itemGroupValue  : '@?',
                 allowCustom     : '=?',
@@ -58,6 +59,7 @@
                 var options = {
                     valueField: scope.itemKey,
                     labelField: scope.itemValue,
+                    sortField : scope.itemSort || scope.itemValue,
                     searchField: [scope.itemValue],
                     maxOptions: 1200
                 };
