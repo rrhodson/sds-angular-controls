@@ -1,7 +1,7 @@
 /*! 
  * sds-angular-controls
  * Angular Directives used with sds-angular generator
- * @version 0.3.23 
+ * @version 0.3.24 
  * 
  * Copyright (c) 2015 Steve Gentile, David Benson 
  * @link https://github.com/SMARTDATASYSTEMSLLC/sds-angular-controls 
@@ -1187,6 +1187,7 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                 function createFilters (filter, cols){
                     var result = {filters: []};
                     var dateRangeRegex = /^(\s*(\d+[-/]){2}[^-]*)-(\s*(\d+[-/]){2}[^-]*)$/;
+                    var dateRegex = /^(\s*(\d+[-/]){2}[^-]*)$/;
 
                     if (typeof filter === 'object'){
                         var n;
@@ -1205,7 +1206,7 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
 
                             }else if (item.key && item.filter && item.type === 'date' && item.filter[0] === '-'){
                                 n = item.filter.slice(1);
-                                if (moment(n).isValid()) {
+                                if (dateRegex.test(n) && moment(n).isValid()) {
                                     r.push({
                                         fieldType: 'date',
                                         fieldOperator: 'lt',
@@ -1297,7 +1298,7 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                                     });
                                 }
                             }else if (item.key && item.sortable && item.type === 'date'){
-                                if (moment(filter).isValid()) {
+                                if (dateRegex.test(filter) && moment(filter).isValid()) {
                                     r.push({
                                         fieldType: 'date',
                                         fieldOperator: 'eq',

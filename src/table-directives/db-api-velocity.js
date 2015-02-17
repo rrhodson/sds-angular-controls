@@ -53,6 +53,7 @@
                 function createFilters (filter, cols){
                     var result = {filters: []};
                     var dateRangeRegex = /^(\s*(\d+[-/]){2}[^-]*)-(\s*(\d+[-/]){2}[^-]*)$/;
+                    var dateRegex = /^(\s*(\d+[-/]){2}[^-]*)$/;
 
                     if (typeof filter === 'object'){
                         var n;
@@ -71,7 +72,7 @@
 
                             }else if (item.key && item.filter && item.type === 'date' && item.filter[0] === '-'){
                                 n = item.filter.slice(1);
-                                if (moment(n).isValid()) {
+                                if (dateRegex.test(n) && moment(n).isValid()) {
                                     r.push({
                                         fieldType: 'date',
                                         fieldOperator: 'lt',
@@ -163,7 +164,7 @@
                                     });
                                 }
                             }else if (item.key && item.sortable && item.type === 'date'){
-                                if (moment(filter).isValid()) {
+                                if (dateRegex.test(filter) && moment(filter).isValid()) {
                                     r.push({
                                         fieldType: 'date',
                                         fieldOperator: 'eq',
