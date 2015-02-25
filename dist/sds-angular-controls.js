@@ -350,7 +350,7 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
 
 (function () {
     'use strict';
-    function formDatePicker ($timeout) {
+    function formDatePicker ($timeout, $log) {
         return{
             restrict: 'EA',
             require: '^form-field',
@@ -391,28 +391,28 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
 
                 scope.$watch('container.record[container.field]', function (val){
                     if (typeof val === 'string'){
-                        container.$scope.record[container.$scope.field] = moment(container.$scope.record[container.$scope.field]).toDate();
+                        container.$scope.record[container.$scope.field] = moment.utc(container.$scope.record[container.$scope.field]).format(scope.dateFormat.toUpperCase());
                     }
                 });
 
                 scope.$watch("container.isReadonly", function(newVal){
                     if(newVal) {
                         if(scope.container.record[scope.container.field]) {
-                            scope.readOnlyModel = moment(scope.container.record[scope.container.field]).format(scope.dateFormat.toUpperCase());
+                            scope.readOnlyModel = moment.utc(scope.container.record[scope.container.field]).format(scope.dateFormat.toUpperCase());
                         }
                     }
                 });
 
                 if (scope.max) {
-                    container.$scope.max = moment(scope.max).format(scope.dateFormat);
+                    container.$scope.max = moment.utc(scope.max).format(scope.dateFormat.toUpperCase());
                 }
                 if (scope.min) {
-                    container.$scope.min = moment(scope.min).format(scope.dateFormat);
+                    container.$scope.min = moment.utc(scope.min).format(scope.dateFormat.toUpperCase());
                 }
             }
         }
     }
-    formDatePicker.$inject = ["$timeout"];
+    formDatePicker.$inject = ["$timeout", "$log"];
 
     function datepickerPopup (){
         return {
