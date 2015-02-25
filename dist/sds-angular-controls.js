@@ -1,7 +1,7 @@
 /*! 
  * sds-angular-controls
  * Angular Directives used with sds-angular generator
- * @version 0.3.25 
+ * @version 0.3.26 
  * 
  * Copyright (c) 2015 Steve Gentile, David Benson 
  * @link https://github.com/SMARTDATASYSTEMSLLC/sds-angular-controls 
@@ -282,6 +282,16 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                     $timeout(function (){input.focus(); });
                 }
 
+                // hack to force reloading options
+                scope.$watch('items', function (val, old){
+                    if(val && val !== old){
+                        scope.reload = true;
+                        $timeout(function (){
+                           scope.reload = false;
+                        });
+                    }
+                });
+
                 scope.$watch("container.isReadonly", function(newVal){
                     if(newVal) {
                         if (scope.container.record && scope.container.record[scope.container.field]) {
@@ -317,6 +327,16 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                     options.optgroupField = scope.itemGroupKey;
                     options.optgroupValueField = scope.itemGroupKey;
                     options.optgroupLabelField = scope.itemGroupValue;
+
+                    scope.$watch('groups', function (val, old){
+                        if (val !== old){
+                            scope.options.optgroups =  scope.groups;
+                            scope.reload = true;
+                            $timeout(function (){
+                                scope.reload = false;
+                            });
+                        }
+                    });
                 }
 
                 scope.options = options;
@@ -1641,14 +1661,52 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
     dbGrid.$inject = ["$filter", "$timeout", "$q"];
 
     angular.module('sds-angular-controls').directive('dbGrid', dbGrid);
-
 })();
 
+(function () {
+
+    function isolateControl() {
+        return {
+            restrict: 'A',
+            require: ['ngModel', '^?form'],
+            link: function (scope, elm, attrs, ctrls) {
+                // Do a copy of the controller
+                var ctrlCopy = {};
+                angular.copy(ctrls[0], ctrlCopy);
+
+                if (ctrls[1]) {
+                    ctrls[1].$removeControl(ctrls[0]);
+                }
+
+                var isolated = {
+                    $addControl    : angular.noop,
+                    $removeControl : angular.noop,
+                    $setValidity: function (validationToken, isValid, control) {
+                        //ctrlCopy.$setValidity(validationToken, isValid, control);
+                    },
+                    $setDirty: function () {
+                        elm.removeClass('ng-pristine').addClass('ng-dirty');
+                        ctrls[0].$dirty = true;
+                        ctrls[0].$pristine = false;
+                    },
+                    $setPristine: function () {
+                        elm.removeClass('ng-dirty').addClass('ng-pristine');
+                        ctrls[0].$dirty = false;
+                        ctrls[0].$pristine = true;
+                    }
+                };
+                angular.extend(ctrls[0], isolated);
+            }
+        };
+    }
+
+    angular.module('sds-angular-controls').directive('isolateControl', isolateControl);
+})();
 angular.module('sds-angular-controls').run(['$templateCache', function($templateCache) {
   'use strict';
 
   $templateCache.put('sds-angular-controls/form-directives/form-autocomplete.html',
-    "<div class=\"{{::container.layout === 'horizontal' ? layoutCss : '' }}\"> <select ng-if=\"!container.isReadonly\" ng-readonly=\"container.isReadonly\" ng-required=\"container.isRequired\" name=\"{{::container.field}}\" selectize=\"options\" options=\"items\" class=\"{{::container.layout !== 'horizontal' ? layoutCss : ''}}\" ng-model=\"container.record[container.field]\"></select> <!-- optionValue as optionLabel for arrayItem in array --> <input ng-if=\"container.isReadonly\" style=\"{{::style}}\" readonly type=\"text\" class=\"form-control {{::container.layout !== 'horizontal' ? layoutCss : ''}}\" ng-model=\"readOnlyModel\"> </div>"
+    "<div class=\"{{::container.layout === 'horizontal' ? layoutCss : '' }}\"> <select ng-if=\"!container.isReadonly && !reload\" ng-readonly=\"container.isReadonly\" ng-required=\"container.isRequired\" name=\"{{::container.field}}\" selectize=\"options\" options=\"items\" class=\"{{::container.layout !== 'horizontal' ? layoutCss : ''}}\" ng-model=\"container.record[container.field]\"></select> <!-- optionValue as optionLabel for arrayItem in array --> <input ng-if=\"container.isReadonly\" style=\"{{::style}}\" readonly type=\"text\" class=\"form-control {{::container.layout !== 'horizontal' ? layoutCss : ''}}\" ng-model=\"readOnlyModel\"> </div>"
   );
 
 
@@ -1713,11 +1771,11 @@ angular.module('sds-angular-controls').run(['$templateCache', function($template
 
 
   $templateCache.put('sds-angular-controls/table-directives/db-grid.html',
-    "<div class=\"table-responsive\"> <div class=\"btn-toolbar\"> <a ng-if=\"_model.showAdvancedFilter\" href=\"\" class=\"btn btn-default\" ng-click=\"_model.clearFilters()\">Clear All Filters <span class=\"big-x\">&times;</span></a> <div ng-if=\"!_model.showAdvancedFilter && _model.filterType !== 'none'\" class=\"toolbar-input\"> <div class=\"form-group has-feedback\"> <input class=\"form-control\" type=\"text\" ng-model=\"_model.filterText\" ng-keyup=\"$grid.refresh()\" placeholder=\"Filter {{_model.label || 'items'}}\" on-enter=\"_model.onEnter()\"> <a href=\"\" ng-click=\"_model.filterText = ''; $grid.refresh()\" class=\"form-control-feedback feedback-link\">&times;</a> </div> </div> <a href=\"\" ng-if=\"_model.filterType === 'advanced'\" class=\"btn btn-default\" ng-class=\"{'btn-primary': _model.showAdvancedFilter}\" ng-click=\"_model.showAdvancedFilter = !_model.showAdvancedFilter\">{{_model.showAdvancedFilter ? 'Simple' : 'Advanced'}} Filtering</a> <db-transclude></db-transclude> <p ng-if=\"_model.total && _model.label\"><i>{{_model.total}} {{_model.label}}</i></p> </div> <table class=\"table db-grid table-hover {{_model.layoutCss}}\"> <thead> <tr> <th ng-repeat=\"_col in _model.cols\" ng-style=\"{width: _col.width}\" class=\"{{_col.layoutCss}}\"> <div ng-if=\"_model.showAdvancedFilter && _col.sortable\"> <input type=\"text\" class=\"form-control filter-input\" on-enter=\"_model.onEnter()\" ng-keyup=\"$grid.refresh()\" ng-model=\"_col.filter\" placeholder=\"Filter {{::_col.label || _col.key}}\" tooltip=\"{{_col.type ? 'Use a dash (-) to specify a range' : ''}}\" tooltip-trigger=\"focus\" tooltip-placement=\"top\"> </div> <a href=\"\" ng-if=\"::_col.sortable\" ng-click=\"_model.toggleSort($index)\">{{::_col.label || (_col.key | labelCase) }}&nbsp;<i class=\"fa\" style=\"display: inline\" ng-class=\"{\n" +
+    "<div class=\"table-responsive\"> <div class=\"btn-toolbar\"> <a ng-if=\"_model.showAdvancedFilter\" href=\"\" class=\"btn btn-default\" ng-click=\"_model.clearFilters()\">Clear All Filters <span class=\"big-x\">&times;</span></a> <div ng-if=\"!_model.showAdvancedFilter && _model.filterType !== 'none'\" class=\"toolbar-input\"> <div class=\"form-group has-feedback\"> <input class=\"form-control\" type=\"text\" ng-model=\"_model.filterText\" ng-keyup=\"$grid.refresh()\" placeholder=\"Filter {{_model.label || 'items'}}\" on-enter=\"_model.onEnter()\" isolate-control> <a href=\"\" ng-click=\"_model.filterText = ''; $grid.refresh()\" class=\"form-control-feedback feedback-link\">&times;</a> </div> </div> <a href=\"\" ng-if=\"_model.filterType === 'advanced'\" class=\"btn btn-default\" ng-class=\"{'btn-primary': _model.showAdvancedFilter}\" ng-click=\"_model.showAdvancedFilter = !_model.showAdvancedFilter\">{{_model.showAdvancedFilter ? 'Simple' : 'Advanced'}} Filtering</a> <db-transclude></db-transclude> <p ng-if=\"_model.total && _model.label\"><i>{{_model.total}} {{_model.label}}</i></p> </div> <table class=\"table db-grid table-hover {{_model.layoutCss}}\"> <thead> <tr> <th ng-repeat=\"_col in _model.cols\" ng-style=\"{width: _col.width}\" class=\"{{_col.layoutCss}}\"> <div ng-if=\"_model.showAdvancedFilter && _col.sortable\"> <input type=\"text\" class=\"form-control filter-input\" on-enter=\"_model.onEnter()\" ng-keyup=\"$grid.refresh()\" ng-model=\"_col.filter\" placeholder=\"Filter {{::_col.label || _col.key}}\" tooltip=\"{{_col.type ? 'Use a dash (-) to specify a range' : ''}}\" tooltip-trigger=\"focus\" tooltip-placement=\"top\" isolate-control> </div> <a href=\"\" ng-if=\"::_col.sortable\" ng-click=\"_model.toggleSort($index)\">{{::_col.label || (_col.key | labelCase) }}&nbsp;<i class=\"fa\" style=\"display: inline\" ng-class=\"{\n" +
     "                         'fa-sort'     : _model.sort !== $index,\n" +
     "                         'fa-sort-down': _model.sort === $index &&  _model.sortAsc,\n" +
     "                         'fa-sort-up'  : _model.sort === $index && !_model.sortAsc\n" +
-    "                         }\"></i> </a> <span ng-if=\"::!_col.sortable\"> {{::_col.label || (_col.key | labelCase)}} </span>    <tbody ng-show=\"!_model.waiting\"> <tr> <td ng-repeat=\"_col in _model.cols\" db-bind-cell>   </table> <div ng-if=\"_model.filteredItems && _model.filteredItems.length === 0 && _model.label && !_model.waiting\" class=\"db-summary\"> No {{_model.label}}. </div> <pagination ng-if=\"_model.total > _model.pageSize && !_model.waiting\" total-items=\"_model.total\" items-per-page=\"_model.pageSize\" max-size=\"10\" rotate=\"false\" ng-model=\"_model.currentPage\"></pagination> <div ng-show=\"_model.waiting\"> <i class=\"fa fa-circle-o-notch fa-spin\"></i> Please Wait... </div> </div>"
+    "                         }\"></i> </a> <span ng-if=\"::!_col.sortable\"> {{::_col.label || (_col.key | labelCase)}} </span>    <tbody ng-show=\"!_model.waiting\"> <tr> <td ng-repeat=\"_col in _model.cols\" db-bind-cell>   </table> <div ng-if=\"_model.filteredItems && _model.filteredItems.length === 0 && _model.label && !_model.waiting\" class=\"db-summary\"> No {{_model.label}}. </div> <pagination ng-if=\"_model.total > _model.pageSize && !_model.waiting\" total-items=\"_model.total\" items-per-page=\"_model.pageSize\" max-size=\"10\" rotate=\"false\" ng-model=\"_model.currentPage\" isolate-control></pagination> <div ng-show=\"_model.waiting\"> <i class=\"fa fa-circle-o-notch fa-spin\"></i> Please Wait... </div> </div>"
   );
 
 }]);

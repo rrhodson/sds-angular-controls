@@ -39,6 +39,16 @@
                     $timeout(function (){input.focus(); });
                 }
 
+                // hack to force reloading options
+                scope.$watch('items', function (val, old){
+                    if(val && val !== old){
+                        scope.reload = true;
+                        $timeout(function (){
+                           scope.reload = false;
+                        });
+                    }
+                });
+
                 scope.$watch("container.isReadonly", function(newVal){
                     if(newVal) {
                         if (scope.container.record && scope.container.record[scope.container.field]) {
@@ -74,6 +84,16 @@
                     options.optgroupField = scope.itemGroupKey;
                     options.optgroupValueField = scope.itemGroupKey;
                     options.optgroupLabelField = scope.itemGroupValue;
+
+                    scope.$watch('groups', function (val, old){
+                        if (val !== old){
+                            scope.options.optgroups =  scope.groups;
+                            scope.reload = true;
+                            $timeout(function (){
+                                scope.reload = false;
+                            });
+                        }
+                    });
                 }
 
                 scope.options = options;

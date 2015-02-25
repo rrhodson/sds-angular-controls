@@ -6,7 +6,7 @@
         <div ng-if="!_model.showAdvancedFilter && _model.filterType !== 'none'" class="toolbar-input">
             <div class="form-group has-feedback">
                 <input class="form-control" type="text" ng-model="_model.filterText" ng-keyup="$grid.refresh()"
-                       placeholder="Filter {{_model.label || 'items'}}" on-enter="_model.onEnter()" />
+                       placeholder="Filter {{_model.label || 'items'}}" on-enter="_model.onEnter()" isolate-control />
                 <a href="" ng-click="_model.filterText = ''; $grid.refresh()" class="form-control-feedback feedback-link">&times;</a>
             </div>
         </div>
@@ -27,7 +27,7 @@
                         <input type="text" class="form-control filter-input" on-enter="_model.onEnter()"
                                ng-keyup="$grid.refresh()" ng-model="_col.filter" placeholder="Filter {{::_col.label || _col.key}}"
                                tooltip="{{_col.type ? 'Use a dash (-) to specify a range' : ''}}"  tooltip-trigger="focus"
-                               tooltip-placement="top">
+                               tooltip-placement="top" isolate-control />
                     </div>
                     <a href="" ng-if="::_col.sortable"
                        ng-click="_model.toggleSort($index)">{{::_col.label || (_col.key | labelCase)
@@ -52,7 +52,7 @@
     <div ng-if="_model.filteredItems && _model.filteredItems.length === 0 && _model.label && !_model.waiting" class="db-summary">
         No {{_model.label}}.
     </div>
-    <pagination ng-if="_model.total > _model.pageSize && !_model.waiting" total-items="_model.total" items-per-page="_model.pageSize" max-size="10" rotate="false" ng-model="_model.currentPage"></pagination>
+    <pagination ng-if="_model.total > _model.pageSize && !_model.waiting" total-items="_model.total" items-per-page="_model.pageSize" max-size="10" rotate="false" ng-model="_model.currentPage" isolate-control></pagination>
     <div ng-show="_model.waiting">
         <i class="fa fa-circle-o-notch fa-spin"></i> Please Wait...
     </div>

@@ -190,5 +190,4 @@
     }
 
     angular.module('sds-angular-controls').directive('dbGrid', dbGrid);
-
 })();
