@@ -1,6 +1,6 @@
 {
   "name": "sds-angular-controls",
-  "version": "0.3.28",
+  "version": "0.3.29",
   "homepage": "https://github.com/SMARTDATASYSTEMSLLC/sds-angular-controls",
   "authors": [
     "Steve Gentile <steven.gentile@gmail.com>",
@@ -49,8 +49,7 @@
     "jquery.maskedinput": "digitalBush/jquery.maskedinput#>=1.4.0",
     "jquery": "~2",
     "moment": "~2",
-    "selectize": "~0.11",
-    "selectize-ng": "https://github.com/jagged3dge/selectize-ng.git#5b24c3ec13dd96a8f7085e633f608712ce9f35ec"
+    "selectize": "~0.11"
   },
   "resolutions": {
     "angular": "~1.3",

@@ -19,6 +19,10 @@
                     compiled($scope);
                     $element.data('compiled', compiled);
                 }
+
+                if ($scope._col.layoutCss){
+                  $element.addClass($scope._col.layoutCss);
+                }
             }
         }
     }

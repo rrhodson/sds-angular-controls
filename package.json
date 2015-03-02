@@ -1,6 +1,6 @@
 {
   "name": "sds-angular-controls",
-  "version": "0.3.28",
+  "version": "0.3.29",
   "homepage": "https://github.com/SMARTDATASYSTEMSLLC/sds-angular-controls",
   "authors": [
     {
@@ -32,7 +32,7 @@
     "grunt-contrib-nodeunit": "~0.4.1",
     "grunt-contrib-uglify": "~0.5.0",
     "grunt-contrib-watch": "~0.6.1",
-    "grunt-ng-annotate": "^0.8.0",
+    "grunt-ng-annotate": "^0.10.0",
     "pre-git": "^0.1.1"
   },
   "pre-commit": [

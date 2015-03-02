@@ -82,7 +82,10 @@
 
                 function defaultGetItems (filter, sortKey, sortAsc, page, pageSize, cols){
                     if ($scope._model.items) {
-                        var items = orderByFilter(complexFilter($scope._model.items, filter), sortKey, !sortAsc);
+                        var items = complexFilter($scope._model.items, filter);
+                        if (sortKey){
+                            items = orderByFilter(items, sortKey, !sortAsc);
+                        }
                         $scope._model.total = items ? items.length : 0;
                         return $q.when(pageFilter(items, page, pageSize));
                     }else{

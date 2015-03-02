@@ -16,6 +16,7 @@
                 itemSort        : '@?',
                 itemGroupKey    : '@?',
                 itemGroupValue  : '@?',
+                dropdownDirection:'@?',
                 allowCustom     : '=?',
                 style           : '@?',
                 layoutCss       : '@?' //default col-md-6
@@ -39,15 +40,15 @@
                     $timeout(function (){input.focus(); });
                 }
 
-                // hack to force reloading options
-                scope.$watch('items', function (val, old){
-                    if(val && val !== old){
-                        scope.reload = true;
-                        $timeout(function (){
-                           scope.reload = false;
-                        });
-                    }
-                });
+                //// hack to force reloading options
+                //scope.$watch('items', function (val, old){
+                //    if(val && val !== old){
+                //        scope.reload = true;
+                //        $timeout(function (){
+                //           scope.reload = false;
+                //        });
+                //    }
+                //});
 
                 scope.$watch("container.isReadonly", function(newVal){
                     if(newVal) {
@@ -67,6 +68,8 @@
                 });
 
                 var options = {
+                    plugins: ['dropdown_direction'],
+                    dropdownDirection: scope.dropdownDirection || 'auto',
                     valueField: scope.itemKey,
                     labelField: scope.itemValue,
                     sortField : scope.itemSort || scope.itemValue,
@@ -102,4 +105,5 @@
     }
 
     angular.module('sds-angular-controls').directive('formAutocomplete', formAutocomplete);
+
 })();
