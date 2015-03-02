@@ -41,14 +41,14 @@
                 }
 
                 //// hack to force reloading options
-                //scope.$watch('items', function (val, old){
-                //    if(val && val !== old){
-                //        scope.reload = true;
-                //        $timeout(function (){
-                //           scope.reload = false;
-                //        });
-                //    }
-                //});
+                scope.$watch('items', function (val, old){
+                    if(val && val !== old){
+                        scope.reload = true;
+                        $timeout(function (){
+                           scope.reload = false;
+                        });
+                    }
+                });
 
                 scope.$watch("container.isReadonly", function(newVal){
                     if(newVal) {

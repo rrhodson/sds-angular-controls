@@ -41,8 +41,7 @@
 
                 scope.$watch('container.record[container.field]', function (val){
                     if (typeof val === 'string'){
-                        var date = moment(container.$scope.record[container.$scope.field]);
-                        container.$scope.record[container.$scope.field] = date.toDate();
+                        container.$scope.record[container.$scope.field] = moment.utc(container.$scope.record[container.$scope.field]).toDate();
                     }
                 });
 

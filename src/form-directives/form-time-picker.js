@@ -22,6 +22,11 @@
                     default: //stacked
                         scope.layoutCss = scope.layoutCss || "";
                 }
+                scope.$watch('container.record[container.field]', function (val){
+                    if (typeof val === 'string'){
+                        container.$scope.record[container.$scope.field] = moment.utc(container.$scope.record[container.$scope.field]).toDate();
+                    }
+                });
 
                 scope.$watch("container.isReadonly", function(newVal){
                     if(newVal) {

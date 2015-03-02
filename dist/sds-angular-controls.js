@@ -1,7 +1,7 @@
 /*! 
  * sds-angular-controls
  * Angular Directives used with sds-angular generator
- * @version 0.3.29 
+ * @version 0.3.30 
  * 
  * Copyright (c) 2015 Steve Gentile, David Benson 
  * @link https://github.com/SMARTDATASYSTEMSLLC/sds-angular-controls 
@@ -284,14 +284,14 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                 }
 
                 //// hack to force reloading options
-                //scope.$watch('items', function (val, old){
-                //    if(val && val !== old){
-                //        scope.reload = true;
-                //        $timeout(function (){
-                //           scope.reload = false;
-                //        });
-                //    }
-                //});
+                scope.$watch('items', function (val, old){
+                    if(val && val !== old){
+                        scope.reload = true;
+                        $timeout(function (){
+                           scope.reload = false;
+                        });
+                    }
+                });
 
                 scope.$watch("container.isReadonly", function(newVal){
                     if(newVal) {
@@ -475,8 +475,7 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
 
                 scope.$watch('container.record[container.field]', function (val){
                     if (typeof val === 'string'){
-                        var date = moment(container.$scope.record[container.$scope.field]);
-                        container.$scope.record[container.$scope.field] = date.toDate();
+                        container.$scope.record[container.$scope.field] = moment.utc(container.$scope.record[container.$scope.field]).toDate();
                     }
                 });
 
@@ -1037,6 +1036,11 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                     default: //stacked
                         scope.layoutCss = scope.layoutCss || "";
                 }
+                scope.$watch('container.record[container.field]', function (val){
+                    if (typeof val === 'string'){
+                        container.$scope.record[container.$scope.field] = moment.utc(container.$scope.record[container.$scope.field]).toDate();
+                    }
+                });
 
                 scope.$watch("container.isReadonly", function(newVal){
                     if(newVal) {
