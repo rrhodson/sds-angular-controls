@@ -395,7 +395,7 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
 
                 scope.$watch('container.record[container.field]', function (val){
                     if (typeof val === 'string'){
-                        container.$scope.record[container.$scope.field] = moment.utc(container.$scope.record[container.$scope.field]).format(scope.dateFormat.toUpperCase());
+                        container.$scope.record[container.$scope.field] = moment.utc(container.$scope.record[container.$scope.field]).toDate();
                     }
                 });
 
