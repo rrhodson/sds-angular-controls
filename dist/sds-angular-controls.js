@@ -83,6 +83,16 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                     return _.all(filters, function (col) {
                         if (!col.filter || !col.key) {
                             return true;
+                        } else if (!col.type && _.isObject(prop(item,col.key))) {
+                            return _.any(prop(item,col.key), function (v){
+                                if (_.isPlainObject(v)){
+                                    return _.any(v, function (vv){
+                                        return (vv + "").toLowerCase().indexOf(col.filter) > -1;
+                                    });
+                                }else{
+                                    return (prop(item,col.key) + "").toLowerCase().indexOf(col.filter) > -1;
+                                }
+                            });
                         } else if (!col.type) {
                             return (prop(item,col.key) + "").toLowerCase().indexOf(col.filter) > -1;
                         } else if (col.type === 'date') {
@@ -1496,6 +1506,16 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                 }
 
                 function getData(filter, sortKey, sortAsc, currentPage, pageSize, cols){
+                    if(scope.filterBy) {
+                        if (typeof filter === 'object') {
+                            _.extend(filter, scope.filterBy);
+                        } else if (typeof filter === 'string' && filter){
+                            //API doesn't support this use case
+                        }else {
+                            filter = scope.filterBy;
+                        }
+                    }
+
                     var query = {
                         page: currentPage,
                         pageSize: pageSize,
@@ -1548,9 +1568,9 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                                 n = item.filter.slice(1);
                                 if (dateRegex.test(n) && moment(n).isValid()) {
                                     r.push({
-                                        fieldType: 'date',
+                                        fieldType: 'datetime',
                                         fieldOperator: 'lt',
-                                        fieldValue: n,
+                                        fieldValue: moment(n).utcOffset(0).format('MM/DD/YYYY HH:mm a'),
                                         field: capitalize(item.key)
                                     });
                                 }
@@ -1584,15 +1604,15 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
 
                                 if (moment(n[1]).isValid() && moment(n[3]).isValid()) {
                                     r.push({
-                                        fieldType: 'date',
+                                        fieldType: 'datetime',
                                         fieldOperator: 'gte',
-                                        fieldValue: n[1],
+                                        fieldValue: moment(n[1]).utcOffset(0).format('MM/DD/YYYY HH:mm a'),
                                         field: capitalize(item.key)
                                     });
                                     r.push({
-                                        fieldType: 'date',
+                                        fieldType: 'datetime',
                                         fieldOperator: 'lte',
-                                        fieldValue: n[3],
+                                        fieldValue: moment(n[3]).utcOffset(0).format('MM/DD/YYYY HH:mm a'),
                                         field: capitalize(item.key)
                                     });
                                 }
@@ -1608,9 +1628,15 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                             }else if (item.key && item.filter && item.type === 'date'){
                                 if (moment(item.filter).isValid()) {
                                     r.push({
-                                        fieldType: 'date',
-                                        fieldOperator: 'eq',
-                                        fieldValue: item.filter,
+                                        fieldType: 'datetime',
+                                        fieldOperator: 'gte',
+                                        fieldValue: moment(item.filter).startOf('day').utcOffset(0).format('MM/DD/YYYY HH:mm a'),
+                                        field: capitalize(item.key)
+                                    });
+                                    r.push({
+                                        fieldType: 'datetime',
+                                        fieldOperator: 'lte',
+                                        fieldValue: moment(item.filter).endOf('day').utcOffset(0).format('MM/DD/YYYY HH:mm a'),
                                         field: capitalize(item.key)
                                     });
                                 }
@@ -2096,7 +2122,7 @@ angular.module('sds-angular-controls').run(['$templateCache', function($template
 
 
   $templateCache.put('sds-angular-controls/table-directives/db-grid.html',
-    "<div class=\"table-responsive\"> <div class=\"btn-toolbar\"> <a ng-if=\"_model.showAdvancedFilter\" href=\"\" class=\"btn btn-default\" ng-click=\"_model.clearFilters()\">Clear All Filters <span class=\"big-x\">&times;</span></a> <div ng-if=\"!_model.showAdvancedFilter && _model.filterType !== 'none'\" class=\"toolbar-input\"> <div class=\"form-group has-feedback\"> <input class=\"form-control\" type=\"text\" ng-model=\"_model.filterText\" ng-keyup=\"$grid.refresh()\" placeholder=\"Filter {{_model.label || 'items'}}\" on-enter=\"_model.onEnter()\" isolate-control> <a href=\"\" ng-click=\"_model.filterText = ''; $grid.refresh()\" class=\"form-control-feedback feedback-link\">&times;</a> </div> </div> <a href=\"\" ng-if=\"_model.filterType === 'advanced'\" class=\"btn btn-default\" ng-class=\"{'btn-primary': _model.showAdvancedFilter}\" ng-click=\"_model.showAdvancedFilter = !_model.showAdvancedFilter\">{{_model.showAdvancedFilter ? 'Simple' : 'Advanced'}} Filtering</a> <db-transclude></db-transclude> <p ng-if=\"_model.total && _model.label\"><i>{{_model.total}} {{_model.label}}</i></p> </div> <table class=\"table db-grid table-hover {{_model.layoutCss}}\"> <thead> <tr> <th ng-repeat=\"_col in _model.cols\" ng-style=\"{width: _col.width}\" class=\"{{_col.layoutCss}}\"> <div ng-if=\"_model.showAdvancedFilter && _col.sortable\"> <input type=\"text\" class=\"form-control filter-input\" on-enter=\"_model.onEnter()\" ng-keyup=\"$grid.refresh()\" ng-model=\"_col.filter\" placeholder=\"Filter {{::_col.label || _col.key}}\" tooltip=\"{{_col.type ? 'Use a dash (-) to specify a range' : ''}}\" tooltip-trigger=\"focus\" tooltip-placement=\"top\" isolate-control> </div> <a href=\"\" ng-if=\"::_col.sortable\" ng-click=\"_model.toggleSort($index)\">{{::_col.label || (_col.key | labelCase) }}&nbsp;<i class=\"fa\" style=\"display: inline\" ng-class=\"{\n" +
+    "<div class=\"table-responsive\"> <div class=\"btn-toolbar\"> <a ng-if=\"_model.showAdvancedFilter\" href=\"\" class=\"btn btn-default\" ng-click=\"_model.clearFilters()\">Clear All Filters <span class=\"big-x\">&times;</span></a> <div ng-if=\"!_model.showAdvancedFilter && _model.filterType !== 'none'\" class=\"toolbar-input\"> <div class=\"form-group has-feedback\"> <input class=\"form-control\" type=\"text\" ng-model=\"_model.filterText\" ng-keyup=\"$grid.refresh()\" placeholder=\"Filter {{_model.label || 'items'}}\" on-enter=\"_model.onEnter()\" isolate-control> <a href=\"\" ng-click=\"_model.filterText = ''; $grid.refresh()\" class=\"form-control-feedback feedback-link\">&times;</a> </div> </div> <a href=\"\" ng-if=\"_model.filterType === 'advanced'\" class=\"btn btn-default\" ng-class=\"{'btn-primary': _model.showAdvancedFilter}\" ng-click=\"_model.showAdvancedFilter = !_model.showAdvancedFilter\">{{_model.showAdvancedFilter ? 'Simple' : 'Advanced'}} Filtering</a> <db-transclude></db-transclude> <p ng-if=\"_model.total && _model.label\"><i>{{_model.total}} {{_model.label}}</i></p> </div> <table class=\"table db-grid table-hover {{_model.layoutCss}}\"> <thead> <tr> <th ng-repeat=\"_col in _model.cols\" ng-style=\"{width: _col.width}\" class=\"{{_col.layoutCss}}\"> <div ng-if=\"_model.showAdvancedFilter && _col.sortable\"> <input type=\"text\" class=\"form-control filter-input\" on-enter=\"_model.onEnter()\" ng-keyup=\"$grid.refresh()\" ng-model=\"_col.filter\" placeholder=\"Filter {{::_col.label || (_col.key | labelCase)}}\" tooltip=\"{{_col.type ? 'Use a dash (-) to specify a range' : ''}}\" tooltip-trigger=\"focus\" tooltip-placement=\"top\" isolate-control> </div> <a href=\"\" ng-if=\"::_col.sortable\" ng-click=\"_model.toggleSort($index)\">{{::_col.label || (_col.key | labelCase) }}&nbsp;<i class=\"fa\" style=\"display: inline\" ng-class=\"{\n" +
     "                         'fa-sort'     : _model.sort !== $index,\n" +
     "                         'fa-sort-down': _model.sort === $index &&  _model.sortAsc,\n" +
     "                         'fa-sort-up'  : _model.sort === $index && !_model.sortAsc\n" +

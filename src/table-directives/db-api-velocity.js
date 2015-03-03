@@ -8,8 +8,7 @@
             require: '^dbGrid',
             scope:{
                 api: '@',
-                postParams: '=',
-                filterBy: '='
+                postParams: '='
             },
             link: function (scope, element, attr, dbGrid) {
 
@@ -35,7 +34,7 @@
                         });
                     }
 
-                    _.extend(query, scope.postParams);
+                    _.merge(query, scope.postParams);
 
                     $rootScope.$broadcast('db-api:start', query);
                     dbGrid.setWaiting(true);
@@ -74,9 +73,9 @@
                                 n = item.filter.slice(1);
                                 if (dateRegex.test(n) && moment(n).isValid()) {
                                     r.push({
-                                        fieldType: 'date',
+                                        fieldType: 'datetime',
                                         fieldOperator: 'lt',
-                                        fieldValue: n,
+                                        fieldValue: moment(n).utcOffset(0).format('MM/DD/YYYY HH:mm a'),
                                         field: capitalize(item.key)
                                     });
                                 }
@@ -110,15 +109,15 @@
 
                                 if (moment(n[1]).isValid() && moment(n[3]).isValid()) {
                                     r.push({
-                                        fieldType: 'date',
+                                        fieldType: 'datetime',
                                         fieldOperator: 'gte',
-                                        fieldValue: n[1],
+                                        fieldValue: moment(n[1]).utcOffset(0).format('MM/DD/YYYY HH:mm a'),
                                         field: capitalize(item.key)
                                     });
                                     r.push({
-                                        fieldType: 'date',
+                                        fieldType: 'datetime',
                                         fieldOperator: 'lte',
-                                        fieldValue: n[3],
+                                        fieldValue: moment(n[3]).utcOffset(0).format('MM/DD/YYYY HH:mm a'),
                                         field: capitalize(item.key)
                                     });
                                 }
@@ -134,9 +133,15 @@
                             }else if (item.key && item.filter && item.type === 'date'){
                                 if (moment(item.filter).isValid()) {
                                     r.push({
-                                        fieldType: 'date',
-                                        fieldOperator: 'eq',
-                                        fieldValue: item.filter,
+                                        fieldType: 'datetime',
+                                        fieldOperator: 'gte',
+                                        fieldValue: moment(item.filter).startOf('day').utcOffset(0).format('MM/DD/YYYY HH:mm a'),
+                                        field: capitalize(item.key)
+                                    });
+                                    r.push({
+                                        fieldType: 'datetime',
+                                        fieldOperator: 'lte',
+                                        fieldValue: moment(item.filter).endOf('day').utcOffset(0).format('MM/DD/YYYY HH:mm a'),
                                         field: capitalize(item.key)
                                     });
                                 }

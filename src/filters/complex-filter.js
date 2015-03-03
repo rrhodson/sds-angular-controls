@@ -67,6 +67,16 @@
                     return _.all(filters, function (col) {
                         if (!col.filter || !col.key) {
                             return true;
+                        } else if (!col.type && _.isObject(prop(item,col.key))) {
+                            return _.any(prop(item,col.key), function (v){
+                                if (_.isPlainObject(v)){
+                                    return _.any(v, function (vv){
+                                        return (vv + "").toLowerCase().indexOf(col.filter) > -1;
+                                    });
+                                }else{
+                                    return (prop(item,col.key) + "").toLowerCase().indexOf(col.filter) > -1;
+                                }
+                            });
                         } else if (!col.type) {
                             return (prop(item,col.key) + "").toLowerCase().indexOf(col.filter) > -1;
                         } else if (col.type === 'date') {

@@ -25,7 +25,7 @@
                 <th ng-repeat="_col in _model.cols" ng-style="{width: _col.width}" class="{{_col.layoutCss}}">
                     <div ng-if="_model.showAdvancedFilter && _col.sortable">
                         <input type="text" class="form-control filter-input" on-enter="_model.onEnter()"
-                               ng-keyup="$grid.refresh()" ng-model="_col.filter" placeholder="Filter {{::_col.label || _col.key}}"
+                               ng-keyup="$grid.refresh()" ng-model="_col.filter" placeholder="Filter {{::_col.label || (_col.key | labelCase)}}"
                                tooltip="{{_col.type ? 'Use a dash (-) to specify a range' : ''}}"  tooltip-trigger="focus"
                                tooltip-placement="top" isolate-control />
                     </div>
