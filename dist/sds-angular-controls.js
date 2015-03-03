@@ -1,7 +1,7 @@
 /*! 
  * sds-angular-controls
  * Angular Directives used with sds-angular generator
- * @version 0.3.30 
+ * @version 0.3.32 
  * 
  * Copyright (c) 2015 Steve Gentile, David Benson 
  * @link https://github.com/SMARTDATASYSTEMSLLC/sds-angular-controls 
@@ -283,12 +283,39 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                     $timeout(function (){input.focus(); });
                 }
 
+                function convertToArray(){
+                    var items = _.reduce(scope.items, function(result, item, key) {
+                        //result[item["item-key"]] = item["item-value"];
+                        result.push({
+                            "itemKey" : key,
+                            "itemValue": item
+                        });
+
+                        return result;
+                    }, []);
+
+                    scope.options.valueField = "itemKey";
+                    scope.options.labelField = "itemValue";
+                    scope.options.searchField = ["itemValue"];
+                    scope.reload = true;
+                    $timeout(function (){
+                        scope.reload = false;
+                    });
+
+                    return items;
+                }
+
                 //// hack to force reloading options
-                scope.$watch('items', function (val, old){
-                    if(val && val !== old){
+                scope.$watch("items", function(newVal, oldVal){
+                    if(scope.items && !_.isArray(scope.items)){
+                        scope.items = convertToArray();
+
+                    }
+
+                    if(newVal && newVal !== oldVal){
                         scope.reload = true;
                         $timeout(function (){
-                           scope.reload = false;
+                            scope.reload = false;
                         });
                     }
                 });
