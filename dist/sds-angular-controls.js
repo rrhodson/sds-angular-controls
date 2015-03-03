@@ -1,7 +1,7 @@
 /*! 
  * sds-angular-controls
  * Angular Directives used with sds-angular generator
- * @version 0.3.32 
+ * @version 0.3.33 
  * 
  * Copyright (c) 2015 Steve Gentile, David Benson 
  * @link https://github.com/SMARTDATASYSTEMSLLC/sds-angular-controls 
@@ -1492,8 +1492,7 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
             require: '^dbGrid',
             scope:{
                 api: '@',
-                postParams: '=',
-                filterBy: '='
+                postParams: '='
             },
             link: function (scope, element, attr, dbGrid) {
 
@@ -1506,16 +1505,6 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                 }
 
                 function getData(filter, sortKey, sortAsc, currentPage, pageSize, cols){
-                    if(scope.filterBy) {
-                        if (typeof filter === 'object') {
-                            _.extend(filter, scope.filterBy);
-                        } else if (typeof filter === 'string' && filter){
-                            //API doesn't support this use case
-                        }else {
-                            filter = scope.filterBy;
-                        }
-                    }
-
                     var query = {
                         page: currentPage,
                         pageSize: pageSize,
@@ -1529,7 +1518,7 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                         });
                     }
 
-                    _.extend(query, scope.postParams);
+                    _.merge(query, scope.postParams);
 
                     $rootScope.$broadcast('db-api:start', query);
                     dbGrid.setWaiting(true);
