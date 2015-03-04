@@ -1,7 +1,7 @@
 /*! 
  * sds-angular-controls
  * Angular Directives used with sds-angular generator
- * @version 0.3.39 
+ * @version 0.3.40 
  * 
  * Copyright (c) 2015 Steve Gentile, David Benson 
  * @link https://github.com/SMARTDATASYSTEMSLLC/sds-angular-controls 
@@ -2126,7 +2126,7 @@ angular.module('sds-angular-controls').run(['$templateCache', function($template
 
 
   $templateCache.put('sds-angular-controls/form-directives/form-input.html',
-    "<div class=\"{{::container.layout === 'horizontal' ? layoutCss : '' }}\"> <input class=\"form-control inputField {{::container.layout !== 'horizontal' ? layoutCss : ''}}\" ng-model=\"container.record[container.field]\" name=\"{{::container.field}}\" type=\"{{::type}}\" ng-if=\"type !== 'number'\" ng-required=\"container.isRequired\" ng-disabled=\"container.isReadonly\" placeholder=\"{{::placeholder || container.label}}\" style=\"{{::style}}\" mask-input=\"{{mask}}\" maxlength=\"{{maxlength || -1}}\" minlength=\"{{minlength || -1}}\"> <input class=\"form-control inputField {{::container.layout !== 'horizontal' ? layoutCss : ''}}\" ng-model=\"container.record[container.field]\" name=\"{{::container.field}}\" type=\"number\" ng-if=\"type === 'number'\" ng-required=\"container.isRequired\" ng-disabled=\"container.isReadonly\" placeholder=\"{{::placeholder || container.label}}\" min=\"{{::min}}\" max=\"{{::max}}\" step=\"{{::step}}\" style=\"{{::style}}\" mask-input=\"{{mask}}\"> <div ng-if=\"::(rightLabel && rightLabel.length > 0)\" class=\"rightLabel\">{{::rightLabel}}</div> </div>"
+    "<div class=\"{{::container.layout === 'horizontal' ? layoutCss : '' }}\"> <input class=\"form-control inputField {{::container.layout !== 'horizontal' ? layoutCss : ''}}\" ng-model=\"container.record[container.field]\" name=\"{{::container.field}}\" type=\"{{::type}}\" ng-if=\"type !== 'number'\" ng-required=\"container.isRequired\" ng-disabled=\"container.isReadonly\" placeholder=\"{{::placeholder || container.label}}\" style=\"{{::style}}\" mask-input=\"{{mask}}\" maxlength=\"{{maxlength || ''}}\" minlength=\"{{minlength || -1}}\"> <input class=\"form-control inputField {{::container.layout !== 'horizontal' ? layoutCss : ''}}\" ng-model=\"container.record[container.field]\" name=\"{{::container.field}}\" type=\"number\" ng-if=\"type === 'number'\" ng-required=\"container.isRequired\" ng-disabled=\"container.isReadonly\" placeholder=\"{{::placeholder || container.label}}\" min=\"{{::min}}\" max=\"{{::max}}\" step=\"{{::step}}\" style=\"{{::style}}\" mask-input=\"{{mask}}\"> <div ng-if=\"::(rightLabel && rightLabel.length > 0)\" class=\"rightLabel\">{{::rightLabel}}</div> </div>"
   );
 
 

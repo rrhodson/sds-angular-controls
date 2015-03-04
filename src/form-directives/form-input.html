@@ -9,7 +9,7 @@
            placeholder='{{::placeholder || container.label}}'
            style="{{::style}}"
            mask-input="{{mask}}"
-           maxlength="{{maxlength || -1}}"
+           maxlength="{{maxlength || ''}}"
            minlength="{{minlength || -1}}"
         />
     <input class="form-control inputField {{::container.layout !== 'horizontal' ? layoutCss : ''}}"
