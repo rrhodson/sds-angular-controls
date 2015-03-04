@@ -392,7 +392,7 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
 
 (function () {
     'use strict';
-    function formInput ($timeout) {
+    function formControl ($timeout) {
         return{
             restrict: 'A',
             require: '^form-field',
@@ -415,9 +415,9 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
             }
         }
     }
-    formInput.$inject = ["$timeout"];
+    formControl.$inject = ["$timeout"];
 
-    angular.module('sds-angular-controls').directive('formInput', formInput)
+    angular.module('sds-angular-controls').directive('formControl', formControl)
 
 })();
 
@@ -1534,6 +1534,12 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
             },
             link: function (scope, element, attr, dbGrid) {
 
+                if (attr.postParams){
+                    scope.watch('postParams', function (){
+                       dbGrid.refresh();
+                    });
+                }
+
                 function capitalize (str){
                     return str.charAt(0).toUpperCase() + str.slice(1);
                 }
@@ -1954,7 +1960,6 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                 }
 
                 function onEnter(){
-                    console.log('enter');
                     if ($scope._model.items.length === 1){
                         $timeout(function (){
                             $element.find('tbody tr a:first').click();
@@ -2002,6 +2007,7 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
 
                 this.setDataSource = function (dataSource){
                     $scope._model.getItems = dataSource;
+                    $scope._model.items = [true];
                     $scope._model.refresh();
                 };
 

@@ -109,7 +109,6 @@
                 }
 
                 function onEnter(){
-                    console.log('enter');
                     if ($scope._model.items.length === 1){
                         $timeout(function (){
                             $element.find('tbody tr a:first').click();
@@ -168,8 +167,8 @@
                     $scope._model.waiting = waiting;
                 };
 
-                this.refresh = function (total){
-                    if ($scope._model.items){
+                this.refresh = function (force){
+                    if ($scope._model.items || force){
                         $scope.$grid.refresh();
                     }
                 };

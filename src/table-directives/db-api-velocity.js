@@ -12,6 +12,14 @@
             },
             link: function (scope, element, attr, dbGrid) {
 
+                if (attr.postParams){
+                    scope.watch('postParams', function (val){
+                        if(val) {
+                            dbGrid.refresh(true);
+                        }
+                    });
+                }
+
                 function capitalize (str){
                     return str.charAt(0).toUpperCase() + str.slice(1);
                 }
