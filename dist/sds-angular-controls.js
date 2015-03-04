@@ -279,6 +279,22 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
             link: function (scope, element, attr, container) {
                 var input = element.find('select');
                 scope.container = container.$scope;
+                scope.innerItems = [];
+                //// hack to force reloading options
+                scope.$watch("items", function(newVal, oldVal){
+                    if(scope.items && !_.isArray(scope.items)){
+                        scope.innerItems = convertToArray();
+                    }else{
+                        scope.innerItems = scope.items;
+                    }
+
+                    if(newVal && newVal !== oldVal){
+                        scope.reload = true;
+                        $timeout(function (){
+                            scope.reload = false;
+                        });
+                    }
+                });
 
                 // one-time bindings:
                 switch(container.$scope.layout){
@@ -315,29 +331,14 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                     return items;
                 }
 
-                //// hack to force reloading options
-                scope.$watch("items", function(newVal, oldVal){
-                    if(scope.items && !_.isArray(scope.items)){
-                        scope.items = convertToArray();
-
-                    }
-
-                    if(newVal && newVal !== oldVal){
-                        scope.reload = true;
-                        $timeout(function (){
-                            scope.reload = false;
-                        });
-                    }
-                });
-
                 scope.$watch("container.isReadonly", function(newVal){
                     if(newVal) {
                         if (scope.container.record && scope.container.record[scope.container.field]) {
 
-                            var value = scope.items[scope.container.record[scope.container.field]];
+                            var value = scope.innerItems[scope.container.record[scope.container.field]];
                             //if using itemKey/itemValue -we need to find it in the array vs. hash:
                             if(scope.itemValue && scope.itemKey){
-                                var arrayItem = _.find(scope.items, function(item){
+                                var arrayItem = _.find(scope.innerItems, function(item){
                                     return item[scope.itemKey] === scope.container.record[scope.container.field];
                                 });
                                 value = arrayItem[scope.itemValue];
@@ -918,6 +919,18 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
             link: function (scope, element, attr, container) {
                 var input = element.find('select');
                 scope.container = container.$scope;
+                scope.innerItems = {};
+
+                scope.$watch("items", function(newVal, oldVal){
+
+                    if(scope.items && _.isArray(scope.items)) {
+                        if (scope.itemKey && scope.itemValue) {
+                            scope.innerItems = convertToHash(scope.items, scope.itemKey, scope.itemValue);
+                        }
+                    }else{
+                        scope.innerItems = scope.items;
+                    }
+                });
 
                 // one-time bindings:
                 switch(container.$scope.layout){
@@ -936,10 +949,10 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                     if(newVal) {
                         if (scope.container.record && scope.container.record[scope.container.field]) {
 
-                            var value = scope.items[scope.container.record[scope.container.field]];
+                            var value = scope.innerItems[scope.container.record[scope.container.field]];
                             //if using itemKey/itemValue -we need to find it in the array vs. hash:
                             if(scope.itemValue && scope.itemKey){
-                                var arrayItem = _.find(scope.items, function(item){
+                                var arrayItem = _.find(scope.innerItems, function(item){
                                    return item[scope.itemKey] === scope.container.record[scope.container.field];
                                 });
                                 value = arrayItem[scope.itemValue];
@@ -994,13 +1007,7 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                     }
                 };
 
-                scope.$watch("items", function(newVal, oldVal){
-                    if(scope.items && _.isArray(scope.items)) {
-                        if (scope.itemKey && scope.itemValue) {
-                            scope.items = convertToHash(scope.items, scope.itemKey, scope.itemValue);
-                        }
-                    }
-                });
+
             }
         }
     }
@@ -1535,7 +1542,7 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
             link: function (scope, element, attr, dbGrid) {
 
                 if (attr.postParams){
-                    scope.watch('postParams', function (val){
+                    scope.$watch('postParams', function (val){
                         if(val) {
                             dbGrid.refresh(true);
                         }
@@ -2091,7 +2098,7 @@ angular.module('sds-angular-controls').run(['$templateCache', function($template
   'use strict';
 
   $templateCache.put('sds-angular-controls/form-directives/form-autocomplete.html',
-    "<div class=\"{{::container.layout === 'horizontal' ? layoutCss : '' }}\"> <select ng-if=\"!container.isReadonly && !reload\" ng-readonly=\"container.isReadonly\" ng-required=\"container.isRequired\" name=\"{{::container.field}}\" selectize=\"options\" options=\"items\" class=\"{{::container.layout !== 'horizontal' ? layoutCss : ''}}\" ng-model=\"container.record[container.field]\"></select> <!-- optionValue as optionLabel for arrayItem in array --> <input ng-if=\"container.isReadonly\" style=\"{{::style}}\" readonly type=\"text\" class=\"form-control {{::container.layout !== 'horizontal' ? layoutCss : ''}}\" ng-model=\"readOnlyModel\"> </div>"
+    "<div class=\"{{::container.layout === 'horizontal' ? layoutCss : '' }}\"> <select ng-if=\"!container.isReadonly && !reload\" ng-readonly=\"container.isReadonly\" ng-required=\"container.isRequired\" name=\"{{::container.field}}\" selectize=\"options\" options=\"innerItems\" class=\"{{::container.layout !== 'horizontal' ? layoutCss : ''}}\" ng-model=\"container.record[container.field]\"></select> <!-- optionValue as optionLabel for arrayItem in array --> <input ng-if=\"container.isReadonly\" style=\"{{::style}}\" readonly type=\"text\" class=\"form-control {{::container.layout !== 'horizontal' ? layoutCss : ''}}\" ng-model=\"readOnlyModel\"> </div>"
   );
 
 
@@ -2131,7 +2138,7 @@ angular.module('sds-angular-controls').run(['$templateCache', function($template
 
 
   $templateCache.put('sds-angular-controls/form-directives/form-select.html',
-    "<div class=\"{{::container.layout === 'horizontal' ? layoutCss : '' }}\"> <select ng-if=\"!container.isReadonly\" class=\"form-control {{::container.layout !== 'horizontal' ? layoutCss : ''}}\" name=\"{{::container.field}}\" ng-model=\"container.record[container.field]\" ng-options=\"convertType(key) as items[key] for key in orderHash(items)\" ng-required=\"container.isRequired\"></select> <!-- optionValue as optionLabel for arrayItem in array --> <input ng-if=\"container.isReadonly\" style=\"{{::style}}\" readonly type=\"text\" class=\"form-control {{::container.layout !== 'horizontal' ? layoutCss : ''}}\" ng-model=\"readOnlyModel\"> </div>"
+    "<div class=\"{{::container.layout === 'horizontal' ? layoutCss : '' }}\"> <select ng-if=\"!container.isReadonly\" class=\"form-control {{::container.layout !== 'horizontal' ? layoutCss : ''}}\" name=\"{{::container.field}}\" ng-model=\"container.record[container.field]\" ng-options=\"convertType(key) as innerItems[key] for key in orderHash(innerItems)\" ng-required=\"container.isRequired\"></select> <!-- optionValue as optionLabel for arrayItem in array --> <input ng-if=\"container.isReadonly\" style=\"{{::style}}\" readonly type=\"text\" class=\"form-control {{::container.layout !== 'horizontal' ? layoutCss : ''}}\" ng-model=\"readOnlyModel\"> </div>"
   );
 
 

@@ -20,6 +20,18 @@
             link: function (scope, element, attr, container) {
                 var input = element.find('select');
                 scope.container = container.$scope;
+                scope.innerItems = {};
+
+                scope.$watch("items", function(newVal, oldVal){
+
+                    if(scope.items && _.isArray(scope.items)) {
+                        if (scope.itemKey && scope.itemValue) {
+                            scope.innerItems = convertToHash(scope.items, scope.itemKey, scope.itemValue);
+                        }
+                    }else{
+                        scope.innerItems = scope.items;
+                    }
+                });
 
                 // one-time bindings:
                 switch(container.$scope.layout){
@@ -38,10 +50,10 @@
                     if(newVal) {
                         if (scope.container.record && scope.container.record[scope.container.field]) {
 
-                            var value = scope.items[scope.container.record[scope.container.field]];
+                            var value = scope.innerItems[scope.container.record[scope.container.field]];
                             //if using itemKey/itemValue -we need to find it in the array vs. hash:
                             if(scope.itemValue && scope.itemKey){
-                                var arrayItem = _.find(scope.items, function(item){
+                                var arrayItem = _.find(scope.innerItems, function(item){
                                    return item[scope.itemKey] === scope.container.record[scope.container.field];
                                 });
                                 value = arrayItem[scope.itemValue];
@@ -96,13 +108,7 @@
                     }
                 };
 
-                scope.$watch("items", function(newVal, oldVal){
-                    if(scope.items && _.isArray(scope.items)) {
-                        if (scope.itemKey && scope.itemValue) {
-                            scope.items = convertToHash(scope.items, scope.itemKey, scope.itemValue);
-                        }
-                    }
-                });
+
             }
         }
     }

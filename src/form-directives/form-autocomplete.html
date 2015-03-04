@@ -5,7 +5,7 @@
             ng-required="container.isRequired"
             name="{{::container.field}}"
             selectize="options"
-            options="items"
+            options="innerItems"
             class="{{::container.layout !== 'horizontal' ? layoutCss : ''}}"
             ng-model="container.record[container.field]"></select>
     <!-- optionValue as optionLabel for arrayItem in array -->

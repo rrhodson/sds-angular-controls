@@ -3,7 +3,7 @@
             class="form-control {{::container.layout !== 'horizontal' ? layoutCss : ''}}"
             name="{{::container.field}}"
             ng-model="container.record[container.field]"
-            ng-options="convertType(key) as items[key] for key in orderHash(items)"
+            ng-options="convertType(key) as innerItems[key] for key in orderHash(innerItems)"
             ng-required="container.isRequired"></select>
     <!-- optionValue as optionLabel for arrayItem in array -->
 

@@ -13,7 +13,7 @@
             link: function (scope, element, attr, dbGrid) {
 
                 if (attr.postParams){
-                    scope.watch('postParams', function (val){
+                    scope.$watch('postParams', function (val){
                         if(val) {
                             dbGrid.refresh(true);
                         }
@@ -42,7 +42,11 @@
                         });
                     }
 
-                    _.merge(query, scope.postParams);
+                    _.merge(query, scope.postParams, function(a, b) {
+                        if (_.isArray(a)) {
+                            return a.concat(b);
+                        }
+                    });
 
                     $rootScope.$broadcast('db-api:start', query);
                     dbGrid.setWaiting(true);
