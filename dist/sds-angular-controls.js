@@ -1,7 +1,7 @@
 /*! 
  * sds-angular-controls
  * Angular Directives used with sds-angular generator
- * @version 0.3.34 
+ * @version 0.3.38 
  * 
  * Copyright (c) 2015 Steve Gentile, David Benson 
  * @link https://github.com/SMARTDATASYSTEMSLLC/sds-angular-controls 
@@ -1535,8 +1535,10 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
             link: function (scope, element, attr, dbGrid) {
 
                 if (attr.postParams){
-                    scope.watch('postParams', function (){
-                       dbGrid.refresh();
+                    scope.watch('postParams', function (val){
+                        if(val) {
+                            dbGrid.refresh(true);
+                        }
                     });
                 }
 
@@ -2007,7 +2009,6 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
 
                 this.setDataSource = function (dataSource){
                     $scope._model.getItems = dataSource;
-                    $scope._model.items = [true];
                     $scope._model.refresh();
                 };
 
@@ -2019,8 +2020,8 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                     $scope._model.waiting = waiting;
                 };
 
-                this.refresh = function (total){
-                    if ($scope._model.items){
+                this.refresh = function (force){
+                    if ($scope._model.items || force){
                         $scope.$grid.refresh();
                     }
                 };
