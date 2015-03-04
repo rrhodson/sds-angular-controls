@@ -41,7 +41,6 @@
                             direction: sortAsc ? '' : 'desc'
                         });
                     }
-
                     _.merge(query, scope.postParams, function(a, b) {
                         if (_.isArray(a)) {
                             return a.concat(b);

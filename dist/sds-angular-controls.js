@@ -1,7 +1,7 @@
 /*! 
  * sds-angular-controls
  * Angular Directives used with sds-angular generator
- * @version 0.3.38 
+ * @version 0.3.39 
  * 
  * Copyright (c) 2015 Steve Gentile, David Benson 
  * @link https://github.com/SMARTDATASYSTEMSLLC/sds-angular-controls 
@@ -1570,8 +1570,11 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                             direction: sortAsc ? '' : 'desc'
                         });
                     }
-
-                    _.merge(query, scope.postParams);
+                    _.merge(query, scope.postParams, function(a, b) {
+                        if (_.isArray(a)) {
+                            return a.concat(b);
+                        }
+                    });
 
                     $rootScope.$broadcast('db-api:start', query);
                     dbGrid.setWaiting(true);
