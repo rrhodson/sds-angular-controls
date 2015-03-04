@@ -21,14 +21,18 @@
 
     <table class="table db-grid table-hover {{_model.layoutCss}}">
         <thead>
-            <tr>
+            <tr ng-if="_model.showAdvancedFilter">
                 <th ng-repeat="_col in _model.cols" ng-style="{width: _col.width}" class="{{_col.layoutCss}}">
-                    <div ng-if="_model.showAdvancedFilter && _col.sortable">
+                    <div ng-if="::_col.sortable">
                         <input type="text" class="form-control filter-input" on-enter="_model.onEnter()"
                                ng-keyup="$grid.refresh()" ng-model="_col.filter" placeholder="Filter {{::_col.label || (_col.key | labelCase)}}"
                                tooltip="{{_col.type ? 'Use a dash (-) to specify a range' : ''}}"  tooltip-trigger="focus"
                                tooltip-placement="top" isolate-control />
                     </div>
+                </th>
+            </tr>
+            <tr>
+                <th ng-repeat="_col in _model.cols" ng-style="{width: _col.width}" class="{{_col.layoutCss}}">
                     <a href="" ng-if="::_col.sortable"
                        ng-click="_model.toggleSort($index)">{{::_col.label || (_col.key | labelCase)
                         }}&nbsp;<i class="fa" style="display: inline;" ng-class="{

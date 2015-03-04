@@ -1,7 +1,7 @@
 /*! 
  * sds-angular-controls
  * Angular Directives used with sds-angular generator
- * @version 0.3.33 
+ * @version 0.3.34 
  * 
  * Copyright (c) 2015 Steve Gentile, David Benson 
  * @link https://github.com/SMARTDATASYSTEMSLLC/sds-angular-controls 
@@ -114,7 +114,7 @@ input.datepicker + ul {
   vertical-align: middle;
 }
 .db-grid.table thead > tr > th {
-  vertical-align: top;
+  vertical-align: bottom;
 }
 .form-control.filter-input {
   height: 28px;
@@ -122,11 +122,12 @@ input.datepicker + ul {
   font-size: 12px;
   line-height: 1.5;
   border-width: 0 0 4px;
-  margin-bottom: 8px;
+  margin-bottom: -12px;
   background-color: #fff;
   margin-top: 0px;
   box-sizing: content-box;
   margin-left: -10px;
+  border-color: transparent;
   border-radius: 0;
   box-shadow: inset 0px -1px 1px #d7d7d7 !important;
 }

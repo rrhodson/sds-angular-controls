@@ -14,6 +14,8 @@
                 mask            : '@?',
                 max             : '@?',
                 min             : '@?',
+                maxlength       : '@?',
+                minlength       : '@?',
                 style           : '@?',
                 layoutCss       : '@?' //default col-md-6
             },
@@ -42,6 +44,10 @@
                 }
                 if (attr.pattern){
                     input.attr('pattern', attr.pattern);
+                }
+
+                if (container.$scope.isAutofocus){
+                    $timeout(function (){input.focus(); });
                 }
 
 

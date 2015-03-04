@@ -99,7 +99,7 @@
                     dropdownDirection: scope.dropdownDirection || 'auto',
                     valueField: scope.itemKey,
                     labelField: scope.itemValue,
-                    sortField : scope.itemSort || scope.itemValue,
+                    sortField : scope.itemSort,
                     searchField: [scope.itemValue],
                     maxOptions: 1200
                 };
