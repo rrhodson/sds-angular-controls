@@ -1,7 +1,7 @@
 
 (function () {
     'use strict';
-    function formInput ($timeout) {
+    function formControl ($timeout) {
         return{
             restrict: 'A',
             require: '^form-field',
@@ -25,6 +25,6 @@
         }
     }
 
-    angular.module('sds-angular-controls').directive('formInput', formInput)
+    angular.module('sds-angular-controls').directive('formControl', formControl)
 
 })();
