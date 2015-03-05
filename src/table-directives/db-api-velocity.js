@@ -30,7 +30,7 @@
 
                 function getData(filter, sortKey, sortAsc, currentPage, pageSize, cols){
                     var query = {
-                        page: currentPage,
+                        page: currentPage+1,
                         pageSize: pageSize,
                         sort: [],
                         filter: createFilters(filter, cols)

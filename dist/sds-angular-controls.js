@@ -1,7 +1,7 @@
 /*! 
  * sds-angular-controls
  * Angular Directives used with sds-angular generator
- * @version 0.4.0 
+ * @version 0.4.1 
  * 
  * Copyright (c) 2015 Steve Gentile, David Benson 
  * @link https://github.com/SMARTDATASYSTEMSLLC/sds-angular-controls 
@@ -1578,7 +1578,7 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
 
                 function getData(filter, sortKey, sortAsc, currentPage, pageSize, cols){
                     var query = {
-                        page: currentPage,
+                        page: currentPage+1,
                         pageSize: pageSize,
                         sort: [],
                         filter: createFilters(filter, cols)
