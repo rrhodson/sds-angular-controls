@@ -1,13 +1,13 @@
 /*! 
  * sds-angular-controls
  * Angular Directives used with sds-angular generator
- * @version 0.3.40 
+ * @version 0.4.0 
  * 
  * Copyright (c) 2015 Steve Gentile, David Benson 
  * @link https://github.com/SMARTDATASYSTEMSLLC/sds-angular-controls 
  * @license  MIT 
  */ 
-angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSanitize', 'selectize-ng']);
+angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSanitize', 'selectize-ng', 'currencyMask']);
 
 (function (){
   'use strict';
@@ -55,22 +55,32 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                         }
                     } else if (col.type === 'number' && col.filter) {
                         var n = col.filter.split("-");
-                        if(!n[0] && n[1]){
-                            n.slice(0,1);
+                        if (!n[0] && n[1]) {
+                            n.slice(0, 1);
                             n[0] *= -1;
                         }
-                        if(!n[1] && n[2]){
-                            n.slice(1,1);
+                        if (!n[1] && n[2]) {
+                            n.slice(1, 1);
                             n[1] *= -1;
                         }
                         var n1 = parseFloat(n[0]);
                         var n2 = parseFloat(n[1] || n[0]);
                         filters.push({
-                            filter:[n1, n2],
+                            filter: [n1, n2],
                             key: col.key,
-                            type:col.type
+                            type: col.type
                         });
-                    }else if (typeof col.filter === 'string'){
+                    }else if (col.type === 'bool' && col.filter){
+                        var b = col.filter.toLowerCase();
+                        if (b === 'no'.substr(0, b.length) || b === 'false'.substr(0, b.length)){
+                            b = false;
+                        }
+                        filters.push({
+                            filter: !!b,
+                            key: col.key,
+                            type: col.type
+                        });
+                    }else if (col.filter && typeof col.filter === 'string'){
                         filters.push({
                             filter:col.filter.toLowerCase(),
                             key: col.key
@@ -81,7 +91,7 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                 // run query
                 return _.filter(input, function (item) {
                     return _.all(filters, function (col) {
-                        if (!col.filter || !col.key) {
+                        if (!col.key) {
                             return true;
                         } else if (!col.type && _.isObject(prop(item,col.key))) {
                             return _.any(prop(item,col.key), function (v){
@@ -100,6 +110,8 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                             return d >= col.filter[0] && d <= col.filter[1];
                         } else if (col.type === 'number') {
                             return prop(item,col.key) >= col.filter[0] && prop(item,col.key) <= col.filter[1];
+                        }else if (col.type === 'bool') {
+                            return !!prop(item,col.key) === col.filter;
                         }
                     });
                 });
@@ -192,67 +204,67 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
     angular.module('sds-angular-controls').filter('unsafe', unsafe);
 })();
 
-(function () {
-    'use strict';
-    function autoNumeric (){
-        var options = {};
-        return {
-            require: '?ngModel', // Require ng-model in the element attribute for watching changes.
-            restrict: 'A',
-            compile: function (tElm, tAttrs) {
-                //ref: https://gist.github.com/kwokhou/5964296
-                //autonumeric: https://github.com/BobKnothe/autoNumeric
-
-                var isTextInput = tElm.is('input:text');
-
-                return function (scope, elm, attrs, controller) {
-                    // Get instance-specific options.
-                    var opts = angular.extend({}, options, scope.$eval(attrs.autoNumeric));
-
-                    // Helper method to update autoNumeric with new value.
-                    var updateElement = function (element, newVal) {
-                        // Only set value if value is numeric
-                        if ($.isNumeric(newVal)) {
-                            element.autoNumeric('set', newVal);
-                        }
-                    };
-
-                    // Initialize element as autoNumeric with options.
-                    elm.autoNumeric(opts);
-
-                    // if element has controller, wire it (only for <input type="text" />)
-                    if (controller && isTextInput) {
-                        // watch for external changes to model and re-render element
-                        scope.$watch(tAttrs.ngModel, function (current, old) {
-                            controller.$render();
-                        });
-                        // render element as autoNumeric
-                        controller.$render = function () {
-                            updateElement(elm, controller.$viewValue);
-                        };
-                        // Detect changes on element and update model.
-                        elm.on('change', function (e) {
-                            scope.$apply(function () {
-                                controller.$setViewValue(elm.autoNumeric('get'));
-                            });
-                        });
-                    }
-                    else {
-                        // Listen for changes to value changes and re-render element.
-                        // Useful when binding to a readonly input field.
-                        if (isTextInput) {
-                            attrs.$observe('value', function (val) {
-                                updateElement(elm, val);
-                            });
-                        }
-                    }
-                };
-            } // compile
-        };
-    }
-
-    angular.module('sds-angular-controls').directive('autoNumeric',autoNumeric);
-})();
+//(function () {
+//    'use strict';
+//    function autoNumeric (){
+//        var options = {};
+//        return {
+//            require: '?ngModel', // Require ng-model in the element attribute for watching changes.
+//            restrict: 'A',
+//            compile: function (tElm, tAttrs) {
+//                //ref: https://gist.github.com/kwokhou/5964296
+//                //autonumeric: https://github.com/BobKnothe/autoNumeric
+//
+//                var isTextInput = tElm.is('input:text');
+//
+//                return function (scope, elm, attrs, controller) {
+//                    // Get instance-specific options.
+//                    var opts = angular.extend({}, options, scope.$eval(attrs.autoNumeric));
+//
+//                    // Helper method to update autoNumeric with new value.
+//                    var updateElement = function (element, newVal) {
+//                        // Only set value if value is numeric
+//                        if ($.isNumeric(newVal)) {
+//                            element.autoNumeric('set', newVal);
+//                        }
+//                    };
+//
+//                    // Initialize element as autoNumeric with options.
+//                    elm.autoNumeric(opts);
+//
+//                    // if element has controller, wire it (only for <input type="text" />)
+//                    if (controller && isTextInput) {
+//                        // watch for external changes to model and re-render element
+//                        scope.$watch(tAttrs.ngModel, function (current, old) {
+//                            controller.$render();
+//                        });
+//                        // render element as autoNumeric
+//                        controller.$render = function () {
+//                            updateElement(elm, controller.$viewValue);
+//                        };
+//                        // Detect changes on element and update model.
+//                        elm.on('change', function (e) {
+//                            scope.$apply(function () {
+//                                controller.$setViewValue(elm.autoNumeric('get'));
+//                            });
+//                        });
+//                    }
+//                    else {
+//                        // Listen for changes to value changes and re-render element.
+//                        // Useful when binding to a readonly input field.
+//                        if (isTextInput) {
+//                            attrs.$observe('value', function (val) {
+//                                updateElement(elm, val);
+//                            });
+//                        }
+//                    }
+//                };
+//            } // compile
+//        };
+//    }
+//
+//    angular.module('sds-angular-controls').directive('autoNumeric',autoNumeric);
+//})();
 
 (function () {
     'use strict';
@@ -285,7 +297,11 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                     if(scope.items && !_.isArray(scope.items)){
                         scope.innerItems = convertToArray();
                     }else{
-                        scope.innerItems = scope.items;
+                        var i = 0;
+                        scope.innerItems = _.map(scope.items, function (v){
+                            v.__sort = i++;
+                            return v;
+                        });
                     }
 
                     if(newVal && newVal !== oldVal){
@@ -310,16 +326,17 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                 }
 
                 function convertToArray(){
+                    var i = 0;
                     var items = _.reduce(scope.items, function(result, item, key) {
                         //result[item["item-key"]] = item["item-value"];
                         result.push({
                             "itemKey" : key,
-                            "itemValue": item
+                            "itemValue": item,
+                            "__sort": i++
                         });
 
                         return result;
                     }, []);
-
                     scope.options.valueField = "itemKey";
                     scope.options.labelField = "itemValue";
                     scope.options.searchField = ["itemValue"];
@@ -353,10 +370,12 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                     dropdownDirection: scope.dropdownDirection || 'auto',
                     valueField: scope.itemKey,
                     labelField: scope.itemValue,
-                    sortField : scope.itemSort,
                     searchField: [scope.itemValue],
+                    sortField:  scope.itemSort || '__sort',
                     maxOptions: 1200
                 };
+
+
 
                 if (scope.allowCustom){
                     options.persist = false;
@@ -420,6 +439,83 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
 
     angular.module('sds-angular-controls').directive('formControl', formControl)
 
+})();
+
+(function () {
+    'use strict';
+    function formCurrencyInput ($timeout) {
+        return{
+            restrict: 'EA',
+            require: '^form-field',
+            replace: true,
+            scope: {
+                placeholder     : '@?',
+                rightLabel      : '@?',
+                mask            : '@?',
+                max             : '@?',
+                min             : '@?',
+                style           : '@?',
+                layoutCss       : '@?' //default col-md-6
+            },
+            templateUrl: 'sds-angular-controls/form-directives/form-currency-input.html',
+            link: function (scope, element, attr, container) {
+                var input = element.find('input');
+                scope.container = container.$scope;
+
+                // one-time bindings:
+                switch(container.$scope.layout){
+                    case "horizontal":
+                        scope.layoutCss = scope.layoutCss || "col-md-6";
+                        break;
+                    default: //stacked
+                        scope.layoutCss = scope.layoutCss || "";
+                }
+
+                if (scope.min){
+                    container.$scope.min = scope.min;
+                }
+                if (scope.max){
+                    container.$scope.max = scope.max;
+                }
+                if (container.$scope.isAutofocus){
+                    $timeout(function (){input.focus(); });
+                }
+
+                //$timeout(function (){
+                //    var isIntegerStep = false;
+                //    if (scope.type === "number"){
+                //        element.find(".inputField").on('keydown', function (e) {
+                //            var key = e.which || e.keyCode;
+                //            console.log(key, e);
+                //
+                //            return e.metaKey || e.ctrlKey || (!e.shiftKey &&
+                //                    // numbers
+                //                key >= 48 && key <= 57 ||
+                //                    // Numeric keypad
+                //                key >= 96 && key <= 105 ||
+                //                    // Minus
+                //                key == 109 || key == 189 ||
+                //                    // decimal points
+                //                (!isIntegerStep && key == 190 || key == 110) ||
+                //                    // Backspace and Tab and Enter
+                //                key == 8 || key == 9 || key == 13 ||
+                //                    // Home and End
+                //                key == 35 || key == 36 ||
+                //                    // left and right arrows
+                //                key == 37 || key == 39 ||
+                //                    // Del and Ins
+                //                key == 46 || key == 45);
+                //
+                //
+                //        });
+                //    }
+                //});
+            }
+        }
+    }
+    formCurrencyInput.$inject = ["$timeout"];
+
+    angular.module('sds-angular-controls').directive('formCurrencyInput', formCurrencyInput);
 })();
 
 (function () {
@@ -821,83 +917,6 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
     formMultiSelect.$inject = ["$timeout"];
 
     angular.module('sds-angular-controls').directive('formMultiSelect', formMultiSelect);
-})();
-
-(function () {
-    'use strict';
-    function formNumericInput ($timeout) {
-        return{
-            restrict: 'EA',
-            require: '^form-field',
-            replace: true,
-            scope: {
-                placeholder     : '@?',
-                rightLabel      : '@?',
-                mask            : '@?',
-                max             : '@?',
-                min             : '@?',
-                style           : '@?',
-                layoutCss       : '@?' //default col-md-6
-            },
-            templateUrl: 'sds-angular-controls/form-directives/form-numeric-input.html',
-            link: function (scope, element, attr, container) {
-                var input = element.find('input');
-                scope.container = container.$scope;
-
-                // one-time bindings:
-                switch(container.$scope.layout){
-                    case "horizontal":
-                        scope.layoutCss = scope.layoutCss || "col-md-6";
-                        break;
-                    default: //stacked
-                        scope.layoutCss = scope.layoutCss || "";
-                }
-
-                if (scope.min){
-                    container.$scope.min = scope.min;
-                }
-                if (scope.max){
-                    container.$scope.max = scope.max;
-                }
-                if (container.$scope.isAutofocus){
-                    $timeout(function (){input.focus(); });
-                }
-
-                $timeout(function (){
-                    var isIntegerStep = false;
-                    if (scope.type === "number"){
-                        element.find(".inputField").on('keydown', function (e) {
-                            var key = e.which || e.keyCode;
-                            console.log(key, e);
-
-                            return e.metaKey || e.ctrlKey || (!e.shiftKey &&
-                                    // numbers
-                                key >= 48 && key <= 57 ||
-                                    // Numeric keypad
-                                key >= 96 && key <= 105 ||
-                                    // Minus
-                                key == 109 || key == 189 ||
-                                    // decimal points
-                                (!isIntegerStep && key == 190 || key == 110) ||
-                                    // Backspace and Tab and Enter
-                                key == 8 || key == 9 || key == 13 ||
-                                    // Home and End
-                                key == 35 || key == 36 ||
-                                    // left and right arrows
-                                key == 37 || key == 39 ||
-                                    // Del and Ins
-                                key == 46 || key == 45);
-
-
-                        });
-                    }
-                });
-            }
-        }
-    }
-    formNumericInput.$inject = ["$timeout"];
-
-    angular.module('sds-angular-controls').directive('formNumericInput', formNumericInput);
 })();
 
 (function () {
@@ -1834,6 +1853,7 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                         label: $attrs.label,
                         sortable:  $attrs.sortable === 'false' ? false : !!$attrs.key,
                         type: $attrs.type,
+                        title: $attrs.title,
                         bind: $attrs.bind === 'true',
                         template: templateFunc
                     };
@@ -1913,6 +1933,7 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                     cols: [],
                     items: null,
                     filteredItems: null,
+                    getTooltip: getTooltip,
                     getItems: defaultGetItems,
                     toggleSort: toggleSort,
                     clearFilters: clearFilters,
@@ -1976,6 +1997,17 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                         $timeout(function (){
                             $element.find('tbody tr a:first').click();
                         });
+                    }
+                }
+
+                function getTooltip(col){
+                    if (col.title){
+                        return col.title;
+                    }
+                    if (col.type === 'bool'){
+                        return 'Filter using yes, no, true, or false'
+                    }else if (col.type){
+                        return 'Use a dash (-) to specify a range'
                     }
                 }
 
@@ -2105,6 +2137,11 @@ angular.module('sds-angular-controls').run(['$templateCache', function($template
   );
 
 
+  $templateCache.put('sds-angular-controls/form-directives/form-currency-input.html',
+    "<div class=\"{{::container.layout === 'horizontal' ? layoutCss : '' }}\"> <input class=\"form-control inputField {{::container.layout !== 'horizontal' ? layoutCss : ''}}\" ng-model=\"container.record[container.field]\" type=\"text\" name=\"{{::container.field}}\" ng-required=\"container.isRequired\" ng-disabled=\"container.isReadonly\" step=\"any\" style=\"{{::style}}\" currency-mask> <div ng-if=\"::(rightLabel && rightLabel.length > 0)\" class=\"rightLabel\">{{::rightLabel}}</div> </div>"
+  );
+
+
   $templateCache.put('sds-angular-controls/form-directives/form-date-picker.html',
     "<div class=\"{{::container.layout === 'horizontal' ? layoutCss : '' }}\"> <span class=\"input-group {{::container.layout !== 'horizontal' ? layoutCss : ''}}\" ng-if=\"!container.isReadonly\"> <input type=\"text\" style=\"{{::style}}\" class=\"form-control datepicker\" placeholder=\"{{placeholder || container.label}}\" ng-model=\"container.record[container.field]\" ng-required=\"::container.isRequired\" min-date=\"min\" max-date=\"max\" datepicker-popup=\"{{::dateFormat}}\" is-open=\"calendar.opened\"> <span class=\"input-group-btn\"> <button type=\"button\" class=\"btn btn-default\" ng-click=\"open($event)\"><i class=\"glyphicon glyphicon-calendar\"></i></button> </span> </span> <input ng-if=\"container.isReadonly\" style=\"{{::style}}\" readonly type=\"text\" class=\"form-control {{::container.layout !== 'horizontal' ? layoutCss : ''}}\" ng-model=\"readOnlyModel\"> </div>"
   );
@@ -2135,11 +2172,6 @@ angular.module('sds-angular-controls').run(['$templateCache', function($template
   );
 
 
-  $templateCache.put('sds-angular-controls/form-directives/form-numeric-input.html',
-    "<div class=\"{{::container.layout === 'horizontal' ? layoutCss : '' }}\"> <input class=\"form-control inputField {{::container.layout !== 'horizontal' ? layoutCss : ''}}\" ng-model=\"container.record[container.field]\" type=\"text\" name=\"{{::container.field}}\" ng-required=\"container.isRequired\" ng-disabled=\"container.isReadonly\" placeholder=\"{{::placeholder || container.label}}\" step=\"any\" style=\"{{::style}}\" mask-input=\"{{::mask}}\" auto-numeric> <div ng-if=\"::(rightLabel && rightLabel.length > 0)\" class=\"rightLabel\">{{::rightLabel}}</div> </div>"
-  );
-
-
   $templateCache.put('sds-angular-controls/form-directives/form-select.html',
     "<div class=\"{{::container.layout === 'horizontal' ? layoutCss : '' }}\"> <select ng-if=\"!container.isReadonly\" class=\"form-control {{::container.layout !== 'horizontal' ? layoutCss : ''}}\" name=\"{{::container.field}}\" ng-model=\"container.record[container.field]\" ng-options=\"convertType(key) as innerItems[key] for key in orderHash(innerItems)\" ng-required=\"container.isRequired\"></select> <!-- optionValue as optionLabel for arrayItem in array --> <input ng-if=\"container.isReadonly\" style=\"{{::style}}\" readonly type=\"text\" class=\"form-control {{::container.layout !== 'horizontal' ? layoutCss : ''}}\" ng-model=\"readOnlyModel\"> </div>"
   );
@@ -2166,7 +2198,7 @@ angular.module('sds-angular-controls').run(['$templateCache', function($template
 
 
   $templateCache.put('sds-angular-controls/table-directives/db-grid.html',
-    "<div class=\"table-responsive\"> <div class=\"btn-toolbar\"> <a ng-if=\"_model.showAdvancedFilter\" href=\"\" class=\"btn btn-default\" ng-click=\"_model.clearFilters()\">Clear All Filters <span class=\"big-x\">&times;</span></a> <div ng-if=\"!_model.showAdvancedFilter && _model.filterType !== 'none'\" class=\"toolbar-input\"> <div class=\"form-group has-feedback\"> <input class=\"form-control\" type=\"text\" ng-model=\"_model.filterText\" ng-keyup=\"$grid.refresh()\" placeholder=\"Filter {{_model.label || 'items'}}\" on-enter=\"_model.onEnter()\" isolate-control> <a href=\"\" ng-click=\"_model.filterText = ''; $grid.refresh()\" class=\"form-control-feedback feedback-link\">&times;</a> </div> </div> <a href=\"\" ng-if=\"_model.filterType === 'advanced'\" class=\"btn btn-default\" ng-class=\"{'btn-primary': _model.showAdvancedFilter}\" ng-click=\"_model.showAdvancedFilter = !_model.showAdvancedFilter\">{{_model.showAdvancedFilter ? 'Simple' : 'Advanced'}} Filtering</a> <db-transclude></db-transclude> <p ng-if=\"_model.total && _model.label\"><i>{{_model.total}} {{_model.label}}</i></p> </div> <table class=\"table db-grid table-hover {{_model.layoutCss}}\"> <thead> <tr ng-if=\"_model.showAdvancedFilter\"> <th ng-repeat=\"_col in _model.cols\" ng-style=\"{width: _col.width}\" class=\"{{_col.layoutCss}}\"> <div ng-if=\"::_col.sortable\"> <input type=\"text\" class=\"form-control filter-input\" on-enter=\"_model.onEnter()\" ng-keyup=\"$grid.refresh()\" ng-model=\"_col.filter\" placeholder=\"Filter {{::_col.label || (_col.key | labelCase)}}\" tooltip=\"{{_col.type ? 'Use a dash (-) to specify a range' : ''}}\" tooltip-trigger=\"focus\" tooltip-placement=\"top\" isolate-control> </div>   <tr> <th ng-repeat=\"_col in _model.cols\" ng-style=\"{width: _col.width}\" class=\"{{_col.layoutCss}}\"> <a href=\"\" ng-if=\"::_col.sortable\" ng-click=\"_model.toggleSort($index)\">{{::_col.label || (_col.key | labelCase) }}&nbsp;<i class=\"fa\" style=\"display: inline\" ng-class=\"{\n" +
+    "<div class=\"table-responsive\"> <div class=\"btn-toolbar\"> <a ng-if=\"_model.showAdvancedFilter\" href=\"\" class=\"btn btn-default\" ng-click=\"_model.clearFilters()\">Clear All Filters <span class=\"big-x\">&times;</span></a> <div ng-if=\"!_model.showAdvancedFilter && _model.filterType !== 'none'\" class=\"toolbar-input\"> <div class=\"form-group has-feedback\"> <input class=\"form-control\" type=\"text\" ng-model=\"_model.filterText\" ng-keyup=\"$grid.refresh()\" placeholder=\"Filter {{_model.label || 'items'}}\" on-enter=\"_model.onEnter()\" isolate-control> <a href=\"\" ng-click=\"_model.filterText = ''; $grid.refresh()\" class=\"form-control-feedback feedback-link\">&times;</a> </div> </div> <a href=\"\" ng-if=\"_model.filterType === 'advanced'\" class=\"btn btn-default\" ng-class=\"{'btn-primary': _model.showAdvancedFilter}\" ng-click=\"_model.showAdvancedFilter = !_model.showAdvancedFilter\">{{_model.showAdvancedFilter ? 'Simple' : 'Advanced'}} Filtering</a> <db-transclude></db-transclude> <p ng-if=\"_model.total && _model.label\"><i>{{_model.total}} {{_model.label}}</i></p> </div> <table class=\"table db-grid table-hover {{_model.layoutCss}}\"> <thead> <tr ng-if=\"_model.showAdvancedFilter\"> <th ng-repeat=\"_col in _model.cols\" ng-style=\"{width: _col.width}\" class=\"{{_col.layoutCss}}\"> <div ng-if=\"::_col.sortable\"> <input type=\"text\" class=\"form-control filter-input\" on-enter=\"_model.onEnter()\" ng-keyup=\"$grid.refresh()\" ng-model=\"_col.filter\" placeholder=\"Filter {{::_col.label || (_col.key | labelCase)}}\" tooltip=\"{{_model.getTooltip(_col)}}\" tooltip-trigger=\"focus\" tooltip-placement=\"top\" isolate-control> </div>   <tr> <th ng-repeat=\"_col in _model.cols\" ng-style=\"{width: _col.width}\" class=\"{{_col.layoutCss}}\"> <a href=\"\" ng-if=\"::_col.sortable\" ng-click=\"_model.toggleSort($index)\">{{::_col.label || (_col.key | labelCase) }}&nbsp;<i class=\"fa\" style=\"display: inline\" ng-class=\"{\n" +
     "                         'fa-sort'     : _model.sort !== $index,\n" +
     "                         'fa-sort-down': _model.sort === $index &&  _model.sortAsc,\n" +
     "                         'fa-sort-up'  : _model.sort === $index && !_model.sortAsc\n" +

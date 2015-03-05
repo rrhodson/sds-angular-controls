@@ -26,7 +26,7 @@
                     <div ng-if="::_col.sortable">
                         <input type="text" class="form-control filter-input" on-enter="_model.onEnter()"
                                ng-keyup="$grid.refresh()" ng-model="_col.filter" placeholder="Filter {{::_col.label || (_col.key | labelCase)}}"
-                               tooltip="{{_col.type ? 'Use a dash (-) to specify a range' : ''}}"  tooltip-trigger="focus"
+                               tooltip="{{_model.getTooltip(_col)}}"  tooltip-trigger="focus"
                                tooltip-placement="top" isolate-control />
                     </div>
                 </th>

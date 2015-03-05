@@ -50,6 +50,7 @@
                     cols: [],
                     items: null,
                     filteredItems: null,
+                    getTooltip: getTooltip,
                     getItems: defaultGetItems,
                     toggleSort: toggleSort,
                     clearFilters: clearFilters,
@@ -113,6 +114,17 @@
                         $timeout(function (){
                             $element.find('tbody tr a:first').click();
                         });
+                    }
+                }
+
+                function getTooltip(col){
+                    if (col.title){
+                        return col.title;
+                    }
+                    if (col.type === 'bool'){
+                        return 'Filter using yes, no, true, or false'
+                    }else if (col.type){
+                        return 'Use a dash (-) to specify a range'
                     }
                 }
 

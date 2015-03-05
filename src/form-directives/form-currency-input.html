@@ -5,11 +5,9 @@
            name='{{::container.field}}'
            ng-required='container.isRequired'
            ng-disabled="container.isReadonly"
-           placeholder='{{::placeholder || container.label}}'
            step="any"
            style="{{::style}}"
-           mask-input="{{::mask}}"
-           auto-numeric
+           currency-mask
             />
     <div ng-if="::(rightLabel && rightLabel.length > 0)" class="rightLabel">{{::rightLabel}}</div>
 </div>

@@ -32,7 +32,11 @@
                     if(scope.items && !_.isArray(scope.items)){
                         scope.innerItems = convertToArray();
                     }else{
-                        scope.innerItems = scope.items;
+                        var i = 0;
+                        scope.innerItems = _.map(scope.items, function (v){
+                            v.__sort = i++;
+                            return v;
+                        });
                     }
 
                     if(newVal && newVal !== oldVal){
@@ -57,16 +61,17 @@
                 }
 
                 function convertToArray(){
+                    var i = 0;
                     var items = _.reduce(scope.items, function(result, item, key) {
                         //result[item["item-key"]] = item["item-value"];
                         result.push({
                             "itemKey" : key,
-                            "itemValue": item
+                            "itemValue": item,
+                            "__sort": i++
                         });
 
                         return result;
                     }, []);
-
                     scope.options.valueField = "itemKey";
                     scope.options.labelField = "itemValue";
                     scope.options.searchField = ["itemValue"];
@@ -100,10 +105,12 @@
                     dropdownDirection: scope.dropdownDirection || 'auto',
                     valueField: scope.itemKey,
                     labelField: scope.itemValue,
-                    sortField : scope.itemSort,
                     searchField: [scope.itemValue],
+                    sortField:  scope.itemSort || '__sort',
                     maxOptions: 1200
                 };
+
+
 
                 if (scope.allowCustom){
                     options.persist = false;

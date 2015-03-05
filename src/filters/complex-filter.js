@@ -39,22 +39,32 @@
                         }
                     } else if (col.type === 'number' && col.filter) {
                         var n = col.filter.split("-");
-                        if(!n[0] && n[1]){
-                            n.slice(0,1);
+                        if (!n[0] && n[1]) {
+                            n.slice(0, 1);
                             n[0] *= -1;
                         }
-                        if(!n[1] && n[2]){
-                            n.slice(1,1);
+                        if (!n[1] && n[2]) {
+                            n.slice(1, 1);
                             n[1] *= -1;
                         }
                         var n1 = parseFloat(n[0]);
                         var n2 = parseFloat(n[1] || n[0]);
                         filters.push({
-                            filter:[n1, n2],
+                            filter: [n1, n2],
                             key: col.key,
-                            type:col.type
+                            type: col.type
                         });
-                    }else if (typeof col.filter === 'string'){
+                    }else if (col.type === 'bool' && col.filter){
+                        var b = col.filter.toLowerCase();
+                        if (b === 'no'.substr(0, b.length) || b === 'false'.substr(0, b.length)){
+                            b = false;
+                        }
+                        filters.push({
+                            filter: !!b,
+                            key: col.key,
+                            type: col.type
+                        });
+                    }else if (col.filter && typeof col.filter === 'string'){
                         filters.push({
                             filter:col.filter.toLowerCase(),
                             key: col.key
@@ -65,7 +75,7 @@
                 // run query
                 return _.filter(input, function (item) {
                     return _.all(filters, function (col) {
-                        if (!col.filter || !col.key) {
+                        if (!col.key) {
                             return true;
                         } else if (!col.type && _.isObject(prop(item,col.key))) {
                             return _.any(prop(item,col.key), function (v){
@@ -84,6 +94,8 @@
                             return d >= col.filter[0] && d <= col.filter[1];
                         } else if (col.type === 'number') {
                             return prop(item,col.key) >= col.filter[0] && prop(item,col.key) <= col.filter[1];
+                        }else if (col.type === 'bool') {
+                            return !!prop(item,col.key) === col.filter;
                         }
                     });
                 });

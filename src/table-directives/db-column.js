@@ -45,6 +45,7 @@
                         label: $attrs.label,
                         sortable:  $attrs.sortable === 'false' ? false : !!$attrs.key,
                         type: $attrs.type,
+                        title: $attrs.title,
                         bind: $attrs.bind === 'true',
                         template: templateFunc
                     };
