@@ -38,7 +38,7 @@
                     container.$scope.max = scope.max;
                 }
                 if (container.$scope.isAutofocus){
-                    $timeout(function (){input.focus(); });
+                    $timeout(function (){element.find('input').focus(); });
                 }
 
                 //$timeout(function (){

@@ -57,7 +57,7 @@
                 }
 
                 if (container.$scope.isAutofocus){
-                    $timeout(function (){input.focus(); });
+                    $timeout(function (){element.find('select').focus(); });
                 }
 
                 function convertToArray(){

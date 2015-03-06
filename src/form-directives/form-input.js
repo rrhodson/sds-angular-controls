@@ -34,7 +34,7 @@
                 }
 
                 if (container.$scope.isAutofocus){
-                    $timeout(function (){input.focus(); });
+                    $timeout(function (){element.find('input').focus();});
                 }
                 if (scope.min){
                     container.$scope.min = scope.min;
@@ -44,10 +44,6 @@
                 }
                 if (attr.pattern){
                     input.attr('pattern', attr.pattern);
-                }
-
-                if (container.$scope.isAutofocus){
-                    $timeout(function (){input.focus(); });
                 }
 
 

@@ -31,7 +31,7 @@
                 }
 
                 if (container.$scope.isAutofocus){
-                    $timeout(function (){input.focus(); });
+                    $timeout(function (){element.find('input').focus(); });
                 }
 
                 scope.type = attr.type || "text";

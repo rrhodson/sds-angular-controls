@@ -322,7 +322,7 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                 }
 
                 if (container.$scope.isAutofocus){
-                    $timeout(function (){input.focus(); });
+                    $timeout(function (){element.find('select').focus(); });
                 }
 
                 function convertToArray(){
@@ -478,7 +478,7 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                     container.$scope.max = scope.max;
                 }
                 if (container.$scope.isAutofocus){
-                    $timeout(function (){input.focus(); });
+                    $timeout(function (){element.find('input').focus(); });
                 }
 
                 //$timeout(function (){
@@ -547,7 +547,7 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                 }
 
                 if (container.$scope.isAutofocus){
-                    $timeout(function (){input.focus(); });
+                    $timeout(function (){element.find('input').focus(); });
                 }
                 
                 scope.dateFormat = scope.dateFormat || "MM-dd-yyyy";
@@ -627,7 +627,7 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                 }
 
                 if (container.$scope.isAutofocus){
-                    $timeout(function (){input.focus(); });
+                    $timeout(function (){element.find('input').focus(); });
                 }
 
                 scope.dateFormat = scope.dateFormat || "MM-dd-yyyy";
@@ -779,7 +779,7 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                 }
 
                 if (container.$scope.isAutofocus){
-                    $timeout(function (){input.focus(); });
+                    $timeout(function (){element.find('input').focus();});
                 }
                 if (scope.min){
                     container.$scope.min = scope.min;
@@ -789,10 +789,6 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                 }
                 if (attr.pattern){
                     input.attr('pattern', attr.pattern);
-                }
-
-                if (container.$scope.isAutofocus){
-                    $timeout(function (){input.focus(); });
                 }
 
 
@@ -870,7 +866,7 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                 }
 
                 if (container.$scope.isAutofocus){
-                    $timeout(function (){input.focus(); });
+                    $timeout(function (){element.find('select').focus(); });
                 }
 
                 scope.$watch("container.isReadonly", function(newVal){
@@ -961,7 +957,7 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                 }
 
                 if (container.$scope.isAutofocus){
-                    $timeout(function (){input.focus(); });
+                    $timeout(function (){element.find('select').focus(); });
                 }
 
                 scope.$watch("container.isReadonly", function(newVal){
@@ -1060,7 +1056,7 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                 }
 
                 if (container.$scope.isAutofocus){
-                    $timeout(function (){input.focus(); });
+                    $timeout(function (){element.find('textarea').focus(); });
                 }
             }
         }
@@ -1100,7 +1096,7 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                 }
 
                 if (container.$scope.isAutofocus){
-                    $timeout(function (){input.focus(); });
+                    $timeout(function (){element.find('input').focus(); });
                 }
 
                 scope.type = attr.type || "text";
