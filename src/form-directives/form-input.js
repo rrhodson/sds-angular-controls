@@ -46,7 +46,6 @@
                     input.attr('pattern', attr.pattern);
                 }
 
-
                 scope.step = attr.step || "any";
                 scope.type = attr.type || "text";
 
