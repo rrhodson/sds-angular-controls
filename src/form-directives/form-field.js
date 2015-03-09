@@ -24,7 +24,6 @@
                 showLabel               : '=?',
                 errorLayoutCss          : '@?',
                 hideValidationMessage   : '=?',  //default is false
-                log                     : '@?',
                 validationFieldName     : '@?'  //to override the default label   '[validationFieldName]' is required
             },
             templateUrl: 'sds-angular-controls/form-directives/form-field.html',
@@ -56,6 +55,10 @@
                 if($scope.layout === "horizontal"){
                     $scope.labelCss = $scope.labelCss || "col-md-4";
                 }
+
+                this.setValueFormatter = function (func){
+                    $scope.valueFormatter = func;
+                };
 
                 //validation ie. on submit
                 $scope.showError = function(field){

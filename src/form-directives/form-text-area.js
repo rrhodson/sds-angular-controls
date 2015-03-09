@@ -17,12 +17,8 @@
                 var input = element.find('textarea');
                 scope.container = container.$scope;
 
-                switch(container.$scope.layout){
-                    case "horizontal":
-                        scope.layoutCss = scope.layoutCss || "col-md-6";
-                        break;
-                    default: //stacked
-                        scope.layoutCss = scope.layoutCss || "";
+                if (attr.layoutCss && container.$scope.layout === 'horizontal'){
+                    scope.watch('layoutCss', function (){container.$scope.childLayoutCss = scope.layoutCss; });
                 }
 
                 if (container.$scope.isAutofocus){

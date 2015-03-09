@@ -24,15 +24,6 @@
                 var input = element.find('input');
                 scope.container = container.$scope;
 
-                // one-time bindings:
-                switch(container.$scope.layout){
-                    case "horizontal":
-                        scope.layoutCss = scope.layoutCss || "col-md-6";
-                        break;
-                    default: //stacked
-                        scope.layoutCss = scope.layoutCss || "";
-                }
-
                 if (container.$scope.isAutofocus){
                     $timeout(function (){element.find('input').focus();});
                 }
@@ -44,6 +35,9 @@
                 }
                 if (attr.pattern){
                     input.attr('pattern', attr.pattern);
+                }
+                if (attr.layoutCss && container.$scope.layout === 'horizontal'){
+                    scope.watch('layoutCss', function (){container.$scope.childLayoutCss = scope.layoutCss; });
                 }
 
                 scope.step = attr.step || "any";

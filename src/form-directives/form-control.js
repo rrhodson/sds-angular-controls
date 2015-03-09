@@ -4,17 +4,20 @@
     function formControl ($timeout) {
         return{
             restrict: 'A',
+            terminal: true,
+            priority: 1000,
             require: '^form-field, ngModel',
             compile: function (tElement, tAttrs){
-                tElement.attr('ng-model', 'container.record[container.field]');
-                tElement.attr('ng-required', 'container.isRequired');
-                tElement.attr('ng-disabled', 'container.isReadonly');
-                tElement.attr('name', '{{::container.field}}');
+                var name = tAttrs.name || tAttrs.ngModel.substr(tAttrs.ngModel.lastIndexOf('.')+1);
+                tElement.attr('name', name);
+                tElement.attr('ng-required', tAttrs.ngRequired || '{{container.isRequired}}');
+
+
                 return function (scope, element, attr, containers) {
-                    var input = element.find('input');
                     var ngModel = containers[1];
                     var formField = containers[0];
                     scope.container = formField.$scope;
+                    scope.container.field = name;
 
                     if (attr.min){
                         formField.$scope.min = attr.min;
@@ -22,9 +25,12 @@
                     if (attr.max){
                         formField.$scope.max = attr.max;
                     }
+                    if (attr.layoutCss && formField.$scope.layout === 'horizontal'){
+                        attr.$observe('layoutCss', function (val){ formField.$scope.childLayoutCss = val; });
+                    }
 
-                    var name = attr.name || attr.ngModel.substr(attr.ngModel.lastIndexOf('.')+1);;
-                    formField.$scope.field = name;
+                    //formField.setValueFormatter()
+
 
                 }
             }
