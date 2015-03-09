@@ -97,6 +97,7 @@ input.datepicker + ul {
   width: 300px;
   display: inline-block;
   margin-left: 5px;
+  margin-right: 5px;
   vertical-align: top;
 }
 .btn-toolbar > db-transclude > div {
@@ -121,8 +122,8 @@ input.datepicker + ul {
   padding: 4px 10px;
   font-size: 12px;
   line-height: 1.5;
-  border-width: 0 0 4px;
-  margin-bottom: -12px;
+  border-width: 0;
+  margin-bottom: -8px;
   background-color: #fff;
   margin-top: 0px;
   box-sizing: content-box;
@@ -130,6 +131,10 @@ input.datepicker + ul {
   border-color: transparent;
   border-radius: 0;
   box-shadow: inset 0px -1px 1px #d7d7d7 !important;
+}
+.form-control.filter-input:focus {
+  border-bottom-width: 4px;
+  margin-bottom: -12px;
 }
 .form-control-feedback.feedback-link {
   font-size: 20px;
@@ -140,73 +145,3 @@ input.datepicker + ul {
   text-decoration: none;
   font-weight: bold;
 }
-/*
-
-
-.nav-pills {
-    margin-bottom:4px;
-    input.form-control[type=text] {
-        width: 300px;
-        margin: 3px 10px;
-    }
-
-    p{
-        line-height: 28px;
-        margin: 0px 10px;
-    }
-}
-
-
-.primary-table.table > thead > tr > th {
-    background-color: @brand-primary;
-    color:#fff;
-    margin-top:4px;
-    vertical-align:top;
-
-    a{
-        color:#fff;
-    }
-    &:first-child{
-        border-radius: 3px 0 0 0;
-    }
-    &:last-child{
-        border-radius: 0 3px 0 0;
-    }
-}
-
-
-.feedback-link{
-    font-size:20px;
-    pointer-events: auto;
-    font-weight: normal;
-
-    &:hover{
-        text-decoration: none;
-        font-weight: bold;
-    }
-}
-
-.big-x{
-    font-size: 20px;
-    vertical-align: bottom;
-    line-height: 16px;
-}
-
-
-
-.btn-toolbar {
-  .toolbar-input{
-    width:300px;
-    display:inline-block;
-    margin-left:5px;
-    vertical-align: top;
-  }
-  p{
-    margin-left:10px;
-    display: inline-block;
-  }
-//  ng-transclude > .btn {
-//    margin-left: 5px;
-//  }
-}
-*/

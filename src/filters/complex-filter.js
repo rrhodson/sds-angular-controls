@@ -40,12 +40,19 @@
                     } else if (col.type === 'number' && col.filter) {
                         var n = col.filter.split("-");
                         if (!n[0] && n[1]) {
-                            n.slice(0, 1);
+                            console.log(n);
+                            n.shift();
                             n[0] *= -1;
+                            console.log(n);
                         }
                         if (!n[1] && n[2]) {
-                            n.slice(1, 1);
+                            console.log(n);
+                            n.splice(1, 1);
                             n[1] *= -1;
+                            console.log(n);
+                        }
+                        if (n[1] === ""){
+                            n[1] =  Number.MAX_VALUE;
                         }
                         var n1 = parseFloat(n[0]);
                         var n2 = parseFloat(n[1] || n[0]);

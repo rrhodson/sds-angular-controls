@@ -37,6 +37,7 @@
                 var pageFilter = $filter('page');
 
                 $scope._model = {
+                    isApi: false,
                     label: $attrs.label,
                     layoutCss: $attrs.layoutCss,
                     currentPage: 1,
@@ -55,16 +56,11 @@
                     toggleSort: toggleSort,
                     clearFilters: clearFilters,
                     onEnter: onEnter,
-                    refresh: _.debounce(refresh, 250),
+                    refresh: _.debounce(refresh, 100),
                     waiting: false
                 };
                 $scope.$grid = {
-                    refresh: _.debounce(function(){
-                        // hard refresh all rows
-                        $scope._model.currentPage = 1;
-                        $scope._model.filteredItems = null;
-                        $timeout(refresh);
-                    }, 500),
+                    refresh: _.debounce(refresh.bind(this, true), 100),
                     items: function (){ return $scope._model.filteredItems; }
                 };
 
@@ -73,7 +69,7 @@
                 var loop = $attrs.for.split(' ');
                 this.rowName = loop[0];
                 if (loop[2]) {
-                    $scope.$watchCollection(loop.slice(2).join(' '), function (items) {
+                    $scope.$watchCollection(loop.slice(2).join(' '), function (items, old) {
                         $scope._model.currentPage = 1;
                         $scope._model.filteredItems = null;
                         $scope._model.items = items;
@@ -128,7 +124,13 @@
                     }
                 }
 
-                function refresh() {
+                function refresh(force) {
+                    if (force){
+                        $scope._model.currentPage = 1;
+                        if($scope._model.isApi) {
+                            $scope._model.filteredItems = null;
+                        }
+                    }
                     $timeout(function () {
                         $scope._model.getItems(
                             $scope._model.showAdvancedFilter ? $scope._model.cols : $scope._model.filterText,
@@ -168,7 +170,10 @@
 
                 this.setDataSource = function (dataSource){
                     $scope._model.getItems = dataSource;
-                    $scope._model.refresh();
+                    $scope._model.isApi = true;
+                    $scope._model.refresh = _.debounce(refresh, 1000);
+                    $scope.$grid.refresh  = _.debounce(refresh.bind(this, true), 1000);
+                    refresh();
                 };
 
                 this.setTotal = function (total){
@@ -181,7 +186,7 @@
 
                 this.refresh = function (force){
                     if ($scope._model.items || force){
-                        $scope.$grid.refresh();
+                        refresh(true);
                     }
                 };
 
@@ -191,7 +196,7 @@
                             if (_.isString(val)){
                                 $scope._model.filterText = val;
                             }
-                            $scope.$grid.refresh();
+                            $scope._model.refresh();
                         }
                     });
                 }

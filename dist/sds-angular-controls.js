@@ -56,12 +56,19 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                     } else if (col.type === 'number' && col.filter) {
                         var n = col.filter.split("-");
                         if (!n[0] && n[1]) {
-                            n.slice(0, 1);
+                            console.log(n);
+                            n.shift();
                             n[0] *= -1;
+                            console.log(n);
                         }
                         if (!n[1] && n[2]) {
-                            n.slice(1, 1);
+                            console.log(n);
+                            n.splice(1, 1);
                             n[1] *= -1;
+                            console.log(n);
+                        }
+                        if (n[1] === ""){
+                            n[1] =  Number.MAX_VALUE;
                         }
                         var n1 = parseFloat(n[0]);
                         var n2 = parseFloat(n[1] || n[0]);
@@ -514,22 +521,28 @@ angular.module('currencyMask', []).directive('currencyMask', function () {
     function formControl ($timeout) {
         return{
             restrict: 'A',
-            require: '^form-field',
+            require: '^form-field, ngModel',
             compile: function (tElement, tAttrs){
                 tElement.attr('ng-model', 'container.record[container.field]');
                 tElement.attr('ng-required', 'container.isRequired');
                 tElement.attr('ng-disabled', 'container.isReadonly');
                 tElement.attr('name', '{{::container.field}}');
-                return function (scope, element, attr, container) {
+                return function (scope, element, attr, containers) {
                     var input = element.find('input');
-                    scope.container = container.$scope;
+                    var ngModel = containers[1];
+                    var formField = containers[0];
+                    scope.container = formField.$scope;
 
                     if (attr.min){
-                        container.$scope.min = attr.min;
+                        formField.$scope.min = attr.min;
                     }
                     if (attr.max){
-                        container.$scope.max = attr.max;
+                        formField.$scope.max = attr.max;
                     }
+
+                    var name = attr.name || attr.ngModel.substr(attr.ngModel.lastIndexOf('.')+1);;
+                    formField.$scope.field = name;
+
                 }
             }
         }
@@ -2014,6 +2027,7 @@ angular.module('currencyMask', []).directive('currencyMask', function () {
                 var pageFilter = $filter('page');
 
                 $scope._model = {
+                    isApi: false,
                     label: $attrs.label,
                     layoutCss: $attrs.layoutCss,
                     currentPage: 1,
@@ -2032,16 +2046,11 @@ angular.module('currencyMask', []).directive('currencyMask', function () {
                     toggleSort: toggleSort,
                     clearFilters: clearFilters,
                     onEnter: onEnter,
-                    refresh: _.debounce(refresh, 250),
+                    refresh: _.debounce(refresh, 100),
                     waiting: false
                 };
                 $scope.$grid = {
-                    refresh: _.debounce(function(){
-                        // hard refresh all rows
-                        $scope._model.currentPage = 1;
-                        $scope._model.filteredItems = null;
-                        $timeout(refresh);
-                    }, 500),
+                    refresh: _.debounce(refresh.bind(this, true), 100),
                     items: function (){ return $scope._model.filteredItems; }
                 };
 
@@ -2050,7 +2059,7 @@ angular.module('currencyMask', []).directive('currencyMask', function () {
                 var loop = $attrs.for.split(' ');
                 this.rowName = loop[0];
                 if (loop[2]) {
-                    $scope.$watchCollection(loop.slice(2).join(' '), function (items) {
+                    $scope.$watchCollection(loop.slice(2).join(' '), function (items, old) {
                         $scope._model.currentPage = 1;
                         $scope._model.filteredItems = null;
                         $scope._model.items = items;
@@ -2105,7 +2114,13 @@ angular.module('currencyMask', []).directive('currencyMask', function () {
                     }
                 }
 
-                function refresh() {
+                function refresh(force) {
+                    if (force){
+                        $scope._model.currentPage = 1;
+                        if($scope._model.isApi) {
+                            $scope._model.filteredItems = null;
+                        }
+                    }
                     $timeout(function () {
                         $scope._model.getItems(
                             $scope._model.showAdvancedFilter ? $scope._model.cols : $scope._model.filterText,
@@ -2145,7 +2160,10 @@ angular.module('currencyMask', []).directive('currencyMask', function () {
 
                 this.setDataSource = function (dataSource){
                     $scope._model.getItems = dataSource;
-                    $scope._model.refresh();
+                    $scope._model.isApi = true;
+                    $scope._model.refresh = _.debounce(refresh, 1000);
+                    $scope.$grid.refresh  = _.debounce(refresh.bind(this, true), 1000);
+                    refresh();
                 };
 
                 this.setTotal = function (total){
@@ -2158,7 +2176,7 @@ angular.module('currencyMask', []).directive('currencyMask', function () {
 
                 this.refresh = function (force){
                     if ($scope._model.items || force){
-                        $scope.$grid.refresh();
+                        refresh(true);
                     }
                 };
 
@@ -2168,7 +2186,7 @@ angular.module('currencyMask', []).directive('currencyMask', function () {
                             if (_.isString(val)){
                                 $scope._model.filterText = val;
                             }
-                            $scope.$grid.refresh();
+                            $scope._model.refresh();
                         }
                     });
                 }

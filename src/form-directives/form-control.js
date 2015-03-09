@@ -4,22 +4,28 @@
     function formControl ($timeout) {
         return{
             restrict: 'A',
-            require: '^form-field',
+            require: '^form-field, ngModel',
             compile: function (tElement, tAttrs){
                 tElement.attr('ng-model', 'container.record[container.field]');
                 tElement.attr('ng-required', 'container.isRequired');
                 tElement.attr('ng-disabled', 'container.isReadonly');
                 tElement.attr('name', '{{::container.field}}');
-                return function (scope, element, attr, container) {
+                return function (scope, element, attr, containers) {
                     var input = element.find('input');
-                    scope.container = container.$scope;
+                    var ngModel = containers[1];
+                    var formField = containers[0];
+                    scope.container = formField.$scope;
 
                     if (attr.min){
-                        container.$scope.min = attr.min;
+                        formField.$scope.min = attr.min;
                     }
                     if (attr.max){
-                        container.$scope.max = attr.max;
+                        formField.$scope.max = attr.max;
                     }
+
+                    var name = attr.name || attr.ngModel.substr(attr.ngModel.lastIndexOf('.')+1);;
+                    formField.$scope.field = name;
+
                 }
             }
         }
