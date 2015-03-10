@@ -1,7 +1,7 @@
 /*! 
  * sds-angular-controls
  * Angular Directives used with sds-angular generator
- * @version 0.4.5 
+ * @version 0.4.6 
  * 
  * Copyright (c) 2015 Steve Gentile, David Benson 
  * @link https://github.com/SMARTDATASYSTEMSLLC/sds-angular-controls 
@@ -2050,7 +2050,7 @@ angular.module('currencyMask', []).directive('currencyMask', function () {
                     waiting: false
                 };
                 $scope.$grid = {
-                    refresh: _.debounce(refresh.bind(this, true), 100),
+                    refresh: _.debounce(resetRefresh, 100),
                     items: function (){ return $scope._model.filteredItems; }
                 };
 
@@ -2114,13 +2114,15 @@ angular.module('currencyMask', []).directive('currencyMask', function () {
                     }
                 }
 
-                function refresh(force) {
-                    if (force){
-                        $scope._model.currentPage = 1;
-                        if($scope._model.isApi) {
-                            $scope._model.filteredItems = null;
-                        }
+                function resetRefresh(){
+                    $scope._model.currentPage = 1;
+                    if($scope._model.isApi) {
+                        $scope._model.filteredItems = null;
                     }
+                    refresh();
+                }
+
+                function refresh() {
                     $timeout(function () {
                         $scope._model.getItems(
                             $scope._model.showAdvancedFilter ? $scope._model.cols : $scope._model.filterText,
@@ -2162,7 +2164,7 @@ angular.module('currencyMask', []).directive('currencyMask', function () {
                     $scope._model.getItems = dataSource;
                     $scope._model.isApi = true;
                     $scope._model.refresh = _.debounce(refresh, 1000);
-                    $scope.$grid.refresh  = _.debounce(refresh.bind(this, true), 1000);
+                    $scope.$grid.refresh  = _.debounce(resetRefresh, 1000);
                     refresh();
                 };
 
@@ -2176,7 +2178,7 @@ angular.module('currencyMask', []).directive('currencyMask', function () {
 
                 this.refresh = function (force){
                     if ($scope._model.items || force){
-                        refresh(true);
+                        resetRefresh();
                     }
                 };
 
@@ -2191,7 +2193,7 @@ angular.module('currencyMask', []).directive('currencyMask', function () {
                     });
                 }
 
-                $scope.$watch('_model.currentPage', $scope._model.refresh);
+                $scope.$watch('_model.currentPage', refresh);
                 $scope.$watch('_model.sort',        $scope._model.refresh);
                 $scope.$watch('_model.sortAsc',     $scope._model.refresh);
             }]
