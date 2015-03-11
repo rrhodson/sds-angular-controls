@@ -37,7 +37,7 @@
                     input.attr('pattern', attr.pattern);
                 }
                 if (attr.layoutCss && container.$scope.layout === 'horizontal'){
-                    scope.watch('layoutCss', function (){container.$scope.childLayoutCss = scope.layoutCss; });
+                    scope.$watch('layoutCss', function (){container.$scope.childLayoutCss = scope.layoutCss; });
                 }
 
                 scope.step = attr.step || "any";

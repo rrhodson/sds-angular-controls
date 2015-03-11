@@ -56,10 +56,6 @@
                     $scope.labelCss = $scope.labelCss || "col-md-4";
                 }
 
-                this.setValueFormatter = function (func){
-                    $scope.valueFormatter = func;
-                };
-
                 //validation ie. on submit
                 $scope.showError = function(field){
                     try{

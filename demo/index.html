@@ -39,53 +39,15 @@
 
      <h3>Stacked Form</h3>
       <form name="testFrm" ng-submit="vm.save(testFrm)" novalidate>
-          <form-field record="vm.testForm" field="FirstName" label="First Name" is-required="true">
-          </form-field>
-          <form-field record="vm.testForm" field="LastName" is-required="true">
-              <form-input type="text" log="true" is-readonly="true"></form-input>
-          </form-field>
-          <form-field record="vm.testForm" field="PhoneNumber" is-required="true" layout-css="col-md-2">
-              <form-input type="tel" log="true" mask="(999)-999-9999"></form-input>
-          </form-field>
-          <form-field record="vm.testForm" field="Price" is-required="true" validation-field-name="The price">
-              <form-numeric-input></form-numeric-input>
-          </form-field>
-          <form-field record="vm.testForm" field="Email" is-required="true" layout-css="col-md-8">
-              <form-input type="email"></form-input>
-          </form-field>
-          <form-field record="vm.testForm" field="dateTime" is-required="true" log="true">
-              <form-date-time-picker></form-date-time-picker>
+
+          <form-field label="State" is-required="true" is-readonly="true">
+              <select ng-model="vm.testForm.State" form-control ng-options="s.stateCode as s.stateName for s in vm.states"></select>
           </form-field>
 
-          <form-field record="vm.testForm" field="timeOnly" is-required="true" log="true">
-              <form-time-picker></form-time-picker>
-          </form-field>
-          <form-field label="Weight" record="vm.testForm" field="weight">
-              <form-text-toggle on-label="kg" off-label="lb" toggle-field="weightUnit" toggle-switch-type="inverse"></form-text-toggle>
-          </form-field>
-          <form-field record="vm.testForm" field="Age" is-required="true" layout-css="col-md-2">
-              <form-input log="true" type="number" min="1" max="110"></form-input>
-          </form-field>
-          <form-field record="vm.testForm" field="State" label="State" is-required=true>
-              <form-select items="vm.states" log="true" item-key="stateCode" item-value="stateName"></form-select>
-          </form-field>
-          <form-field record="vm.testForm" field="State2" layout-css="col-md-8" is-required="true">
-              <form-autocomplete items="vm.states" log="true" item-key="stateCode" item-value="stateName"></form-autocomplete>
-          </form-field>
-          <form-field record="vm.testForm" field="Country" layout-css="col-md-8">
-              <form-autocomplete items="vm.countries" groups="vm.continents" log="true"
-                                 item-key="countryCode" item-value="country"
-                                 item-group-key="continent" item-group-value="continent"></form-autocomplete>
-          </form-field>
-          <form-field label="DOB" placeholder="Select Date" record="vm.testForm" field="DateOfBirth">
-              <form-date-picker log="true"></form-date-picker>
+          <form-field label="State" is-required="true">
+              <select ng-model="vm.testForm.State" form-control ng-options="s.stateCode as s.stateName for s in vm.states"></select>
           </form-field>
 
-          <form-field label="Do you like ice cream?" record="vm.testForm" field="LikesIceCream">
-              <form-toggle log="true" on-label="Yes" off-label="No"></form-toggle>
-          </form-field>
-
-          <input type="submit" value="Submit" class="btn btn-primary"ß>
       </form>
 
         <hr>

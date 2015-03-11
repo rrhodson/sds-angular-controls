@@ -1,7 +1,7 @@
 /*! 
  * sds-angular-controls
  * Angular Directives used with sds-angular generator
- * @version 0.4.5 
+ * @version 0.4.6 
  * 
  * Copyright (c) 2015 Steve Gentile, David Benson 
  * @link https://github.com/SMARTDATASYSTEMSLLC/sds-angular-controls 
@@ -384,12 +384,8 @@ angular.module('currencyMask', []).directive('currencyMask', function () {
                 });
 
                 // one-time bindings:
-                switch(container.$scope.layout){
-                    case "horizontal":
-                        scope.layoutCss = scope.layoutCss || "col-md-6";
-                        break;
-                    default: //stacked
-                        scope.layoutCss = scope.layoutCss || "";
+                if (attr.layoutCss && container.$scope.layout === 'horizontal'){
+                    scope.$watch('layoutCss', function (){container.$scope.childLayoutCss = scope.layoutCss; });
                 }
 
                 if (container.$scope.isAutofocus){
@@ -518,38 +514,76 @@ angular.module('currencyMask', []).directive('currencyMask', function () {
 
 (function () {
     'use strict';
-    function formControl ($timeout) {
+    function formControl ($timeout,$injector, formControlFormatters) {
         return{
             restrict: 'A',
-            require: '^form-field, ngModel',
+            //terminal: true,
+            //priority: 1000,
+            require: ['^formField', 'ngModel', '?select'],
             compile: function (tElement, tAttrs){
-                tElement.attr('ng-model', 'container.record[container.field]');
-                tElement.attr('ng-required', 'container.isRequired');
-                tElement.attr('ng-disabled', 'container.isReadonly');
-                tElement.attr('name', '{{::container.field}}');
-                return function (scope, element, attr, containers) {
-                    var input = element.find('input');
+                var name = tAttrs.name || tAttrs.ngModel.substr(tAttrs.ngModel.lastIndexOf('.')+1);
+                tElement.attr('name', name);
+                tElement.attr('ng-required', tAttrs.ngRequired || '{{container.isRequired}}');
+                tElement.addClass('form-control');
+
+
+                return function ($scope, $element, $attrs, containers) {
                     var ngModel = containers[1];
                     var formField = containers[0];
-                    scope.container = formField.$scope;
+                    var ngOptions = containers[2];
+                    $scope.container = formField.$scope;
+                    $scope.container.field = name;
 
-                    if (attr.min){
-                        formField.$scope.min = attr.min;
+                    if ($attrs.min){
+                        formField.$scope.min = $attrs.min;
                     }
-                    if (attr.max){
-                        formField.$scope.max = attr.max;
+                    if ($attrs.max){
+                        formField.$scope.max = $attrs.max;
+                    }
+                    if ($attrs.layoutCss && formField.$scope.layout === 'horizontal'){
+                        $attrs.$observe('layoutCss', function (val){ formField.$scope.childLayoutCss = val; });
                     }
 
-                    var name = attr.name || attr.ngModel.substr(attr.ngModel.lastIndexOf('.')+1);;
-                    formField.$scope.field = name;
-
+                    var formatter = _.find(formControlFormatters, function (v, k){ return $element.is(k); });
+                    if (!formatter) {
+                        formatter = function (ngModel){ return function (){ return ngModel.$modelValue; }};
+                    }
+                    $scope.container.valueFormatter = $injector.invoke(formatter, this, {ngModel: ngModel, $attrs: $attrs, $scope: $scope});
                 }
             }
         }
     }
-    formControl.$inject = ["$timeout"];
+    formControl.$inject = ["$timeout", "$injector", "formControlFormatters"];
 
-    angular.module('sds-angular-controls').directive('formControl', formControl)
+    var formControlFormatters = {
+      'select': function (ngModel, $attrs, $parse, $scope){
+          var NG_OPTIONS_REGEXP = /^\s*([\s\S]+?)(?:\s+as\s+([\s\S]+?))?(?:\s+group\s+by\s+([\s\S]+?))?(?:\s+disable\s+when\s+([\s\S]+?))?\s+for\s+(?:([\$\w][\$\w]*)|(?:\(\s*([\$\w][\$\w]*)\s*,\s*([\$\w][\$\w]*)\s*\)))\s+in\s+([\s\S]+?)(?:\s+track\s+by\s+([\s\S]+?))?$/;
+          var match = $attrs.ngOptions.match(NG_OPTIONS_REGEXP);
+          var prop = match[5] || match[7];
+          var valuesFn = $parse(match[8]);
+          var result = $parse(/ as /.test(match[0]) || match[2] ? match[1] : prop);
+          var label = $parse(match[2] || match[1]);
+
+          return function (){
+              var rec = {};
+              rec[prop] = _.find(valuesFn($scope), function (v){
+                  var option = {};
+                  option[prop] = v;
+                  return result($scope, option) === ngModel.$modelValue;
+              });
+              return label($scope, rec);
+          };
+      },
+      'input[datepicker-popup]': function (ngModel, $attrs){
+          return function (){
+              return moment.utc(ngModel.$modelValue).format($attrs.datepickerPopup.replace(/d/g, 'D').replace(/E/g, 'd').replace(/y/g, 'Y'));
+          };
+      }
+    };
+
+    angular.module('sds-angular-controls')
+        .directive('formControl', formControl)
+        .constant('formControlFormatters', formControlFormatters)
 
 })();
 
@@ -575,12 +609,8 @@ angular.module('currencyMask', []).directive('currencyMask', function () {
                 scope.container = container.$scope;
 
                 // one-time bindings:
-                switch(container.$scope.layout){
-                    case "horizontal":
-                        scope.layoutCss = scope.layoutCss || "col-md-6";
-                        break;
-                    default: //stacked
-                        scope.layoutCss = scope.layoutCss || "";
+                if (attr.layoutCss && container.$scope.layout === 'horizontal'){
+                    scope.$watch('layoutCss', function (){container.$scope.childLayoutCss = scope.layoutCss; });
                 }
 
                 if (scope.min){
@@ -649,13 +679,9 @@ angular.module('currencyMask', []).directive('currencyMask', function () {
             link: function (scope, element, attr, container) {
                 var input = element.find('input');
                 scope.container = container.$scope;
-                
-                switch(container.$scope.layout){
-                    case "horizontal":
-                        scope.layoutCss = scope.layoutCss || "col-md-6";
-                        break;
-                    default: //stacked
-                        scope.layoutCss = scope.layoutCss || "";
+
+                if (attr.layoutCss && container.$scope.layout === 'horizontal'){
+                    scope.$watch('layoutCss', function (){container.$scope.childLayoutCss = scope.layoutCss; });
                 }
 
                 if (container.$scope.isAutofocus){
@@ -730,12 +756,8 @@ angular.module('currencyMask', []).directive('currencyMask', function () {
                 var input = element.find('input');
                 scope.container = container.$scope;
 
-                switch(container.$scope.layout){
-                    case "horizontal":
-                        scope.layoutCss = scope.layoutCss || "col-md-6";
-                        break;
-                    default: //stacked
-                        scope.layoutCss = scope.layoutCss || "";
+                if (attr.layoutCss && container.$scope.layout === 'horizontal'){
+                    scope.$watch('layoutCss', function (){container.$scope.childLayoutCss = scope.layoutCss; });
                 }
 
                 if (container.$scope.isAutofocus){
@@ -801,7 +823,6 @@ angular.module('currencyMask', []).directive('currencyMask', function () {
                 showLabel               : '=?',
                 errorLayoutCss          : '@?',
                 hideValidationMessage   : '=?',  //default is false
-                log                     : '@?',
                 validationFieldName     : '@?'  //to override the default label   '[validationFieldName]' is required
             },
             templateUrl: 'sds-angular-controls/form-directives/form-field.html',
@@ -881,15 +902,6 @@ angular.module('currencyMask', []).directive('currencyMask', function () {
                 var input = element.find('input');
                 scope.container = container.$scope;
 
-                // one-time bindings:
-                switch(container.$scope.layout){
-                    case "horizontal":
-                        scope.layoutCss = scope.layoutCss || "col-md-6";
-                        break;
-                    default: //stacked
-                        scope.layoutCss = scope.layoutCss || "";
-                }
-
                 if (container.$scope.isAutofocus){
                     $timeout(function (){element.find('input').focus();});
                 }
@@ -901,6 +913,9 @@ angular.module('currencyMask', []).directive('currencyMask', function () {
                 }
                 if (attr.pattern){
                     input.attr('pattern', attr.pattern);
+                }
+                if (attr.layoutCss && container.$scope.layout === 'horizontal'){
+                    scope.$watch('layoutCss', function (){container.$scope.childLayoutCss = scope.layoutCss; });
                 }
 
                 scope.step = attr.step || "any";
@@ -968,12 +983,8 @@ angular.module('currencyMask', []).directive('currencyMask', function () {
                 scope.container = container.$scope;
 
                 // one-time bindings:
-                switch(container.$scope.layout){
-                    case "horizontal":
-                        scope.layoutCss = scope.layoutCss || "col-md-6";
-                        break;
-                    default: //stacked
-                        scope.layoutCss = scope.layoutCss || "";
+                if (attr.layoutCss && container.$scope.layout === 'horizontal'){
+                    scope.$watch('layoutCss', function (){container.$scope.childLayoutCss = scope.layoutCss; });
                 }
 
                 if (container.$scope.isAutofocus){
@@ -1059,12 +1070,8 @@ angular.module('currencyMask', []).directive('currencyMask', function () {
                 });
 
                 // one-time bindings:
-                switch(container.$scope.layout){
-                    case "horizontal":
-                        scope.layoutCss = scope.layoutCss || "col-md-6";
-                        break;
-                    default: //stacked
-                        scope.layoutCss = scope.layoutCss || "";
+                if (attr.layoutCss && container.$scope.layout === 'horizontal'){
+                    scope.$watch('layoutCss', function (){container.$scope.childLayoutCss = scope.layoutCss; });
                 }
 
                 if (container.$scope.isAutofocus){
@@ -1158,12 +1165,8 @@ angular.module('currencyMask', []).directive('currencyMask', function () {
                 var input = element.find('textarea');
                 scope.container = container.$scope;
 
-                switch(container.$scope.layout){
-                    case "horizontal":
-                        scope.layoutCss = scope.layoutCss || "col-md-6";
-                        break;
-                    default: //stacked
-                        scope.layoutCss = scope.layoutCss || "";
+                if (attr.layoutCss && container.$scope.layout === 'horizontal'){
+                    scope.$watch('layoutCss', function (){container.$scope.childLayoutCss = scope.layoutCss; });
                 }
 
                 if (container.$scope.isAutofocus){
@@ -1198,12 +1201,8 @@ angular.module('currencyMask', []).directive('currencyMask', function () {
                 var input = element.find('input');
                 scope.container = container.$scope;
 
-                switch(container.$scope.layout){
-                    case "horizontal":
-                        scope.layoutCss = scope.layoutCss || "col-md-6";
-                        break;
-                    default: //stacked
-                        scope.layoutCss = scope.layoutCss || "";
+                if (attr.layoutCss && container.$scope.layout === 'horizontal'){
+                    scope.$watch('layoutCss', function (){container.$scope.childLayoutCss = scope.layoutCss; });
                 }
 
                 if (container.$scope.isAutofocus){
@@ -1237,13 +1236,10 @@ angular.module('currencyMask', []).directive('currencyMask', function () {
             link: function (scope, element, attr, container) {
                 scope.container = container.$scope;
 
-                switch(container.$scope.layout){
-                    case "horizontal":
-                        scope.layoutCss = scope.layoutCss || "col-md-6";
-                        break;
-                    default: //stacked
-                        scope.layoutCss = scope.layoutCss || "";
+                if (attr.layoutCss && container.$scope.layout === 'horizontal'){
+                    scope.$watch('layoutCss', function (){container.$scope.childLayoutCss = scope.layoutCss; });
                 }
+
                 scope.$watch('container.record[container.field]', function (val){
                     if (typeof val === 'string'){
                         container.$scope.record[container.$scope.field] = moment.utc(container.$scope.record[container.$scope.field]).toDate();
@@ -1281,12 +1277,8 @@ angular.module('currencyMask', []).directive('currencyMask', function () {
             link: function (scope, element, attr, container) {
                 scope.container = container.$scope;
 
-                switch(container.$scope.layout){
-                    case "horizontal":
-                        scope.layoutCss = scope.layoutCss || "col-md-6";
-                        break;
-                    default: //stacked
-                        scope.layoutCss = scope.layoutCss || "";
+                if (attr.layoutCss && container.$scope.layout === 'horizontal'){
+                    scope.$watch('layoutCss', function (){container.$scope.childLayoutCss = scope.layoutCss; });
                 }
 
                 scope.toggleSwitchType = scope.toggleSwitchType || "primary";
@@ -2270,7 +2262,7 @@ angular.module('sds-angular-controls').run(['$templateCache', function($template
 
 
   $templateCache.put('sds-angular-controls/form-directives/form-field.html',
-    "<div> <div ng-if=\"layout === 'stacked'\" class=\"row\"> <div class=\"form-group clearfix\" ng-form=\"{{field}}\" ng-class=\"{ 'has-error': showError({{field}}) }\"> <div class=\"{{::layoutCss}}\"> <label ng-if=\"showLabel\" class=\"control-label {{labelCss}}\"> {{ label }} <span ng-if=\"isRequired && !isReadonly\">*</span></label> <ng-transclude></ng-transclude> <div ng-if=\"showDefault\"><form-input></form-input></div> <!-- validation --> <div class=\"pull-left\" ng-include=\"'sds-angular-controls/form-directives/form-field-validation.html'\"></div> </div> </div> </div> <div ng-if=\"layout === 'horizontal'\" class=\"row inline-control\"> <div class=\"form-group clearfix\" ng-form=\"{{field}}\" ng-class=\"{ 'has-error': showError({{field}}) }\"> <label ng-if=\"showLabel\" class=\"control-label {{labelCss}}\"> {{ label }} <span ng-if=\"isRequired && !isReadonly\">*</span></label> <ng-transclude></ng-transclude> <div ng-if=\"showDefault\"><form-input></form-input></div> <!-- validation --> <div ng-if=\"!hideValidationMessage\" ng-show=\"showError({{field}})\" class=\"popover validation right alert-danger\" style=\"display:inline-block; top:auto; left:auto; margin-top:-4px; min-width:240px\"> <div class=\"arrow\" style=\"top: 20px\"></div> <div class=\"popover-content\" ng-include=\"'sds-angular-controls/form-directives/form-field-validation.html'\"> </div> </div> </div> </div> <div ng-if=\"layout !== 'stacked' && layout !== 'horizontal'\" ng-form=\"{{field}}\" ng-class=\"{ 'has-error': showError({{field}}) }\" class=\"grid-control {{::layoutCss}}\"> <ng-transclude></ng-transclude> <div ng-if=\"showDefault\"><form-input></form-input></div> </div> <div ng-if=\"log\"> form-input value: {{record[field]}}<br> {{isRequired}} </div> </div>"
+    "<div> <div ng-if=\"layout === 'stacked'\" class=\"row\"> <div class=\"form-group clearfix\" ng-form=\"{{field}}\" ng-class=\"{ 'has-error': showError({{field}}) }\"> <div class=\"{{::layoutCss}}\"> <label ng-if=\"showLabel\" class=\"control-label {{labelCss}}\"> {{ label }} <span ng-if=\"isRequired && !isReadonly\">*</span></label> <span ng-if=\"!valueFormatter || !isReadonly\"><ng-transclude></ng-transclude></span> <input ng-if=\"valueFormatter && isReadonly\" class=\"form-control\" type=\"text\" ng-value=\"valueFormatter()\" name=\"{{field}}\" readonly> <!-- validation --> <div class=\"pull-left\" ng-include=\"'sds-angular-controls/form-directives/form-field-validation.html'\"></div> </div> </div> </div> <div ng-if=\"layout === 'horizontal'\" class=\"row inline-control\"> <div class=\"form-group clearfix\" ng-form=\"{{field}}\" ng-class=\"{ 'has-error': showError({{field}}) }\"> <label ng-if=\"showLabel\" class=\"control-label {{labelCss}}\"> {{ label }} <span ng-if=\"isRequired && !isReadonly\">*</span></label> <div class=\"{{childLayoutCss}} || 'col-md-6'\"> <span ng-if=\"!valueFormatter && !isReadonly\"><ng-transclude></ng-transclude></span> <input ng-if=\"valueFormatter && isReadonly\" class=\"form-control\" type=\"text\" ng-value=\"valueFormatter()\" name=\"{{field}}\" readonly> </div> <!-- validation --> <div ng-if=\"!hideValidationMessage\" ng-show=\"showError({{field}})\" class=\"popover validation right alert-danger\" style=\"display:inline-block; top:auto; left:auto; margin-top:-4px; min-width:240px\"> <div class=\"arrow\" style=\"top: 20px\"></div> <div class=\"popover-content\" ng-include=\"'sds-angular-controls/form-directives/form-field-validation.html'\"> </div> </div> </div> </div> <div ng-if=\"layout !== 'stacked' && layout !== 'horizontal'\" ng-form=\"{{field}}\" ng-class=\"{ 'has-error': showError({{field}}) }\" class=\"grid-control {{::layoutCss}}\"> <span ng-if=\"!valueFormatter || !isReadonly\"><ng-transclude></ng-transclude></span> <input ng-if=\"valueFormatter && isReadonly\" class=\"form-control\" type=\"text\" ng-value=\"valueFormatter()\" name=\"{{field}}\" readonly> </div> </div>"
   );
 
 

@@ -19,7 +19,7 @@
                 scope.container = container.$scope;
 
                 if (attr.layoutCss && container.$scope.layout === 'horizontal'){
-                    scope.watch('layoutCss', function (){container.$scope.childLayoutCss = scope.layoutCss; });
+                    scope.$watch('layoutCss', function (){container.$scope.childLayoutCss = scope.layoutCss; });
                 }
 
                 if (container.$scope.isAutofocus){

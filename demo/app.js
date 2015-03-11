@@ -21,7 +21,7 @@
       PhoneNumber: "",
       Age: 25,
       City: "",
-      State: "",
+      State: "OH",
       ZipCode: "",
       Price:  5.983,
       LikesIceCream: false,
