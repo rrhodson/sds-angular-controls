@@ -15,7 +15,7 @@
      * @param {int}        pageSize  - The page size, defaults to 25. Bound once.
      * @param {expression} for       - Required. Either 'item in items' or (when used with a custom data source) just 'item'
      */
-    function dbGrid ($filter, $timeout, $q) {
+    function dbGrid ($filter, $timeout, $q, $log) {
         return {
             restrict: 'E',
             replace: true,
@@ -25,7 +25,7 @@
             compile: function (tElement, tAttrs){
                 var loop = tAttrs.for.split(' ');
                 if (loop.length !== 1 && loop[1] != 'in') {
-                    console.error('Invalid loop');
+                    $log.error('Invalid loop');
                     return;
                 }
 
@@ -133,7 +133,7 @@
                 }
 
                 function refresh() {
-                    $timeout(function () {
+                    //$timeout(function () {
                         $scope._model.getItems(
                             $scope._model.showAdvancedFilter ? $scope._model.cols : $scope._model.filterText,
                             $scope._model.sort !== null ? $scope._model.cols[$scope._model.sort].key : null,
@@ -144,7 +144,7 @@
                         ).then(function (result){
                             $scope._model.filteredItems = result;
                         });
-                    });
+                    //});
                 }
 
                 this.addColumn = function (item){
@@ -171,11 +171,15 @@
                 };
 
                 this.setDataSource = function (dataSource){
+                    $timeout(function(){
                     $scope._model.getItems = dataSource;
                     $scope._model.isApi = true;
+                    $scope._model.refresh.cancel();
+                    $scope.$grid.refresh.cancel();
                     $scope._model.refresh = _.debounce(refresh, 1000);
                     $scope.$grid.refresh  = _.debounce(resetRefresh, 1000);
                     refresh();
+                    });
                 };
 
                 this.setTotal = function (total){
@@ -206,6 +210,8 @@
                 $scope.$watch('_model.currentPage', refresh);
                 $scope.$watch('_model.sort',        $scope._model.refresh);
                 $scope.$watch('_model.sortAsc',     $scope._model.refresh);
+
+
             }
         };
     }

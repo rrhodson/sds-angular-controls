@@ -131,6 +131,8 @@
                                 changing = false;
                                 storeInvalidValues(values, parseValues(selectize.getValue()));
                             });
+                        }else if(!value){
+                            changing = false;
                         }
 
                         selectize.$control.toggleClass('ng-valid', ngModel.$valid);

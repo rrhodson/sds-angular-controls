@@ -1,7 +1,7 @@
 /*! 
  * sds-angular-controls
  * Angular Directives used with sds-angular generator
- * @version 0.4.6 
+ * @version 0.4.9 
  * 
  * Copyright (c) 2015 Steve Gentile, David Benson 
  * @link https://github.com/SMARTDATASYSTEMSLLC/sds-angular-controls 
@@ -1503,6 +1503,8 @@ angular.module('currencyMask', []).directive('currencyMask', function () {
                                 changing = false;
                                 storeInvalidValues(values, parseValues(selectize.getValue()));
                             });
+                        }else if(!value){
+                            changing = false;
                         }
 
                         selectize.$control.toggleClass('ng-valid', ngModel.$valid);
@@ -2005,7 +2007,7 @@ angular.module('currencyMask', []).directive('currencyMask', function () {
      * @param {int}        pageSize  - The page size, defaults to 25. Bound once.
      * @param {expression} for       - Required. Either 'item in items' or (when used with a custom data source) just 'item'
      */
-    function dbGrid ($filter, $timeout, $q) {
+    function dbGrid ($filter, $timeout, $q, $log) {
         return {
             restrict: 'E',
             replace: true,
@@ -2015,7 +2017,7 @@ angular.module('currencyMask', []).directive('currencyMask', function () {
             compile: function (tElement, tAttrs){
                 var loop = tAttrs.for.split(' ');
                 if (loop.length !== 1 && loop[1] != 'in') {
-                    console.error('Invalid loop');
+                    $log.error('Invalid loop');
                     return;
                 }
 
@@ -2123,7 +2125,7 @@ angular.module('currencyMask', []).directive('currencyMask', function () {
                 }
 
                 function refresh() {
-                    $timeout(function () {
+                    //$timeout(function () {
                         $scope._model.getItems(
                             $scope._model.showAdvancedFilter ? $scope._model.cols : $scope._model.filterText,
                             $scope._model.sort !== null ? $scope._model.cols[$scope._model.sort].key : null,
@@ -2134,7 +2136,7 @@ angular.module('currencyMask', []).directive('currencyMask', function () {
                         ).then(function (result){
                             $scope._model.filteredItems = result;
                         });
-                    });
+                    //});
                 }
 
                 this.addColumn = function (item){
@@ -2161,11 +2163,15 @@ angular.module('currencyMask', []).directive('currencyMask', function () {
                 };
 
                 this.setDataSource = function (dataSource){
+                    $timeout(function(){
                     $scope._model.getItems = dataSource;
                     $scope._model.isApi = true;
+                    $scope._model.refresh.cancel();
+                    $scope.$grid.refresh.cancel();
                     $scope._model.refresh = _.debounce(refresh, 1000);
                     $scope.$grid.refresh  = _.debounce(resetRefresh, 1000);
                     refresh();
+                    });
                 };
 
                 this.setTotal = function (total){
@@ -2196,10 +2202,12 @@ angular.module('currencyMask', []).directive('currencyMask', function () {
                 $scope.$watch('_model.currentPage', refresh);
                 $scope.$watch('_model.sort',        $scope._model.refresh);
                 $scope.$watch('_model.sortAsc',     $scope._model.refresh);
+
+
             }]
         };
     }
-    dbGrid.$inject = ["$filter", "$timeout", "$q"];
+    dbGrid.$inject = ["$filter", "$timeout", "$q", "$log"];
 
     angular.module('sds-angular-controls').directive('dbGrid', dbGrid);
 })();
