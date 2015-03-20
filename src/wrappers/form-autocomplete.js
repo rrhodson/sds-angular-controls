@@ -1,6 +1,19 @@
 /**
  * Created by stevegentile on 12/19/14.
  */
+
+/* TODO: move these hacks into selectize-ng
+
+ <select ng-if="!container.isReadonly && !reload"
+ ng-readonly="container.isReadonly"
+ ng-required="container.isRequired"
+ name="{{::container.field}}"
+ selectize="options"
+ options="innerItems"
+ class="{{::container.layout !== 'horizontal' ? layoutCss : ''}}"
+ ng-model="container.record[container.field]"></select>
+ <!-- optionValue as optionLabel for arrayItem in array -->
+
 (function () {
     'use strict';
     function formAutocomplete ($timeout) {
@@ -17,14 +30,11 @@
                 itemGroupKey    : '@?',
                 itemGroupValue  : '@?',
                 dropdownDirection:'@?',
-                allowCustom     : '=?',
-                style           : '@?',
-                layoutCss       : '@?' //default col-md-6
+                allowCustom     : '=?'
             },
             templateUrl: 'sds-angular-controls/form-directives/form-autocomplete.html',
 
             link: function (scope, element, attr, container) {
-                var input = element.find('select');
                 scope.container = container.$scope;
                 scope.innerItems = [];
                 //// hack to force reloading options
@@ -48,17 +58,10 @@
                 });
 
                 // one-time bindings:
-                switch(container.$scope.layout){
-                    case "horizontal":
-                        scope.layoutCss = scope.layoutCss || "col-md-6";
-                        break;
-                    default: //stacked
-                        scope.layoutCss = scope.layoutCss || "";
+                if (attr.layoutCss && container.$scope.layout === 'horizontal'){
+                    scope.$watch('layoutCss', function (){container.$scope.childLayoutCss = scope.layoutCss; });
                 }
 
-                if (container.$scope.isAutofocus){
-                    $timeout(function (){element.find('select').focus(); });
-                }
 
                 function convertToArray(){
                     var i = 0;
@@ -83,22 +86,6 @@
                     return items;
                 }
 
-                scope.$watch("container.isReadonly", function(newVal){
-                    if(newVal) {
-                        if (scope.container.record && scope.container.record[scope.container.field]) {
-
-                            var value = scope.innerItems[scope.container.record[scope.container.field]];
-                            //if using itemKey/itemValue -we need to find it in the array vs. hash:
-                            if(scope.itemValue && scope.itemKey){
-                                var arrayItem = _.find(scope.innerItems, function(item){
-                                    return item[scope.itemKey] === scope.container.record[scope.container.field];
-                                });
-                                value = arrayItem[scope.itemValue];
-                            }
-                            scope.readOnlyModel = value;
-                        }
-                    }
-                });
 
                 var options = {
                     plugins: ['dropdown_direction'],
@@ -142,3 +129,4 @@
     angular.module('sds-angular-controls').directive('formAutocomplete', formAutocomplete);
 
 })();
+*/

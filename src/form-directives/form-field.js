@@ -6,7 +6,7 @@
  */
 (function () {
     'use strict';
-    function formField ($filter, $timeout) {
+    function formField () {
         return{
             restrict: 'EA',
             transclude: true,
@@ -15,7 +15,6 @@
                 record                  : '=' , //two-way binding
                 isRequired              : '=?',
                 isReadonly              : '=?',
-                isAutofocus             : '=?',
                 field                   : '@' , //one-way binding
                 label                   : '@' ,
                 layout                  : '@?',
@@ -24,7 +23,6 @@
                 showLabel               : '=?',
                 errorLayoutCss          : '@?',
                 hideValidationMessage   : '=?',  //default is false
-                log                     : '@?',
                 validationFieldName     : '@?'  //to override the default label   '[validationFieldName]' is required
             },
             templateUrl: 'sds-angular-controls/form-directives/form-field.html',
@@ -33,20 +31,6 @@
                 this.$scope = $scope;
             },
             link: function($scope, element, attrs, form){
-                //include a default form-input if no transclude included
-                $scope.showDefault = false;
-                $timeout(function(){
-                    if(element.find('ng-transclude *').length === 0){
-                        $scope.showDefault = true;
-                    }
-                });
-                //end include
-
-                if(!$scope.label){
-                    $scope.label = $filter("labelCase")($scope.field);
-                }
-
-                $scope.validationFieldName = $scope.validationFieldName || $filter("labelCase")($scope.label);
                 $scope.showLabel = $scope.showLabel !== false; // default to true
                 $scope.hideValidationMessage = $scope.hideValidationMessage || false;
                 $scope.layoutCss = $scope.layoutCss || "col-md-12";
@@ -57,21 +41,26 @@
                     $scope.labelCss = $scope.labelCss || "col-md-4";
                 }
 
+                element.on('focus', '[name]', function (){
+                    $scope.isFocused = true;
+                    $scope.$apply();
+                }).on('blur', '[name]', function (){
+                    $scope.isFocused = false;
+                    $scope.$apply();
+                });
+
                 //validation ie. on submit
-                $scope.showError = function(field){
-                    try{
-                        if(form.$submitted){
-                            return field.$invalid;
-                        }else if (element.find('[name=' + field.$name + ']:focus').length) {
-                            return false;
-                        }else{
-                            return field.$dirty && field.$invalid;
-                        }
+                $scope.showError = function(){
+                    if ($scope.field && form && form[$scope.field]){
+                        var field = form[$scope.field];
+                        return field.$invalid && (form.$submitted || field.$dirty && !$scope.isFocused);
                     }
-                    catch(err){
-                        return false;
+                };
+                $scope.getError = function (){
+                    if ($scope.field && form && form[$scope.field]) {
+                        return form[$scope.field].$error;
                     }
-                }
+                };
             }
 
         }

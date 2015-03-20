@@ -1,7 +1,7 @@
 /*! 
  * sds-angular-controls
  * Angular Directives used with sds-angular generator
- * @version 0.4.9 
+ * @version 1.0.0 
  * 
  * Copyright (c) 2015 Steve Gentile, David Benson 
  * @link https://github.com/SMARTDATASYSTEMSLLC/sds-angular-controls 
@@ -21,115 +21,6 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
   }
 
   angular.module('sds-angular-controls').filter('camelCase', camelCase);
-})();
-
-(function (){
-    'use strict';
-
-    function complexFilter ($filter){
-        return function(input,arg) {
-            if (typeof arg === "string"){
-                return $filter('filter')(input, arg);
-
-            }else {
-                var prop = function (obj, key){
-                    var arr = key.split(".");
-                    while(arr.length && (obj = obj[arr.shift()])); // jshint ignore:line
-                    return obj;
-                };
-
-
-                var filters = [];
-                // setup filters
-                _.each(arg, function (col) {
-                    if (col.type === 'date' && col.filter) {
-                        var d = col.filter.split("-");
-                        var d1 = moment(d[0]);
-                        var d2 = moment(d[1] || d1.clone().endOf('day'));
-                        if (d1.isValid() && d2.isValid()) {
-                            filters.push({
-                                filter: [d1.valueOf(), d2.valueOf()],
-                                key: col.key,
-                                type: col.type
-                            });
-                        }
-                    } else if (col.type === 'number' && col.filter) {
-                        var n = col.filter.split("-");
-                        if (!n[0] && n[1]) {
-                            console.log(n);
-                            n.shift();
-                            n[0] *= -1;
-                            console.log(n);
-                        }
-                        if (!n[1] && n[2]) {
-                            console.log(n);
-                            n.splice(1, 1);
-                            n[1] *= -1;
-                            console.log(n);
-                        }
-                        if (n[1] === ""){
-                            n[1] =  Number.MAX_VALUE;
-                        }
-                        var n1 = parseFloat(n[0]);
-                        var n2 = parseFloat(n[1] || n[0]);
-                        filters.push({
-                            filter: [n1, n2],
-                            key: col.key,
-                            type: col.type
-                        });
-                    }else if (col.type === 'bool' && col.filter){
-                        var b = col.filter.toLowerCase();
-                        if (b === 'no'.substr(0, b.length) || b === 'false'.substr(0, b.length)){
-                            b = false;
-                        }
-                        filters.push({
-                            filter: !!b,
-                            key: col.key,
-                            type: col.type
-                        });
-                    }else if (col.filter && typeof col.filter === 'string'){
-                        filters.push({
-                            filter:col.filter.toLowerCase(),
-                            key: col.key
-                        });
-                    }
-                });
-
-                // run query
-                return _.filter(input, function (item) {
-                    return _.all(filters, function (col) {
-                        if (!col.key) {
-                            return true;
-                        } else if (!col.type && _.isObject(prop(item,col.key))) {
-                            return _.any(prop(item,col.key), function (v){
-                                if (_.isPlainObject(v)){
-                                    return _.any(v, function (vv){
-                                        return (vv + "").toLowerCase().indexOf(col.filter) > -1;
-                                    });
-                                }else{
-                                    return (prop(item,col.key) + "").toLowerCase().indexOf(col.filter) > -1;
-                                }
-                            });
-                        } else if (!col.type) {
-                            return (prop(item,col.key) + "").toLowerCase().indexOf(col.filter) > -1;
-                        } else if (col.type === 'date') {
-                            var d = moment(prop(item,col.key)).valueOf();
-                            return d >= col.filter[0] && d <= col.filter[1];
-                        } else if (col.type === 'number') {
-                            return prop(item,col.key) >= col.filter[0] && prop(item,col.key) <= col.filter[1];
-                        }else if (col.type === 'bool') {
-                            return !!prop(item,col.key) === col.filter;
-                        }
-                    });
-                });
-            }
-
-
-        };
-    }
-    complexFilter.$inject = ["$filter"];
-
-    angular.module('sds-angular-controls').filter('complexFilter', complexFilter);
 })();
 
 (function (){
@@ -184,32 +75,295 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
 (function (){
     'use strict';
 
-    function page (){
-        return function(input, page, size) {
-            if (!input || !input.length){
-                return [];
-            }
-
-            page = parseInt(page || 0, 10) || 0;
-            size = parseInt(size || 0, 10);
-            if (!size){
-                size = 25;
-            }
-            return input.slice(page * size, (page+1) * size);
-        };
-    }
-
-    angular.module('sds-angular-controls').filter('page', page);
-})();
-
-(function (){
-    'use strict';
-
     function unsafe ($sce) { return $sce.trustAsHtml; }
     unsafe.$inject = ["$sce"];
 
     angular.module('sds-angular-controls').filter('unsafe', unsafe);
 })();
+
+(function () {
+    'use strict';
+    function formButton ($q) {
+        return{
+            restrict: 'E',
+            transclude: true,
+            replace: true,
+            scope: {
+                buttonClass: '@?',
+                action: '&'
+            },
+            template: '<a href="" class="btn {{buttonClass}} {{isDisabled}}" ng-click="doPromise($event)" ng-transclude></a>',
+            link: function($scope, element, attrs){
+                $scope.buttonClass = $scope.buttonClass || 'btn-default';
+                $scope.isDisabled = '';
+                $scope.doPromise = function ($event){
+                    if ($scope.isDisabled){
+                        return;
+                    }
+                    $scope.isDisabled = 'disabled';
+                    $q.when($scope.action($event)).then(function (){
+                        $scope.isDisabled = '';
+                    }, function (){
+                        $scope.isDisabled = '';
+                    });
+                }
+            }
+        }
+    }
+    formButton.$inject = ["$q"];
+
+    angular.module('sds-angular-controls').directive('formButton', formButton)
+
+})();
+
+
+(function () {
+    'use strict';
+    function formControl ($injector, $compile, formControlFormatters) {
+        return{
+            restrict: 'A',
+            terminal: true,
+            priority: 1000,
+            require: ['^formField'],
+            link:  function ($scope, $element, $attrs, containers) {
+                var formField = containers[0];
+                var name = $attrs.name || $attrs.ngModel.substr($attrs.ngModel.lastIndexOf('.')+1);
+                $element.attr('name', name);
+                $element.attr('ng-required', $attrs.ngRequired || '{{container.isRequired}}');
+                $element.removeAttr('form-control');
+                $element.removeAttr('data-form-control');
+
+                if ($element.is('input, select, textarea')){
+                    $element.addClass('form-control');
+                }
+
+                $scope.container = formField.$scope;
+
+                formField.$scope.field = name;
+                if ($attrs.min){
+                    formField.$scope.min = $attrs.min;
+                }
+                if ($attrs.max){
+                    formField.$scope.max = $attrs.max;
+                }
+                if ($attrs.layoutCss && formField.$scope.layout === 'horizontal'){
+                     formField.$scope.childLayoutCss = $attrs.layoutCss;
+                }
+
+
+                // handle custom formatters for disabled controls
+                var formatter = _.find(formControlFormatters, function (v, k){ return $element.is(k); });
+                if (!formatter) {
+                    formatter = function (ngModel){ return function (){ return ngModel(); }};
+                }
+                var getModel = function (obj, key){
+                    var arr = key.split(".");
+                    while(arr.length && (obj = obj[arr.shift()])); // jshint ignore:line
+                    return obj;
+                };
+
+                formField.$scope.valueFormatter = $injector.invoke(formatter, this, {ngModel: getModel.bind(this, $scope, $attrs.ngModel), $attrs: $attrs, $scope: $scope});
+
+                $compile($element)($scope);
+            }
+        }
+    }
+    formControl.$inject = ["$injector", "$compile", "formControlFormatters"];
+
+    var formControlFormatters = {
+        'select[ng-options]': function (ngModel, $attrs, $parse, $scope){
+            var NG_OPTIONS_REGEXP = /^\s*([\s\S]+?)(?:\s+as\s+([\s\S]+?))?(?:\s+group\s+by\s+([\s\S]+?))?(?:\s+disable\s+when\s+([\s\S]+?))?\s+for\s+(?:([\$\w][\$\w]*)|(?:\(\s*([\$\w][\$\w]*)\s*,\s*([\$\w][\$\w]*)\s*\)))\s+in\s+([\s\S]+?)(?:\s+track\s+by\s+([\s\S]+?))?$/;
+            var match = $attrs.ngOptions.match(NG_OPTIONS_REGEXP);
+            var prop = match[5] || match[7];
+            var valuesFn = $parse(match[8]);
+            var result = $parse(/ as /.test(match[0]) || match[2] ? match[1] : prop);
+            var label = $parse(match[2] || match[1]);
+
+            return function (){
+                var model = ngModel();
+
+                var rec = {};
+                rec[prop] = _.find(valuesFn($scope), function (v){
+                    var option = {};
+                    option[prop] = v;
+                    return result($scope, option) === model;
+                });
+                return label($scope, rec);
+            };
+        },
+        'select[selectize]': function (ngModel, $attrs, $parse, $scope){
+            return function (){ //TODO: correct this
+                return ngModel();
+            };
+        },
+        'toggle-switch': function (ngModel, $attrs){
+            return function (){
+                return ngModel() ? $attrs.onLabel : $attrs.offLabel;
+            };
+        },
+        'timepicker': function (ngModel, $attrs){
+            return function (){
+                return moment(ngModel()).format('h:mm a');
+            };
+        },
+        'input[datepicker-popup]': function (ngModel, $attrs, $scope, $interpolate){
+            return function (){
+                return moment(ngModel()).format($interpolate($attrs.datepickerPopup)($scope).replace(/d/g, 'D').replace(/E/g, 'd').replace(/y/g, 'Y'));
+            };
+        }
+    };
+
+    angular.module('sds-angular-controls')
+        .directive('formControl', formControl)
+        .constant('formControlFormatters', formControlFormatters)
+
+})();
+
+(function () {
+    'use strict';
+    function formDatePicker () {
+        return{
+            restrict: 'EA',
+            require: '^form-field',
+            replace: true,
+            scope: {
+                sdsModel         : '=',
+                dateFormat       : '@',
+                max              : '=?',
+                min              : '=?',
+                placeholder      : '@?'
+            },
+            templateUrl: 'sds-angular-controls/form-directives/form-date-picker.html',
+
+            link: function ($scope, $element, $attrs, formField) {
+                var input = $element.find('input');
+                $scope.container = formField.$scope;
+                $scope.dateFormat = $scope.dateFormat || "MM-dd-yyyy";
+
+                $scope.calendar = {opened: false};
+                $scope.open = function($event) {
+                    $event.preventDefault();
+                    $event.stopPropagation();
+                    $scope.isOpened = true;
+                };
+
+                $scope.$watch('sdsModel', function (val){
+                    if (typeof val === 'string'){
+                        $scope.sdsModel = moment.utc(val).toDate();
+                    }
+                });
+
+                formField.$scope.field = $attrs.name || $attrs.sdsModel.substr($attrs.sdsModel.lastIndexOf('.')+1);
+                if ($scope.max) {
+                    formField.$scope.max = moment.utc($scope.max).format($scope.dateFormat.toUpperCase());
+                }
+                if ($scope.min) {
+                    formField.$scope.min = moment.utc($scope.min).format($scope.dateFormat.toUpperCase());
+                }
+            }
+        }
+    }
+
+    function datepickerPopup (){
+        return {
+            restrict: 'EAC',
+            require: 'ngModel',
+            link: function($scope, $element, $attrs, controller) {
+                //remove the default formatter from the input directive to prevent conflict
+                controller.$formatters.shift();
+            }
+        }
+    }
+
+    angular.module('sds-angular-controls').directive('formDatePicker', formDatePicker).directive('datepickerPopup', datepickerPopup);
+})();
+
+/**
+ * Created by stevegentile on 12/19/14.
+ */
+(function () {
+    'use strict';
+    function formField () {
+        return{
+            restrict: 'EA',
+            transclude: true,
+            replace: true,
+            scope: {
+                record                  : '=' , //two-way binding
+                isRequired              : '=?',
+                isReadonly              : '=?',
+                field                   : '@' , //one-way binding
+                label                   : '@' ,
+                layout                  : '@?',
+                labelCss                : '@?',
+                layoutCss               : '@?',
+                showLabel               : '=?',
+                errorLayoutCss          : '@?',
+                hideValidationMessage   : '=?',  //default is false
+                validationFieldName     : '@?'  //to override the default label   '[validationFieldName]' is required
+            },
+            templateUrl: 'sds-angular-controls/form-directives/form-field.html',
+            require: '^form',
+            controller: ["$scope", function ($scope){
+                this.$scope = $scope;
+            }],
+            link: function($scope, element, attrs, form){
+                $scope.showLabel = $scope.showLabel !== false; // default to true
+                $scope.hideValidationMessage = $scope.hideValidationMessage || false;
+                $scope.layoutCss = $scope.layoutCss || "col-md-12";
+                $scope.errorLayoutCss = $scope.errorLayoutCss || "col-md-12";
+
+                $scope.layout = $scope.layout || "stacked";
+                if($scope.layout === "horizontal"){
+                    $scope.labelCss = $scope.labelCss || "col-md-4";
+                }
+
+                element.on('focus', '[name]', function (){
+                    $scope.isFocused = true;
+                    $scope.$apply();
+                }).on('blur', '[name]', function (){
+                    $scope.isFocused = false;
+                    $scope.$apply();
+                });
+
+                //validation ie. on submit
+                $scope.showError = function(){
+                    if ($scope.field && form && form[$scope.field]){
+                        var field = form[$scope.field];
+                        return field.$invalid && (form.$submitted || field.$dirty && !$scope.isFocused);
+                    }
+                };
+                $scope.getError = function (){
+                    if ($scope.field && form && form[$scope.field]) {
+                        return form[$scope.field].$error;
+                    }
+                };
+            }
+
+        }
+    }
+
+    angular.module('sds-angular-controls').directive('formField', formField);
+})();
+
+angular.module('sds-angular-controls').run(['$templateCache', function($templateCache) {
+  'use strict';
+
+  $templateCache.put('sds-angular-controls/form-directives/form-date-picker.html',
+    "<span class=\"input-group\"> <input type=\"text\" form-control class=\"datepicker\" placeholder=\"{{placeholder || container.label}}\" ng-model=\"sdsModel\" min-date=\"min\" max-date=\"max\" datepicker-popup=\"{{::dateFormat}}\" is-open=\"isOpened\"> <span class=\"input-group-btn\"> <button type=\"button\" class=\"btn btn-default\" ng-click=\"open($event)\"><i class=\"glyphicon glyphicon-calendar\"></i></button> </span> </span>"
+  );
+
+
+  $templateCache.put('sds-angular-controls/form-directives/form-field-validation.html',
+    "<div ng-if=\"!hideValidationMessage\" class=\"has-error\" ng-show=\"showError()\" ng-messages=\"getError()\"> <span class=\"control-label\" ng-message=\"required\"> {{ validationFieldName || label || (field | labelCase) }} is required. </span> <span class=\"control-label\" ng-message=\"text\"> {{ validationFieldName || label || (field | labelCase) }} should be text. </span> <span class=\"control-label\" ng-message=\"integer\"> {{ validationFieldName || label || (field | labelCase) }} should be an integer. </span> <span class=\"control-label\" ng-message=\"email\"> {{ validationFieldName || label || (field | labelCase) }} should be an email address. </span> <span class=\"control-label\" ng-message=\"date\"> {{ validationFieldName || label || (field | labelCase) }} should be a date. </span> <span class=\"control-label\" ng-message=\"datetime\"> {{ validationFieldName || label || (field | labelCase) }} should be a datetime. </span> <span class=\"control-label\" ng-message=\"time\"> {{ validationFieldName || label || (field | labelCase) }} should be a time. </span> <span class=\"control-label\" ng-message=\"month\"> {{ validationFieldName || label || (field | labelCase) }} should be a month. </span> <span class=\"control-label\" ng-message=\"week\"> {{ validationFieldName || label || (field | labelCase) }} should be a week. </span> <span class=\"control-label\" ng-message=\"url\"> {{ validationFieldName || label || (field | labelCase) }} should be an url. </span> <span class=\"control-label\" ng-message=\"zip\"> {{ validationFieldName || label || (field | labelCase) }} should be a valid zipcode. </span> <span class=\"control-label\" ng-message=\"number\"> {{ validationFieldName || label || (field | labelCase) }} must be a number</span> <span class=\"control-label\" ng-message=\"tel\"> {{ validationFieldName || label || (field | labelCase) }} must be a phone number</span> <span class=\"control-label\" ng-message=\"color\"> {{ validationFieldName || label || (field | labelCase) }} must be a color</span> <span class=\"control-label\" ng-message=\"min\"> {{ validationFieldName || label || (field | labelCase) }} must be at least {{min}}. </span> <span class=\"control-label\" ng-message=\"max\"> {{ validationFieldName || label || (field | labelCase) }} must not exceed {{max}} </span> <span class=\"control-label\" ng-repeat=\"(k, v) in types\" ng-message=\"{{k}}\"> {{ validationFieldName || label || (field | labelCase) }}{{v[1]}}</span> </div>"
+  );
+
+
+  $templateCache.put('sds-angular-controls/form-directives/form-field.html',
+    "<div> <div ng-if=\"layout === 'stacked'\" class=\"row\"> <div class=\"form-group clearfix\" ng-class=\"{ 'has-error': showError() }\"> <div class=\"{{layoutCss}}\"> <label ng-if=\"showLabel\" class=\"control-label {{labelCss}}\"> {{ label || (field | labelCase) }} <span ng-if=\"isRequired && !isReadonly\">*</span></label> <div ng-if=\"!valueFormatter || !isReadonly\"><ng-transclude></ng-transclude></div> <input ng-if=\"valueFormatter && isReadonly\" class=\"form-control\" type=\"text\" ng-value=\"valueFormatter()\" name=\"{{field}}\" readonly> <!-- validation --> <div class=\"pull-left\" ng-include=\"'sds-angular-controls/form-directives/form-field-validation.html'\"></div> </div> </div> </div> <div ng-if=\"layout === 'horizontal'\" class=\"row inline-control\"> <div class=\"form-group clearfix\" ng-class=\"{ 'has-error': showError() }\"> <label ng-if=\"showLabel\" class=\"control-label {{labelCss}}\"> {{ label || (field | labelCase) }} <span ng-if=\"isRequired && !isReadonly\">*</span></label> <div class=\"{{childLayoutCss || 'col-md-6'}}\"> <span ng-if=\"!valueFormatter || !isReadonly\"><ng-transclude></ng-transclude></span> <input ng-if=\"valueFormatter && isReadonly\" class=\"form-control\" type=\"text\" ng-value=\"valueFormatter()\" name=\"{{field}}\" readonly> </div> <!-- validation --> <div ng-if=\"!hideValidationMessage\" ng-show=\"showError()\" class=\"popover validation right alert-danger\" style=\"display:inline-block; top:auto; left:auto; margin-top:-4px; min-width:240px\"> <div class=\"arrow\" style=\"top: 20px\"></div> <div class=\"popover-content\" ng-include=\"'sds-angular-controls/form-directives/form-field-validation.html'\"> </div> </div> </div> </div> <div ng-if=\"layout !== 'stacked' && layout !== 'horizontal'\" ng-class=\"{ 'has-error': showError() }\" class=\"grid-control {{::layoutCss}}\"> <span ng-if=\"!valueFormatter || !isReadonly\"><ng-transclude></ng-transclude></span> <input ng-if=\"valueFormatter && isReadonly\" class=\"form-control\" type=\"text\" ng-value=\"valueFormatter()\" name=\"{{field}}\" readonly> </div> </div>"
+  );
+
+}]);
 
 angular.module('currencyMask', []).directive('currencyMask', function () {
     return {
@@ -275,67 +429,17 @@ angular.module('currencyMask', []).directive('currencyMask', function () {
         }
     };
 });
-//(function () {
-//    'use strict';
-//    function autoNumeric (){
-//        var options = {};
-//        return {
-//            require: '?ngModel', // Require ng-model in the element attribute for watching changes.
-//            restrict: 'A',
-//            compile: function (tElm, tAttrs) {
-//                //ref: https://gist.github.com/kwokhou/5964296
-//                //autonumeric: https://github.com/BobKnothe/autoNumeric
-//
-//                var isTextInput = tElm.is('input:text');
-//
-//                return function (scope, elm, attrs, controller) {
-//                    // Get instance-specific options.
-//                    var opts = angular.extend({}, options, scope.$eval(attrs.autoNumeric));
-//
-//                    // Helper method to update autoNumeric with new value.
-//                    var updateElement = function (element, newVal) {
-//                        // Only set value if value is numeric
-//                        if ($.isNumeric(newVal)) {
-//                            element.autoNumeric('set', newVal);
-//                        }
-//                    };
-//
-//                    // Initialize element as autoNumeric with options.
-//                    elm.autoNumeric(opts);
-//
-//                    // if element has controller, wire it (only for <input type="text" />)
-//                    if (controller && isTextInput) {
-//                        // watch for external changes to model and re-render element
-//                        scope.$watch(tAttrs.ngModel, function (current, old) {
-//                            controller.$render();
-//                        });
-//                        // render element as autoNumeric
-//                        controller.$render = function () {
-//                            updateElement(elm, controller.$viewValue);
-//                        };
-//                        // Detect changes on element and update model.
-//                        elm.on('change', function (e) {
-//                            scope.$apply(function () {
-//                                controller.$setViewValue(elm.autoNumeric('get'));
-//                            });
-//                        });
-//                    }
-//                    else {
-//                        // Listen for changes to value changes and re-render element.
-//                        // Useful when binding to a readonly input field.
-//                        if (isTextInput) {
-//                            attrs.$observe('value', function (val) {
-//                                updateElement(elm, val);
-//                            });
-//                        }
-//                    }
-//                };
-//            } // compile
-//        };
-//    }
-//
-//    angular.module('sds-angular-controls').directive('autoNumeric',autoNumeric);
-//})();
+/* TODO: move these hacks into selectize-ng
+
+ <select ng-if="!container.isReadonly && !reload"
+ ng-readonly="container.isReadonly"
+ ng-required="container.isRequired"
+ name="{{::container.field}}"
+ selectize="options"
+ options="innerItems"
+ class="{{::container.layout !== 'horizontal' ? layoutCss : ''}}"
+ ng-model="container.record[container.field]"></select>
+ <!-- optionValue as optionLabel for arrayItem in array -->
 
 (function () {
     'use strict';
@@ -353,14 +457,11 @@ angular.module('currencyMask', []).directive('currencyMask', function () {
                 itemGroupKey    : '@?',
                 itemGroupValue  : '@?',
                 dropdownDirection:'@?',
-                allowCustom     : '=?',
-                style           : '@?',
-                layoutCss       : '@?' //default col-md-6
+                allowCustom     : '=?'
             },
             templateUrl: 'sds-angular-controls/form-directives/form-autocomplete.html',
 
             link: function (scope, element, attr, container) {
-                var input = element.find('select');
                 scope.container = container.$scope;
                 scope.innerItems = [];
                 //// hack to force reloading options
@@ -384,17 +485,10 @@ angular.module('currencyMask', []).directive('currencyMask', function () {
                 });
 
                 // one-time bindings:
-                switch(container.$scope.layout){
-                    case "horizontal":
-                        scope.layoutCss = scope.layoutCss || "col-md-6";
-                        break;
-                    default: //stacked
-                        scope.layoutCss = scope.layoutCss || "";
+                if (attr.layoutCss && container.$scope.layout === 'horizontal'){
+                    scope.$watch('layoutCss', function (){container.$scope.childLayoutCss = scope.layoutCss; });
                 }
 
-                if (container.$scope.isAutofocus){
-                    $timeout(function (){element.find('select').focus(); });
-                }
 
                 function convertToArray(){
                     var i = 0;
@@ -419,22 +513,6 @@ angular.module('currencyMask', []).directive('currencyMask', function () {
                     return items;
                 }
 
-                scope.$watch("container.isReadonly", function(newVal){
-                    if(newVal) {
-                        if (scope.container.record && scope.container.record[scope.container.field]) {
-
-                            var value = scope.innerItems[scope.container.record[scope.container.field]];
-                            //if using itemKey/itemValue -we need to find it in the array vs. hash:
-                            if(scope.itemValue && scope.itemKey){
-                                var arrayItem = _.find(scope.innerItems, function(item){
-                                    return item[scope.itemKey] === scope.container.record[scope.container.field];
-                                });
-                                value = arrayItem[scope.itemValue];
-                            }
-                            scope.readOnlyModel = value;
-                        }
-                    }
-                });
 
                 var options = {
                     plugins: ['dropdown_direction'],
@@ -474,832 +552,11 @@ angular.module('currencyMask', []).directive('currencyMask', function () {
             }
         }
     }
-    formAutocomplete.$inject = ["$timeout"];
 
     angular.module('sds-angular-controls').directive('formAutocomplete', formAutocomplete);
 
 })();
-
-(function () {
-    'use strict';
-    function formButton ($q) {
-        return{
-            restrict: 'E',
-            transclude: true,
-            replace: true,
-            scope: {
-                buttonClass: '@?',
-                action: '&'
-            },
-            template: '<a href="" class="btn {{buttonClass}} {{isDisabled}}" ng-click="doPromise($event)" ng-transclude></a>',
-            link: function($scope, element, attrs){
-                $scope.buttonClass = $scope.buttonClass || 'btn-default';
-                $scope.isDisabled = '';
-                $scope.doPromise = function ($event){
-                    if ($scope.isDisabled){
-                        return;
-                    }
-                    $scope.isDisabled = 'disabled';
-                    $q.when($scope.action($event)).then(function (){
-                        $scope.isDisabled = '';
-                    }, function (){
-                        $scope.isDisabled = '';
-                    });
-                }
-            }
-        }
-    }
-    formButton.$inject = ["$q"];
-
-    angular.module('sds-angular-controls').directive('formButton', formButton)
-
-})();
-
-
-(function () {
-    'use strict';
-    function formControl ($timeout) {
-        return{
-            restrict: 'A',
-            require: '^form-field, ngModel',
-            compile: function (tElement, tAttrs){
-                tElement.attr('ng-model', 'container.record[container.field]');
-                tElement.attr('ng-required', 'container.isRequired');
-                tElement.attr('ng-disabled', 'container.isReadonly');
-                tElement.attr('name', '{{::container.field}}');
-                return function (scope, element, attr, containers) {
-                    var input = element.find('input');
-                    var ngModel = containers[1];
-                    var formField = containers[0];
-                    scope.container = formField.$scope;
-
-                    if (attr.min){
-                        formField.$scope.min = attr.min;
-                    }
-                    if (attr.max){
-                        formField.$scope.max = attr.max;
-                    }
-
-                    var name = attr.name || attr.ngModel.substr(attr.ngModel.lastIndexOf('.')+1);;
-                    formField.$scope.field = name;
-
-                }
-            }
-        }
-    }
-    formControl.$inject = ["$timeout"];
-
-    angular.module('sds-angular-controls').directive('formControl', formControl)
-
-})();
-
-(function () {
-    'use strict';
-    function formCurrencyInput ($timeout) {
-        return{
-            restrict: 'EA',
-            require: '^form-field',
-            replace: true,
-            scope: {
-                placeholder     : '@?',
-                rightLabel      : '@?',
-                mask            : '@?',
-                max             : '@?',
-                min             : '@?',
-                style           : '@?',
-                layoutCss       : '@?' //default col-md-6
-            },
-            templateUrl: 'sds-angular-controls/form-directives/form-currency-input.html',
-            link: function (scope, element, attr, container) {
-                var input = element.find('input');
-                scope.container = container.$scope;
-
-                // one-time bindings:
-                switch(container.$scope.layout){
-                    case "horizontal":
-                        scope.layoutCss = scope.layoutCss || "col-md-6";
-                        break;
-                    default: //stacked
-                        scope.layoutCss = scope.layoutCss || "";
-                }
-
-                if (scope.min){
-                    container.$scope.min = scope.min;
-                }
-                if (scope.max){
-                    container.$scope.max = scope.max;
-                }
-                if (container.$scope.isAutofocus){
-                    $timeout(function (){element.find('input').focus(); });
-                }
-
-                //$timeout(function (){
-                //    var isIntegerStep = false;
-                //    if (scope.type === "number"){
-                //        element.find(".inputField").on('keydown', function (e) {
-                //            var key = e.which || e.keyCode;
-                //            console.log(key, e);
-                //
-                //            return e.metaKey || e.ctrlKey || (!e.shiftKey &&
-                //                    // numbers
-                //                key >= 48 && key <= 57 ||
-                //                    // Numeric keypad
-                //                key >= 96 && key <= 105 ||
-                //                    // Minus
-                //                key == 109 || key == 189 ||
-                //                    // decimal points
-                //                (!isIntegerStep && key == 190 || key == 110) ||
-                //                    // Backspace and Tab and Enter
-                //                key == 8 || key == 9 || key == 13 ||
-                //                    // Home and End
-                //                key == 35 || key == 36 ||
-                //                    // left and right arrows
-                //                key == 37 || key == 39 ||
-                //                    // Del and Ins
-                //                key == 46 || key == 45);
-                //
-                //
-                //        });
-                //    }
-                //});
-            }
-        }
-    }
-    formCurrencyInput.$inject = ["$timeout"];
-
-    angular.module('sds-angular-controls').directive('formCurrencyInput', formCurrencyInput);
-})();
-
-(function () {
-    'use strict';
-    function formDatePicker ($timeout, $log) {
-        return{
-            restrict: 'EA',
-            require: '^form-field',
-            replace: true,
-            scope: {
-                dateFormat       : '@',
-                max              : '=?',
-                min              : '=?',
-                style            : '@?',
-                layoutCss        : '@?' //default col-md-6
-            },
-            templateUrl: 'sds-angular-controls/form-directives/form-date-picker.html',
-
-            link: function (scope, element, attr, container) {
-                var input = element.find('input');
-                scope.container = container.$scope;
-                
-                switch(container.$scope.layout){
-                    case "horizontal":
-                        scope.layoutCss = scope.layoutCss || "col-md-6";
-                        break;
-                    default: //stacked
-                        scope.layoutCss = scope.layoutCss || "";
-                }
-
-                if (container.$scope.isAutofocus){
-                    $timeout(function (){element.find('input').focus(); });
-                }
-                
-                scope.dateFormat = scope.dateFormat || "MM-dd-yyyy";
-
-                scope.calendar = {opened: false};
-                scope.open = function($event) {
-                    $event.preventDefault();
-                    $event.stopPropagation();
-                    scope.calendar.opened = true;
-                };
-
-                scope.$watch('container.record[container.field]', function (val){
-                    if (typeof val === 'string'){
-                        container.$scope.record[container.$scope.field] = moment.utc(container.$scope.record[container.$scope.field]).toDate();
-                    }
-                });
-
-                scope.$watch("container.isReadonly", function(newVal){
-                    if(newVal) {
-                        if(scope.container.record[scope.container.field]) {
-                            scope.readOnlyModel = moment.utc(scope.container.record[scope.container.field]).format(scope.dateFormat.toUpperCase());
-                        }
-                    }
-                });
-
-                if (scope.max) {
-                    container.$scope.max = moment.utc(scope.max).format(scope.dateFormat.toUpperCase());
-                }
-                if (scope.min) {
-                    container.$scope.min = moment.utc(scope.min).format(scope.dateFormat.toUpperCase());
-                }
-            }
-        }
-    }
-    formDatePicker.$inject = ["$timeout", "$log"];
-
-    function datepickerPopup (){
-        return {
-            restrict: 'EAC',
-            require: 'ngModel',
-            link: function(scope, element, attr, controller) {
-                //remove the default formatter from the input directive to prevent conflict
-                controller.$formatters.shift();
-            }
-        }
-    }
-
-    angular.module('sds-angular-controls').directive('formDatePicker', formDatePicker).directive('datepickerPopup', datepickerPopup);
-})();
-
-(function () {
-    'use strict';
-    function formDateTimePicker ($timeout) {
-        return{
-            restrict: 'EA',
-            require: '^form-field',
-            replace: true,
-            scope: {
-                dateFormat       : '@',
-                max              : '=?',
-                min              : '=?',
-                style            : '@?',
-                layoutCss        : '@?' //default col-md-6
-            },
-            templateUrl: 'sds-angular-controls/form-directives/form-date-time-picker.html',
-
-            link: function (scope, element, attr, container) {
-                var input = element.find('input');
-                scope.container = container.$scope;
-
-                switch(container.$scope.layout){
-                    case "horizontal":
-                        scope.layoutCss = scope.layoutCss || "col-md-6";
-                        break;
-                    default: //stacked
-                        scope.layoutCss = scope.layoutCss || "";
-                }
-
-                if (container.$scope.isAutofocus){
-                    $timeout(function (){element.find('input').focus(); });
-                }
-
-                scope.dateFormat = scope.dateFormat || "MM-dd-yyyy";
-
-                scope.calendar = {opened: false};
-                scope.open = function($event) {
-                    $event.preventDefault();
-                    $event.stopPropagation();
-                    scope.calendar.opened = true;
-                };
-
-                scope.$watch('container.record[container.field]', function (val){
-                    if (typeof val === 'string'){
-                        container.$scope.record[container.$scope.field] = moment.utc(container.$scope.record[container.$scope.field]).toDate();
-                    }
-                });
-
-                scope.$watch("container.isReadonly", function(newVal){
-                    if(newVal) {
-                        var date = moment(scope.container.record[scope.container.field]);
-                        scope.readOnlyModel = date.format(scope.dateFormat.toUpperCase()) + date.format(' h:mm a');
-                    }
-                });
-
-                if (scope.max) {
-                    container.$scope.max = moment(scope.max).format(scope.dateFormat);
-                }
-                if (scope.min) {
-                    container.$scope.min = moment(scope.min).format(scope.dateFormat);
-                }
-            }
-        }
-    }
-    formDateTimePicker.$inject = ["$timeout"];
-
-    angular.module('sds-angular-controls').directive('formDateTimePicker', formDateTimePicker);
-})();
-
-/**
- * Created by stevegentile on 12/19/14.
- */
-(function () {
-    'use strict';
-    function formField ($filter, $timeout) {
-        return{
-            restrict: 'EA',
-            transclude: true,
-            replace: true,
-            scope: {
-                record                  : '=' , //two-way binding
-                isRequired              : '=?',
-                isReadonly              : '=?',
-                isAutofocus             : '=?',
-                field                   : '@' , //one-way binding
-                label                   : '@' ,
-                layout                  : '@?',
-                labelCss                : '@?',
-                layoutCss               : '@?',
-                showLabel               : '=?',
-                errorLayoutCss          : '@?',
-                hideValidationMessage   : '=?',  //default is false
-                log                     : '@?',
-                validationFieldName     : '@?'  //to override the default label   '[validationFieldName]' is required
-            },
-            templateUrl: 'sds-angular-controls/form-directives/form-field.html',
-            require: '^form',
-            controller: ["$scope", function ($scope){
-                this.$scope = $scope;
-            }],
-            link: function($scope, element, attrs, form){
-                //include a default form-input if no transclude included
-                $scope.showDefault = false;
-                $timeout(function(){
-                    if(element.find('ng-transclude *').length === 0){
-                        $scope.showDefault = true;
-                    }
-                });
-                //end include
-
-                if(!$scope.label){
-                    $scope.label = $filter("labelCase")($scope.field);
-                }
-
-                $scope.validationFieldName = $scope.validationFieldName || $filter("labelCase")($scope.label);
-                $scope.showLabel = $scope.showLabel !== false; // default to true
-                $scope.hideValidationMessage = $scope.hideValidationMessage || false;
-                $scope.layoutCss = $scope.layoutCss || "col-md-12";
-                $scope.errorLayoutCss = $scope.errorLayoutCss || "col-md-12";
-
-                $scope.layout = $scope.layout || "stacked";
-                if($scope.layout === "horizontal"){
-                    $scope.labelCss = $scope.labelCss || "col-md-4";
-                }
-
-                //validation ie. on submit
-                $scope.showError = function(field){
-                    try{
-                        if(form.$submitted){
-                            return field.$invalid;
-                        }else if (element.find('[name=' + field.$name + ']:focus').length) {
-                            return false;
-                        }else{
-                            return field.$dirty && field.$invalid;
-                        }
-                    }
-                    catch(err){
-                        return false;
-                    }
-                }
-            }
-
-        }
-    }
-    formField.$inject = ["$filter", "$timeout"];
-
-    angular.module('sds-angular-controls').directive('formField', formField);
-})();
-
-(function () {
-    'use strict';
-    function formInput ($timeout) {
-        return{
-            restrict: 'E',
-            require: '^form-field',
-            replace: true,
-            scope: {
-                placeholder     : '@?',
-                rightLabel      : '@?',
-                mask            : '@?',
-                max             : '@?',
-                min             : '@?',
-                maxlength       : '@?',
-                minlength       : '@?',
-                style           : '@?',
-                layoutCss       : '@?' //default col-md-6
-            },
-            templateUrl: 'sds-angular-controls/form-directives/form-input.html',
-            link: function (scope, element, attr, container) {
-                var input = element.find('input');
-                scope.container = container.$scope;
-
-                // one-time bindings:
-                switch(container.$scope.layout){
-                    case "horizontal":
-                        scope.layoutCss = scope.layoutCss || "col-md-6";
-                        break;
-                    default: //stacked
-                        scope.layoutCss = scope.layoutCss || "";
-                }
-
-                if (container.$scope.isAutofocus){
-                    $timeout(function (){element.find('input').focus();});
-                }
-                if (scope.min){
-                    container.$scope.min = scope.min;
-                }
-                if (scope.max){
-                    container.$scope.max = scope.max;
-                }
-                if (attr.pattern){
-                    input.attr('pattern', attr.pattern);
-                }
-
-                scope.step = attr.step || "any";
-                scope.type = attr.type || "text";
-
-                $timeout(function (){
-                    var isIntegerStep = scope.step.match(/^\d+$/);
-                    if (scope.type === "number"){
-                        element.find(".inputField").on('keydown', function (e) {
-                            var key = e.which || e.keyCode;
-
-                            return e.metaKey || e.ctrlKey || (!e.shiftKey &&
-                                // numbers
-                            key >= 48 && key <= 57 ||
-                                // Numeric keypad
-                            key >= 96 && key <= 105 ||
-                                // Minus
-                            key == 109 || key == 189 ||
-                                // decimal points
-                            (!isIntegerStep && key == 190 || key == 110) ||
-                                // Backspace and Tab and Enter
-                            key == 8 || key == 9 || key == 13 ||
-                                // Home and End
-                            key == 35 || key == 36 ||
-                                // left and right arrows
-                            key == 37 || key == 39 ||
-                                // Del and Ins
-                            key == 46 || key == 45);
-
-
-                        });
-                    }
-                });
-            }
-        }
-    }
-    formInput.$inject = ["$timeout"];
-
-    angular.module('sds-angular-controls').directive('formInput', formInput)
-
-})();
-
-(function () {
-    'use strict';
-    function formMultiSelect ($timeout) {
-        return{
-            restrict: 'EA',
-            require: '^formField',
-            replace: true,
-            scope: {
-                items           : '=',
-                groups          : '=?',
-                itemKey         : '@?',
-                itemValue       : '@?',
-                itemGroupKey    : '@?',
-                itemGroupValue  : '@?',
-                allowCustom     : '=?',
-                style           : '@?',
-                layoutCss       : '@?' //default col-md-6
-            },
-            templateUrl: 'sds-angular-controls/form-directives/form-multi-select.html',
-
-            link: function (scope, element, attr, container) {
-                var input = element.find('select');
-                scope.container = container.$scope;
-
-                // one-time bindings:
-                switch(container.$scope.layout){
-                    case "horizontal":
-                        scope.layoutCss = scope.layoutCss || "col-md-6";
-                        break;
-                    default: //stacked
-                        scope.layoutCss = scope.layoutCss || "";
-                }
-
-                if (container.$scope.isAutofocus){
-                    $timeout(function (){element.find('select').focus(); });
-                }
-
-                scope.$watch("container.isReadonly", function(newVal){
-                    if(newVal) {
-                        if (scope.container.record && scope.container.record[scope.container.field]) {
-
-                            var value = scope.items[scope.container.record[scope.container.field]];
-                            //if using itemKey/itemValue -we need to find it in the array vs. hash:
-                            if(scope.itemValue && scope.itemKey){
-                                var arrayItem = _.find(scope.items, function(item){
-                                    return item[scope.itemKey] === scope.container.record[scope.container.field];
-                                });
-                                value = arrayItem[scope.itemValue];
-                            }
-                            scope.readOnlyModel = value;
-                        }
-                    }
-                });
-
-                var options = {
-                    plugins: ['remove_button'],
-                    valueField: scope.itemKey,
-                    labelField: scope.itemValue,
-                    searchField: [scope.itemValue],
-                    maxOptions: 10
-                };
-
-                if (scope.allowCustom){
-                    options.persist = false;
-                    options.create = true;
-                }
-
-                if (scope.itemGroupKey && _.isArray(scope.groups)){
-                    options.optgroups =  scope.groups;
-                    options.optgroupField = scope.itemGroupKey;
-                    options.optgroupValueField = scope.itemGroupKey;
-                    options.optgroupLabelField = scope.itemGroupValue;
-                }
-
-                scope.options = options;
-            }
-        }
-    }
-    formMultiSelect.$inject = ["$timeout"];
-
-    angular.module('sds-angular-controls').directive('formMultiSelect', formMultiSelect);
-})();
-
-(function () {
-    'use strict';
-    function formSelect ($timeout) {
-        return{
-            restrict: 'EA',
-            require: '^formField',
-            replace: true,
-            scope: {
-                items           : '=',
-                itemKey         : '@?',
-                itemValue       : '@?',
-                style           : '@?',
-                layoutCss       : '@?' //default col-md-6
-            },
-            templateUrl: 'sds-angular-controls/form-directives/form-select.html',
-
-            link: function (scope, element, attr, container) {
-                var input = element.find('select');
-                scope.container = container.$scope;
-                scope.innerItems = {};
-
-                scope.$watch("items", function(newVal, oldVal){
-
-                    if(scope.items && _.isArray(scope.items)) {
-                        if (scope.itemKey && scope.itemValue) {
-                            scope.innerItems = convertToHash(scope.items, scope.itemKey, scope.itemValue);
-                        }
-                    }else{
-                        scope.innerItems = scope.items;
-                    }
-                });
-
-                // one-time bindings:
-                switch(container.$scope.layout){
-                    case "horizontal":
-                        scope.layoutCss = scope.layoutCss || "col-md-6";
-                        break;
-                    default: //stacked
-                        scope.layoutCss = scope.layoutCss || "";
-                }
-
-                if (container.$scope.isAutofocus){
-                    $timeout(function (){element.find('select').focus(); });
-                }
-
-                scope.$watch("container.isReadonly", function(newVal){
-                    if(newVal) {
-                        if (scope.container.record && scope.container.record[scope.container.field]) {
-
-                            var value = scope.innerItems[scope.container.record[scope.container.field]];
-                            //if using itemKey/itemValue -we need to find it in the array vs. hash:
-                            if(scope.itemValue && scope.itemKey){
-                                var arrayItem = _.find(scope.innerItems, function(item){
-                                   return item[scope.itemKey] === scope.container.record[scope.container.field];
-                                });
-                                value = arrayItem[scope.itemValue];
-                            }
-                            scope.readOnlyModel = value;
-                        }
-                    }
-                });
-
-                scope.orderHash = function(obj){
-                    if (!obj) {
-                        return [];
-                    }
-                    return obj.orderedKeys || Object.keys(obj);
-                };
-
-                function getChild (obj, key){
-                    var arr = key.split(".");
-                    while(arr.length && (obj = obj[arr.shift()])); // jshint ignore:line
-                    return obj;
-                }
-
-                function convertToHash(items, itemKey, itemValue){
-                    var OrderedDictionary = function (){};
-                    OrderedDictionary.prototype.orderedKeys = [];
-                    return _.reduce(items, function (result, item) {
-                        var key = getChild(item, itemKey);
-                        var val = getChild(item, itemValue);
-                        result[key] = val;
-
-                        // set the ordered keys value
-                        result.orderedKeys.push(key);
-                        return result;
-                    }, new OrderedDictionary());
-                }
-
-                // If a key is numeric, javascript converts it to a string when using a foreach. This
-                // tests if the key is numeric, and if so converts it back.
-                scope.convertType = function (item){
-                    //if the record is a string type then keep the item as a string
-                    if(scope.record && scope.record[scope.field]) {
-                        if (typeof scope.record[scope.field] === 'string') {
-                            return item.toString();
-                        }
-                    }
-
-                    //if it's a number - make sure the values are numbers
-                    if (item && !isNaN(item)) {
-                        return parseInt(item, 10);
-                    } else {
-                        return item;
-                    }
-                };
-
-
-            }
-        }
-    }
-    formSelect.$inject = ["$timeout"];
-
-    angular.module('sds-angular-controls').directive('formSelect', formSelect);
-})();
-
-(function () {
-    'use strict';
-    function formTextArea ($timeout) {
-        return{
-            restrict: 'EA',
-            replace: true,
-            require: '^formField',
-            scope: {
-                style           : '@?',
-                layoutCss       : '@?' //default col-md-6
-            },
-            templateUrl: 'sds-angular-controls/form-directives/form-text-area.html',
-            link: function (scope, element, attr, container) {
-                var input = element.find('textarea');
-                scope.container = container.$scope;
-
-                switch(container.$scope.layout){
-                    case "horizontal":
-                        scope.layoutCss = scope.layoutCss || "col-md-6";
-                        break;
-                    default: //stacked
-                        scope.layoutCss = scope.layoutCss || "";
-                }
-
-                if (container.$scope.isAutofocus){
-                    $timeout(function (){element.find('textarea').focus(); });
-                }
-            }
-        }
-    }
-    formTextArea.$inject = ["$timeout"];
-
-    angular.module('sds-angular-controls').directive('formTextArea', formTextArea);
-})();
-
-(function () {
-    'use strict';
-    function formTextToggle ($timeout) {
-        return{
-            restrict: 'EA',
-            replace: true,
-            require: '^form-field',
-            scope: {
-                placeholder     : '@?',
-                toggleField     : '@?', //one-way binding
-                toggleSwitchType: '@?',
-                onLabel         : '@?',
-                offLabel        : '@?',
-                style           : '@?',
-                layoutCss       : '@?' //default col-md-6
-            },
-            templateUrl: 'sds-angular-controls/form-directives/form-text-toggle.html',
-            link: function (scope, element, attr, container) {
-                var input = element.find('input');
-                scope.container = container.$scope;
-
-                switch(container.$scope.layout){
-                    case "horizontal":
-                        scope.layoutCss = scope.layoutCss || "col-md-6";
-                        break;
-                    default: //stacked
-                        scope.layoutCss = scope.layoutCss || "";
-                }
-
-                if (container.$scope.isAutofocus){
-                    $timeout(function (){element.find('input').focus(); });
-                }
-
-                scope.type = attr.type || "text";
-
-                scope.toggleSwitchType = scope.toggleSwitchType || "primary";
-                scope.onLabel = scope.onLabel   || "Yes";
-                scope.offLabel = scope.offLabel || "No";
-            }
-        }
-    }
-    formTextToggle.$inject = ["$timeout"];
-
-    angular.module('sds-angular-controls').directive('formTextToggle', formTextToggle);
-})();
-
-(function () {
-    'use strict';
-    function formTimePicker ($timeout) {
-        return{
-            restrict: 'E',
-            replace: true,
-            require: '^form-field',
-            scope: {
-                layoutCss       : '@?' //default col-md-6
-            },
-            templateUrl: 'sds-angular-controls/form-directives/form-time-picker.html',
-            link: function (scope, element, attr, container) {
-                scope.container = container.$scope;
-
-                switch(container.$scope.layout){
-                    case "horizontal":
-                        scope.layoutCss = scope.layoutCss || "col-md-6";
-                        break;
-                    default: //stacked
-                        scope.layoutCss = scope.layoutCss || "";
-                }
-                scope.$watch('container.record[container.field]', function (val){
-                    if (typeof val === 'string'){
-                        container.$scope.record[container.$scope.field] = moment.utc(container.$scope.record[container.$scope.field]).toDate();
-                    }
-                });
-
-                scope.$watch("container.isReadonly", function(newVal){
-                    if(newVal) {
-                        scope.readOnlyModel = moment(scope.container.record[scope.container.field]).format('h:mm a');
-                    }
-                });
-            }
-        }
-    }
-    formTimePicker.$inject = ["$timeout"];
-
-    angular.module('sds-angular-controls').directive('formTimePicker', formTimePicker);
-})();
-
-(function () {
-    'use strict';
-    function formToggle ($filter) {
-        return{
-            restrict: 'EA',
-            replace: true,
-            require: '^form-field',
-            scope: {
-                toggleSwitchType: '@?',
-                onLabel         : '@?',
-                offLabel        : '@?',
-                style           : '@?',
-                layoutCss       : '@?' //default col-md-6
-            },
-            templateUrl: 'sds-angular-controls/form-directives/form-toggle.html',
-            link: function (scope, element, attr, container) {
-                scope.container = container.$scope;
-
-                switch(container.$scope.layout){
-                    case "horizontal":
-                        scope.layoutCss = scope.layoutCss || "col-md-6";
-                        break;
-                    default: //stacked
-                        scope.layoutCss = scope.layoutCss || "";
-                }
-
-                scope.toggleSwitchType = scope.toggleSwitchType || "primary";
-                scope.onLabel = scope.onLabel   || "Yes";
-                scope.offLabel = scope.offLabel || "No";
-            }
-        }
-    }
-    formToggle.$inject = ["$filter"];
-
-    angular.module('sds-angular-controls').directive('formToggle', formToggle);
-})();
-
+*/
 (function () {
   'use strict';
   function maskInput (){
@@ -1655,676 +912,3 @@ angular.module('currencyMask', []).directive('currencyMask', function () {
     });
 
 })();
-
-(function () {
-    'use strict';
-
-    function dbApiVelocity ($http, $rootScope) {
-        return{
-            restrict: 'E',
-            require: '^dbGrid',
-            scope:{
-                api: '@',
-                postParams: '='
-            },
-            link: function (scope, element, attr, dbGrid) {
-
-                if (attr.postParams){
-                    scope.$watch('postParams', function (val){
-                        if(val) {
-                            dbGrid.refresh(true);
-                        }
-                    });
-                }
-
-                function capitalize (str){
-                    return str.charAt(0).toUpperCase() + str.slice(1);
-                }
-
-                function isNumeric (obj){
-                   return (obj - parseFloat( obj ) + 1) >= 0;
-                }
-
-                function getData(filter, sortKey, sortAsc, currentPage, pageSize, cols){
-                    var query = {
-                        page: currentPage+1,
-                        pageSize: pageSize,
-                        sort: [],
-                        filter: createFilters(filter, cols)
-                    };
-                    if (sortKey !== null){
-                        query.sort.push({
-                            field: capitalize(sortKey),
-                            direction: sortAsc ? '' : 'desc'
-                        });
-                    }
-                    _.merge(query, scope.postParams, function(a, b) {
-                        if (_.isArray(a)) {
-                            return a.concat(b);
-                        }
-                    });
-
-                    $rootScope.$broadcast('db-api:start', query);
-                    dbGrid.setWaiting(true);
-                    return $http.post(scope.api, query).then(function (response) {
-                        $rootScope.$broadcast('db-api:complete', response.data);
-                        dbGrid.setTotal(response.data.total);
-                        dbGrid.setWaiting(false);
-                        return response.data.tableData;
-                    }, function (){
-                        dbGrid.setWaiting(false);
-                        $rootScope.$broadcast('db-api:complete');
-                    });
-                }
-
-                function createFilters (filter, cols){
-                    var result = {filters: []};
-                    var dateRangeRegex = /^(\s*(\d+[-/]){2}[^-]*)-(\s*(\d+[-/]){2}[^-]*)$/;
-                    var dateRegex = /^(\s*(\d+[-/]){2}[^-]*)$/;
-
-                    if (typeof filter === 'object'){
-                        var n;
-                        result.logic = 'and';
-                        result.filters = _.reduce(cols, function (r, item){
-                            if (item.key && item.filter && item.type === 'number' && item.filter[0] === '-'){
-                                n = item.filter.slice(1);
-                                if (isNumeric(n)) {
-                                    r.push({
-                                        fieldType: 'decimal',
-                                        fieldOperator: 'lt',
-                                        fieldValue: parseFloat(n),
-                                        field: capitalize(item.key)
-                                    });
-                                }
-
-                            }else if (item.key && item.filter && item.type === 'date' && item.filter[0] === '-'){
-                                n = item.filter.slice(1);
-                                if (dateRegex.test(n) && moment(n).isValid()) {
-                                    r.push({
-                                        fieldType: 'datetime',
-                                        fieldOperator: 'lt',
-                                        fieldValue: moment(n).utcOffset(0).format('MM/DD/YYYY HH:mm a'),
-                                        field: capitalize(item.key)
-                                    });
-                                }
-                            }else if (item.key && item.filter && item.type === 'number' && item.filter.indexOf('-') > 0){
-                                n = item.filter.split('-');
-                                if(!n[0] && n[1]){
-                                    n.slice(0,1);
-                                    n[0] *= -1;
-                                }
-                                if(!n[1] && n[2]){
-                                    n.slice(1,1);
-                                    n[1] *= -1;
-                                }
-                                if (isNumeric(n[0]) && isNumeric(n[1])) {
-                                    r.push({
-                                        fieldType: 'decimal',
-                                        fieldOperator: 'gte',
-                                        fieldValue: parseFloat(n[0]),
-                                        field: capitalize(item.key)
-                                    });
-                                    r.push({
-                                        fieldType: 'decimal',
-                                        fieldOperator: 'lte',
-                                        fieldValue: parseFloat(n[1]),
-                                        field: capitalize(item.key)
-                                    });
-                                }
-
-                            }else if (item.key && item.filter && item.type === 'date' && dateRangeRegex.test(item.filter)){
-                                n = dateRangeRegex.exec(item.filter);
-
-                                if (moment(n[1]).isValid() && moment(n[3]).isValid()) {
-                                    r.push({
-                                        fieldType: 'datetime',
-                                        fieldOperator: 'gte',
-                                        fieldValue: moment(n[1]).utcOffset(0).format('MM/DD/YYYY HH:mm a'),
-                                        field: capitalize(item.key)
-                                    });
-                                    r.push({
-                                        fieldType: 'datetime',
-                                        fieldOperator: 'lte',
-                                        fieldValue: moment(n[3]).utcOffset(0).format('MM/DD/YYYY HH:mm a'),
-                                        field: capitalize(item.key)
-                                    });
-                                }
-                            }else if (item.key && item.filter && item.type === 'number'){
-                                if (isNumeric(item.filter)) {
-                                    r.push({
-                                        fieldType: 'decimal',
-                                        fieldOperator: 'eq',
-                                        fieldValue: parseFloat(item.filter),
-                                        field: capitalize(item.key)
-                                    });
-                                }
-                            }else if (item.key && item.filter && item.type === 'date'){
-                                if (moment(item.filter).isValid()) {
-                                    r.push({
-                                        fieldType: 'datetime',
-                                        fieldOperator: 'gte',
-                                        fieldValue: moment(item.filter).startOf('day').utcOffset(0).format('MM/DD/YYYY HH:mm a'),
-                                        field: capitalize(item.key)
-                                    });
-                                    r.push({
-                                        fieldType: 'datetime',
-                                        fieldOperator: 'lte',
-                                        fieldValue: moment(item.filter).endOf('day').utcOffset(0).format('MM/DD/YYYY HH:mm a'),
-                                        field: capitalize(item.key)
-                                    });
-                                }
-                            }else if (item.key && item.filter){
-                                r.push({
-                                    fieldType:'string',
-                                    fieldOperator:'contains',
-                                    fieldValue: item.filter,
-                                    field: capitalize(item.key)
-                                });
-                            }
-
-                            return r;
-                        }, []);
-                    }else if (typeof filter === 'string' && filter){
-                        result.logic = 'or';
-                        result.filters = _.reduce(cols, function (r, item){
-                            if (item.key && item.sortable && item.type === 'number'){
-                                if (isNumeric(filter)) {
-                                    r.push({
-                                        fieldType: 'decimal',
-                                        fieldOperator: 'eq',
-                                        fieldValue: parseFloat(filter),
-                                        field: capitalize(item.key)
-                                    });
-                                }
-                            }else if (item.key && item.sortable && item.type === 'date'){
-                                if (dateRegex.test(filter) && moment(filter).isValid()) {
-                                    r.push({
-                                        fieldType: 'date',
-                                        fieldOperator: 'eq',
-                                        fieldValue: filter,
-                                        field: capitalize(item.key)
-                                    });
-                                }
-                            }else if (item.key && item.sortable){
-                                r.push({
-                                    fieldType:'string',
-                                    fieldOperator:'contains',
-                                    fieldValue: filter,
-                                    field: capitalize(item.key)
-                                });
-                            }
-                            return r;
-                        }, []);
-                    }
-                    return result;
-                }
-
-                dbGrid.setDataSource(getData);
-            }
-
-        }
-    }
-    dbApiVelocity.$inject = ["$http", "$rootScope"];
-
-    angular.module('sds-angular-controls').directive('dbApiVelocity', dbApiVelocity);
-})();
-
-
-(function () {
-    'use strict';
-
-    // For internal use only. Manually binds a template using a provided template function, with a fallback to $compile.
-    // Needs to be extremely lightweight.
-
-    function dbBindCell ($compile) {
-        return{
-            restrict: 'A',
-            link: function ($scope, $element) {
-                if (typeof $scope._col.template === 'function'){
-                    $element.append($scope._col.template($scope));
-
-                }else if(!angular.element.trim($element.html())){
-                    var html = angular.element('<span>' + $scope._col.template  + '</span>');
-                    var compiled = $compile(html) ;
-                    $element.append(html);
-                    compiled($scope);
-                    $element.data('compiled', compiled);
-                }
-
-                if ($scope._col.layoutCss){
-                  $element.addClass($scope._col.layoutCss);
-                }
-            }
-        }
-    }
-    dbBindCell.$inject = ["$compile"];
-
-    function dbTransclude (){
-        return {
-            restrict: 'EAC',
-            link: function($scope, $element, $attrs, controller, $transclude) {
-                $transclude(function(clone, scope) {
-                    $element.empty();
-                    scope.$grid = $scope.$grid;
-                    $element.append(clone);
-                });
-            }
-        }
-    }
-
-    angular.module('sds-angular-controls').directive('dbBindCell', dbBindCell).directive('dbTransclude', dbTransclude)
-})();
-
-
-(function () {
-    'use strict';
-
-    /**
-     * A column definition for use in the db-grid
-     *
-     * <db-grid for="item in items">
-     *     <db-col key="name">{{item.name}} is my name.</db-col>
-     * </db-grid>
-     *
-     * @param {string} key      - The key to base sorting and filtering on.
-     * @param {string} label    - A custom label. Defaults to key name.
-     * @param {string} type     - 'string', 'number', or 'date'. Used for filtering and sorting. Defaults to 'string'.
-     * @param {bool}   sortable - Whether or not the column is sortable. Defaults to true.
-     * @param {bool}   bind     - Whether to use full binding on the column. True will use full binding, false will use
-     *                            once-bound interpolate templates. Defaults to false.
-     */
-    function dbCol ($interpolate) {
-        return{
-            restrict: 'E',
-            require: '^dbGrid',
-            compile:function(tElement){
-                var templateText = tElement.html().trim();
-                tElement.empty();
-
-                return function ($scope, $element, $attrs, dbGrid) {
-                    var templateFunc = null;
-
-                    if (!templateText && $attrs.key){
-                        templateText = '{{' + dbGrid.rowName + '.' + $attrs.key + '}}'
-                    }
-                    if ($attrs.bind === 'true'){
-                        templateFunc = templateText;
-                    }else{
-                        templateFunc = $interpolate(templateText);
-                    }
-
-                    var column = {
-                        index: $element.prevAll('db-col').length,
-                        filter: $attrs.query,
-                        width: $attrs.width,
-                        layoutCss: $attrs.layoutCss,
-                        key: $attrs.key,
-                        label: $attrs.label,
-                        sortable:  $attrs.sortable === 'false' ? false : !!$attrs.key,
-                        type: $attrs.type,
-                        title: $attrs.title,
-                        bind: $attrs.bind === 'true',
-                        template: templateFunc
-                    };
-
-                    dbGrid.addColumn(column);
-
-                    if($attrs.query !== undefined){
-                        $attrs.$observe('query', function (val, old){
-                           if(val != old){
-                               column.filter = val;
-                               dbGrid.refresh();
-                           }
-                        });
-                    }
-
-                    $scope.$on('$destroy', function() {
-                        dbGrid.removeColumn(column);
-                    });
-                }
-            }
-        }
-    }
-    dbCol.$inject = ["$interpolate"];
-
-    angular.module('sds-angular-controls').directive('dbCol', dbCol);
-})();
-
-(function () {
-    'use strict';
-
-    /**
-     * Creates a grid with sorting, paging, filtering, and the ability to add custom data sources.
-     * Can contain custom toolbar buttons, a custom data source element, and a list of db-cols.
-     *
-     * <db-grid for="items in item">
-     *     <db-column key="name"></db-column>
-     * </db-grid>
-     *
-     * @param {string}     format    - A label to put next to the count (TODO: make this customizable)
-     * @param {string}     layoutCss - A css class to add to the table
-     * @param {string}     filter    - One of the options 'none', 'simple' or 'advanced'. Defaults to 'advanced'. Bound once.
-     * @param {int}        pageSize  - The page size, defaults to 25. Bound once.
-     * @param {expression} for       - Required. Either 'item in items' or (when used with a custom data source) just 'item'
-     */
-    function dbGrid ($filter, $timeout, $q, $log) {
-        return {
-            restrict: 'E',
-            replace: true,
-            transclude:true,
-            scope:true,
-            templateUrl: 'sds-angular-controls/table-directives/db-grid.html',
-            compile: function (tElement, tAttrs){
-                var loop = tAttrs.for.split(' ');
-                if (loop.length !== 1 && loop[1] != 'in') {
-                    $log.error('Invalid loop');
-                    return;
-                }
-
-                tElement.find('tbody > tr').attr('ng-repeat', loop[0] + ' in _model.filteredItems');
-            },
-            controller: ["$scope", "$element", "$attrs", function ($scope, $element, $attrs){
-                var complexFilter = $filter('complexFilter');
-                var orderByFilter = $filter('orderBy');
-                var pageFilter = $filter('page');
-
-                $scope._model = {
-                    isApi: false,
-                    label: $attrs.label,
-                    layoutCss: $attrs.layoutCss,
-                    currentPage: 1,
-                    total: 0,
-                    sortAsc: $attrs.sort ? $attrs.sort[0] !== '-' : true,
-                    sort: null,
-                    filterText: null,
-                    showAdvancedFilter: false,
-                    pageSize: $attrs.pageSize ? parseInt($attrs.pageSize, 10) : 25,
-                    filterType: ($attrs.filter || 'advanced').toLowerCase(),
-                    cols: [],
-                    items: null,
-                    filteredItems: null,
-                    getTooltip: getTooltip,
-                    getItems: defaultGetItems,
-                    toggleSort: toggleSort,
-                    clearFilters: clearFilters,
-                    onEnter: onEnter,
-                    refresh: _.debounce(refresh, 100),
-                    waiting: false
-                };
-                $scope.$grid = {
-                    refresh: _.debounce(resetRefresh, 100),
-                    items: function (){ return $scope._model.filteredItems; }
-                };
-
-
-
-                var loop = $attrs.for.split(' ');
-                this.rowName = loop[0];
-                if (loop[2]) {
-                    $scope.$watchCollection(loop.slice(2).join(' '), function (items, old) {
-                        $scope._model.currentPage = 1;
-                        $scope._model.filteredItems = null;
-                        $scope._model.items = items;
-                        $scope._model.refresh();
-                    });
-                }
-
-                function defaultGetItems (filter, sortKey, sortAsc, page, pageSize, cols){
-                    if ($scope._model.items) {
-                        var items = complexFilter($scope._model.items, filter);
-                        if (sortKey){
-                            items = orderByFilter(items, sortKey, !sortAsc);
-                        }
-                        $scope._model.total = items ? items.length : 0;
-                        return $q.when(pageFilter(items, page, pageSize));
-                    }else{
-                        return $q.when(null);
-                    }
-                }
-
-                function toggleSort(index){
-                    if ($scope._model.sort === index)  {
-                        $scope._model.sortAsc = !$scope._model.sortAsc;
-                    }else{
-                        $scope._model.sort = index;
-                    }
-                }
-
-                function clearFilters(){
-                    _.each($scope._model.cols, function (item){
-                       item.filter = '';
-                    });
-                    $scope._model.refresh();
-                }
-
-                function onEnter(){
-                    if ($scope._model.items.length === 1){
-                        $timeout(function (){
-                            $element.find('tbody tr a:first').click();
-                        });
-                    }
-                }
-
-                function getTooltip(col){
-                    if (col.title){
-                        return col.title;
-                    }
-                    if (col.type === 'bool'){
-                        return 'Filter using yes, no, true, or false'
-                    }else if (col.type){
-                        return 'Use a dash (-) to specify a range'
-                    }
-                }
-
-                function resetRefresh(){
-                    $scope._model.currentPage = 1;
-                    if($scope._model.isApi) {
-                        $scope._model.filteredItems = null;
-                    }
-                    refresh();
-                }
-
-                function refresh() {
-                    //$timeout(function () {
-                        $scope._model.getItems(
-                            $scope._model.showAdvancedFilter ? $scope._model.cols : $scope._model.filterText,
-                            $scope._model.sort !== null ? $scope._model.cols[$scope._model.sort].key : null,
-                            $scope._model.sortAsc,
-                            $scope._model.currentPage - 1,
-                            $scope._model.pageSize,
-                            $scope._model.cols
-                        ).then(function (result){
-                            $scope._model.filteredItems = result;
-                        });
-                    //});
-                }
-
-                this.addColumn = function (item){
-                    var sort = $attrs.sort || '';
-                    if (sort[0] === '-' || sort[0] === '+'){
-                        sort = sort.slice(1);
-                    }
-
-                    if (sort && sort === item.key && $scope._model.sort === null){
-                        $scope._model.sort = $scope._model.cols.length;
-                    }
-
-                    if (item.filter){
-                        $scope._model.showAdvancedFilter = true;
-                    }
-                    $scope._model.cols.splice(item.index, 0, item);
-                };
-
-                this.removeColumn = function (item) {
-                    var index = $scope._model.cols.indexOf(item);
-                    if (index > -1) {
-                        $scope._model.cols.splice(index, 1);
-                    }
-                };
-
-                this.setDataSource = function (dataSource){
-                    $timeout(function(){
-                    $scope._model.getItems = dataSource;
-                    $scope._model.isApi = true;
-                    $scope._model.refresh.cancel();
-                    $scope.$grid.refresh.cancel();
-                    $scope._model.refresh = _.debounce(refresh, 1000);
-                    $scope.$grid.refresh  = _.debounce(resetRefresh, 1000);
-                    refresh();
-                    });
-                };
-
-                this.setTotal = function (total){
-                    $scope._model.total = total;
-                };
-
-                this.setWaiting = function (waiting){
-                    $scope._model.waiting = waiting;
-                };
-
-                this.refresh = function (force){
-                    if ($scope._model.items || force){
-                        resetRefresh();
-                    }
-                };
-
-                if($attrs.query !== undefined){
-                    $attrs.$observe('query', function (val, old){
-                        if(val != old){
-                            if (_.isString(val)){
-                                $scope._model.filterText = val;
-                            }
-                            $scope._model.refresh();
-                        }
-                    });
-                }
-
-                $scope.$watch('_model.currentPage', refresh);
-                $scope.$watch('_model.sort',        $scope._model.refresh);
-                $scope.$watch('_model.sortAsc',     $scope._model.refresh);
-
-
-            }]
-        };
-    }
-    dbGrid.$inject = ["$filter", "$timeout", "$q", "$log"];
-
-    angular.module('sds-angular-controls').directive('dbGrid', dbGrid);
-})();
-
-(function () {
-
-    function isolateControl() {
-        return {
-            restrict: 'A',
-            require: ['ngModel', '^?form'],
-            link: function (scope, elm, attrs, ctrls) {
-                // Do a copy of the controller
-                var ctrlCopy = {};
-                angular.copy(ctrls[0], ctrlCopy);
-
-                if (ctrls[1]) {
-                    ctrls[1].$removeControl(ctrls[0]);
-                }
-
-                var isolated = {
-                    $addControl    : angular.noop,
-                    $removeControl : angular.noop,
-                    $setValidity: function (validationToken, isValid, control) {
-                        //ctrlCopy.$setValidity(validationToken, isValid, control);
-                    },
-                    $setDirty: function () {
-                        elm.removeClass('ng-pristine').addClass('ng-dirty');
-                        ctrls[0].$dirty = true;
-                        ctrls[0].$pristine = false;
-                    },
-                    $setPristine: function () {
-                        elm.removeClass('ng-dirty').addClass('ng-pristine');
-                        ctrls[0].$dirty = false;
-                        ctrls[0].$pristine = true;
-                    }
-                };
-                angular.extend(ctrls[0], isolated);
-            }
-        };
-    }
-
-    angular.module('sds-angular-controls').directive('isolateControl', isolateControl);
-})();
-angular.module('sds-angular-controls').run(['$templateCache', function($templateCache) {
-  'use strict';
-
-  $templateCache.put('sds-angular-controls/form-directives/form-autocomplete.html',
-    "<div class=\"{{::container.layout === 'horizontal' ? layoutCss : '' }}\"> <select ng-if=\"!container.isReadonly && !reload\" ng-readonly=\"container.isReadonly\" ng-required=\"container.isRequired\" name=\"{{::container.field}}\" selectize=\"options\" options=\"innerItems\" class=\"{{::container.layout !== 'horizontal' ? layoutCss : ''}}\" ng-model=\"container.record[container.field]\"></select> <!-- optionValue as optionLabel for arrayItem in array --> <input ng-if=\"container.isReadonly\" style=\"{{::style}}\" readonly type=\"text\" class=\"form-control {{::container.layout !== 'horizontal' ? layoutCss : ''}}\" ng-model=\"readOnlyModel\"> </div>"
-  );
-
-
-  $templateCache.put('sds-angular-controls/form-directives/form-currency-input.html',
-    "<div class=\"{{::container.layout === 'horizontal' ? layoutCss : '' }}\"> <input class=\"form-control inputField {{::container.layout !== 'horizontal' ? layoutCss : ''}}\" ng-model=\"container.record[container.field]\" type=\"text\" name=\"{{::container.field}}\" ng-required=\"container.isRequired\" ng-disabled=\"container.isReadonly\" step=\"any\" style=\"{{::style}}\" currency-mask> <div ng-if=\"::(rightLabel && rightLabel.length > 0)\" class=\"rightLabel\">{{::rightLabel}}</div> </div>"
-  );
-
-
-  $templateCache.put('sds-angular-controls/form-directives/form-date-picker.html',
-    "<div class=\"{{::container.layout === 'horizontal' ? layoutCss : '' }}\"> <span class=\"input-group {{::container.layout !== 'horizontal' ? layoutCss : ''}}\" ng-if=\"!container.isReadonly\"> <input type=\"text\" style=\"{{::style}}\" class=\"form-control datepicker\" placeholder=\"{{placeholder || container.label}}\" ng-model=\"container.record[container.field]\" ng-required=\"::container.isRequired\" min-date=\"min\" max-date=\"max\" datepicker-popup=\"{{::dateFormat}}\" is-open=\"calendar.opened\"> <span class=\"input-group-btn\"> <button type=\"button\" class=\"btn btn-default\" ng-click=\"open($event)\"><i class=\"glyphicon glyphicon-calendar\"></i></button> </span> </span> <input ng-if=\"container.isReadonly\" style=\"{{::style}}\" readonly type=\"text\" class=\"form-control {{::container.layout !== 'horizontal' ? layoutCss : ''}}\" ng-model=\"readOnlyModel\"> </div>"
-  );
-
-
-  $templateCache.put('sds-angular-controls/form-directives/form-date-time-picker.html',
-    "<div class=\"{{::container.layout === 'horizontal' ? layoutCss : '' }} datepicker timepicker\"> <span class=\"input-group {{::container.layout !== 'horizontal' ? layoutCss : ''}}\" ng-if=\"!container.isReadonly\"> <input type=\"text\" style=\"{{::style}}\" class=\"form-control datepicker\" placeholder=\"{{placeholder || container.label}}\" ng-model=\"container.record[container.field]\" ng-required=\"::container.isRequired\" min-date=\"min\" max-date=\"max\" datepicker-popup=\"{{::dateFormat}}\" is-open=\"calendar.opened\"> <span class=\"input-group-btn\"> <button type=\"button\" class=\"btn btn-default\" ng-click=\"open($event)\"><i class=\"glyphicon glyphicon-calendar\"></i></button> </span> </span> <timepicker ng-if=\"!container.isReadonly\" ng-model=\"container.record[container.field]\" ng-required=\"::container.isRequired\" ng-if=\"!container.isReadonly\" minute-step=\"1\"></timepicker> <input ng-if=\"container.isReadonly\" style=\"{{::style}}\" readonly type=\"text\" class=\"form-control {{::container.layout !== 'horizontal' ? layoutCss : ''}}\" ng-model=\"readOnlyModel\"> </div>"
-  );
-
-
-  $templateCache.put('sds-angular-controls/form-directives/form-field-validation.html',
-    "<div ng-if=\"!hideValidationMessage\" class=\"has-error\" ng-show=\"showError({{field}})\" ng-messages=\"{{field}}.$error\"> <span class=\"control-label\" ng-message=\"required\"> {{ validationFieldName }} is required. </span> <span class=\"control-label\" ng-message=\"text\"> {{ validationFieldName }} should be text. </span> <span class=\"control-label\" ng-message=\"integer\"> {{ validationFieldName }} should be an integer. </span> <span class=\"control-label\" ng-message=\"email\"> {{ validationFieldName }} should be an email address. </span> <span class=\"control-label\" ng-message=\"date\"> {{ validationFieldName}} should be a date. </span> <span class=\"control-label\" ng-message=\"datetime\"> {{ validationFieldName }} should be a datetime. </span> <span class=\"control-label\" ng-message=\"time\"> {{ validationFieldName }} should be a time. </span> <span class=\"control-label\" ng-message=\"month\"> {{ validationFieldName }} should be a month. </span> <span class=\"control-label\" ng-message=\"week\"> {{ validationFieldName }} should be a week. </span> <span class=\"control-label\" ng-message=\"url\"> {{ validationFieldName }} should be an url. </span> <span class=\"control-label\" ng-message=\"zip\"> {{ validationFieldName }} should be a valid zipcode. </span> <span class=\"control-label\" ng-message=\"number\">{{ validationFieldName }} must be a number</span> <span class=\"control-label\" ng-message=\"tel\">{{ validationFieldName }} must be a phone number</span> <span class=\"control-label\" ng-message=\"color\">{{ validationFieldName }} must be a color</span> <span class=\"control-label\" ng-message=\"min\"> {{ validationFieldName }} must be at least {{min}}. </span> <span class=\"control-label\" ng-message=\"max\"> {{ validationFieldName }} must not exceed {{max}} </span> <span class=\"control-label\" ng-repeat=\"(k, v) in types\" ng-message=\"{{k}}\"> {{ validationFieldName }}{{v[1]}}</span> </div>"
-  );
-
-
-  $templateCache.put('sds-angular-controls/form-directives/form-field.html',
-    "<div> <div ng-if=\"layout === 'stacked'\" class=\"row\"> <div class=\"form-group clearfix\" ng-form=\"{{field}}\" ng-class=\"{ 'has-error': showError({{field}}) }\"> <div class=\"{{::layoutCss}}\"> <label ng-if=\"showLabel\" class=\"control-label {{labelCss}}\"> {{ label }} <span ng-if=\"isRequired && !isReadonly\">*</span></label> <ng-transclude></ng-transclude> <div ng-if=\"showDefault\"><form-input></form-input></div> <!-- validation --> <div class=\"pull-left\" ng-include=\"'sds-angular-controls/form-directives/form-field-validation.html'\"></div> </div> </div> </div> <div ng-if=\"layout === 'horizontal'\" class=\"row inline-control\"> <div class=\"form-group clearfix\" ng-form=\"{{field}}\" ng-class=\"{ 'has-error': showError({{field}}) }\"> <label ng-if=\"showLabel\" class=\"control-label {{labelCss}}\"> {{ label }} <span ng-if=\"isRequired && !isReadonly\">*</span></label> <ng-transclude></ng-transclude> <div ng-if=\"showDefault\"><form-input></form-input></div> <!-- validation --> <div ng-if=\"!hideValidationMessage\" ng-show=\"showError({{field}})\" class=\"popover validation right alert-danger\" style=\"display:inline-block; top:auto; left:auto; margin-top:-4px; min-width:240px\"> <div class=\"arrow\" style=\"top: 20px\"></div> <div class=\"popover-content\" ng-include=\"'sds-angular-controls/form-directives/form-field-validation.html'\"> </div> </div> </div> </div> <div ng-if=\"layout !== 'stacked' && layout !== 'horizontal'\" ng-form=\"{{field}}\" ng-class=\"{ 'has-error': showError({{field}}) }\" class=\"grid-control {{::layoutCss}}\"> <ng-transclude></ng-transclude> <div ng-if=\"showDefault\"><form-input></form-input></div> </div> <div ng-if=\"log\"> form-input value: {{record[field]}}<br> {{isRequired}} </div> </div>"
-  );
-
-
-  $templateCache.put('sds-angular-controls/form-directives/form-input.html',
-    "<div class=\"{{::container.layout === 'horizontal' ? layoutCss : '' }}\"> <input class=\"form-control inputField {{::container.layout !== 'horizontal' ? layoutCss : ''}}\" ng-model=\"container.record[container.field]\" name=\"{{::container.field}}\" type=\"{{::type}}\" ng-if=\"type !== 'number'\" ng-required=\"container.isRequired\" ng-disabled=\"container.isReadonly\" placeholder=\"{{placeholder || container.label}}\" style=\"{{::style}}\" mask-input=\"{{mask}}\" maxlength=\"{{maxlength || ''}}\" minlength=\"{{minlength || -1}}\"> <input class=\"form-control inputField {{::container.layout !== 'horizontal' ? layoutCss : ''}}\" ng-model=\"container.record[container.field]\" name=\"{{::container.field}}\" type=\"number\" ng-if=\"type === 'number'\" ng-required=\"container.isRequired\" ng-disabled=\"container.isReadonly\" placeholder=\"{{placeholder || container.label}}\" min=\"{{::min}}\" max=\"{{::max}}\" step=\"{{::step}}\" style=\"{{::style}}\" mask-input=\"{{mask}}\"> <div ng-if=\"::(rightLabel && rightLabel.length > 0)\" class=\"rightLabel\">{{::rightLabel}}</div> </div>"
-  );
-
-
-  $templateCache.put('sds-angular-controls/form-directives/form-multi-select.html',
-    "<div class=\"{{::container.layout === 'horizontal' ? layoutCss : '' }}\"> <input ng-if=\"!container.isReadonly\" ng-readonly=\"container.isReadonly\" ng-required=\"container.isRequired\" name=\"{{::container.field}}\" selectize=\"options\" options=\"items\" class=\"{{::container.layout !== 'horizontal' ? layoutCss : ''}}\" ng-model=\"container.record[container.field]\"> <!-- optionValue as optionLabel for arrayItem in array --> <input ng-if=\"container.isReadonly\" style=\"{{::style}}\" readonly type=\"text\" class=\"form-control {{::container.layout !== 'horizontal' ? layoutCss : ''}}\" ng-model=\"readOnlyModel\"> </div>"
-  );
-
-
-  $templateCache.put('sds-angular-controls/form-directives/form-select.html',
-    "<div class=\"{{::container.layout === 'horizontal' ? layoutCss : '' }}\"> <select ng-if=\"!container.isReadonly\" class=\"form-control {{::container.layout !== 'horizontal' ? layoutCss : ''}}\" name=\"{{::container.field}}\" ng-model=\"container.record[container.field]\" ng-options=\"convertType(key) as innerItems[key] for key in orderHash(innerItems)\" ng-required=\"container.isRequired\"></select> <!-- optionValue as optionLabel for arrayItem in array --> <input ng-if=\"container.isReadonly\" style=\"{{::style}}\" readonly type=\"text\" class=\"form-control {{::container.layout !== 'horizontal' ? layoutCss : ''}}\" ng-model=\"readOnlyModel\"> </div>"
-  );
-
-
-  $templateCache.put('sds-angular-controls/form-directives/form-text-area.html',
-    "<div class=\"{{::container.layout === 'horizontal' ? layoutCss : '' }}\"> <textarea class=\"form-control inputField {{::container.layout !== 'horizontal' ? layoutCss : ''}}\" ng-model=\"container.record[container.field]\" name=\"{{::container.field}}\" ng-required=\"container.isRequired\" ng-disabled=\"container.isReadonly\" style=\"{{::style}}\"></textarea> </div>"
-  );
-
-
-  $templateCache.put('sds-angular-controls/form-directives/form-text-toggle.html',
-    "<div class=\"{{::container.layout === 'horizontal' ? layoutCss : '' }} text-toggle\"> <input type=\"text\" ng-disabled=\"container.isReadonly\" type=\"{{::type}}\" class=\"form-control {{::container.layout !== 'horizontal' ? layoutCss : ''}}\" ng-required=\"container.isRequired\" ng-model=\"container.record[container.field]\"> <!-- bug in toggle where setting any disabled makes it disabled - so needing an if here --> <toggle-switch ng-if=\"container.isReadonly\" is-disabled=\"true\" class=\"{{::toggleSwitchType}}\" ng-model=\"container.record[toggleField]\" on-label=\"{{::onLabel}}\" off-label=\"{{::offLabel}}\"> </toggle-switch> <toggle-switch ng-if=\"!container.isReadonly\" class=\"{{::toggleSwitchType}}\" ng-model=\"container.record[toggleField]\" on-label=\"{{::onLabel}}\" off-label=\"{{::offLabel}}\"> </toggle-switch> </div>"
-  );
-
-
-  $templateCache.put('sds-angular-controls/form-directives/form-time-picker.html',
-    "<div class=\"{{::container.layout === 'horizontal' ? layoutCss : '' }} timepicker\"> <timepicker ng-model=\"container.record[container.field]\" ng-required=\"::container.isRequired\" ng-if=\"!container.isReadonly\" minute-step=\"1\"></timepicker> <input ng-if=\"container.isReadonly\" style=\"{{::style}}\" readonly type=\"text\" class=\"form-control {{::container.layout !== 'horizontal' ? layoutCss : ''}}\" ng-model=\"readOnlyModel\"> </div>"
-  );
-
-
-  $templateCache.put('sds-angular-controls/form-directives/form-toggle.html',
-    "<div class=\"{{::container.layout === 'horizontal' ? layoutCss : '' }}\"> <!-- bug in toggle where setting any disabled makes it disabled - so needing an if here --> <toggle-switch ng-if=\"container.isReadonly\" style=\"{{::style}}\" is-disabled=\"true\" class=\"{{::toggleSwitchType}}\" ng-model=\"container.record[container.field]\" on-label=\"{{::onLabel}}\" off-label=\"{{::offLabel}}\"> </toggle-switch> <toggle-switch ng-if=\"!container.isReadonly\" style=\"{{::style}}\" class=\"{{::toggleSwitchType}}\" ng-model=\"container.record[container.field]\" on-label=\"{{::onLabel}}\" off-label=\"{{::offLabel}}\"> </toggle-switch> </div>"
-  );
-
-
-  $templateCache.put('sds-angular-controls/table-directives/db-grid.html',
-    "<div class=\"table-responsive\"> <div class=\"btn-toolbar\"> <a ng-if=\"_model.showAdvancedFilter\" href=\"\" class=\"btn btn-default\" ng-click=\"_model.clearFilters()\">Clear All Filters <span class=\"big-x\">&times;</span></a> <div ng-if=\"!_model.showAdvancedFilter && _model.filterType !== 'none'\" class=\"toolbar-input\"> <div class=\"form-group has-feedback\"> <input class=\"form-control\" type=\"text\" ng-model=\"_model.filterText\" ng-keyup=\"$grid.refresh()\" placeholder=\"Filter {{_model.label || 'items'}}\" on-enter=\"_model.onEnter()\" isolate-control> <a href=\"\" ng-click=\"_model.filterText = ''; $grid.refresh()\" class=\"form-control-feedback feedback-link\">&times;</a> </div> </div> <a href=\"\" ng-if=\"_model.filterType === 'advanced'\" class=\"btn btn-default\" ng-class=\"{'btn-primary': _model.showAdvancedFilter}\" ng-click=\"_model.showAdvancedFilter = !_model.showAdvancedFilter\">{{_model.showAdvancedFilter ? 'Simple' : 'Advanced'}} Filtering</a> <db-transclude></db-transclude> <p ng-if=\"_model.total && _model.label\"><i>{{_model.total}} {{_model.label}}</i></p> </div> <table class=\"table db-grid table-hover {{_model.layoutCss}}\"> <thead> <tr ng-if=\"_model.showAdvancedFilter\"> <th ng-repeat=\"_col in _model.cols\" ng-style=\"{width: _col.width}\" class=\"{{_col.layoutCss}}\"> <div ng-if=\"::_col.sortable\"> <input type=\"text\" class=\"form-control filter-input\" on-enter=\"_model.onEnter()\" ng-keyup=\"$grid.refresh()\" ng-model=\"_col.filter\" placeholder=\"Filter {{::_col.label || (_col.key | labelCase)}}\" tooltip=\"{{_model.getTooltip(_col)}}\" tooltip-trigger=\"focus\" tooltip-placement=\"top\" isolate-control> </div>   <tr> <th ng-repeat=\"_col in _model.cols\" ng-style=\"{width: _col.width}\" class=\"{{_col.layoutCss}}\"> <a href=\"\" ng-if=\"::_col.sortable\" ng-click=\"_model.toggleSort($index)\">{{::_col.label || (_col.key | labelCase) }}&nbsp;<i class=\"fa\" style=\"display: inline\" ng-class=\"{\n" +
-    "                         'fa-sort'     : _model.sort !== $index,\n" +
-    "                         'fa-sort-down': _model.sort === $index &&  _model.sortAsc,\n" +
-    "                         'fa-sort-up'  : _model.sort === $index && !_model.sortAsc\n" +
-    "                         }\"></i> </a> <span ng-if=\"::!_col.sortable\"> {{::_col.label || (_col.key | labelCase)}} </span>    <tbody ng-show=\"!_model.waiting\"> <tr> <td ng-repeat=\"_col in _model.cols\" db-bind-cell>   </table> <div ng-if=\"_model.filteredItems && _model.filteredItems.length === 0 && _model.label && !_model.waiting\" class=\"db-summary\"> No {{_model.label}}. </div> <pagination ng-if=\"_model.total > _model.pageSize && !_model.waiting\" total-items=\"_model.total\" items-per-page=\"_model.pageSize\" max-size=\"10\" rotate=\"false\" ng-model=\"_model.currentPage\" isolate-control></pagination> <div ng-show=\"_model.waiting\"> <i class=\"fa fa-circle-o-notch fa-spin\"></i> Please Wait... </div> </div>"
-  );
-
-}]);

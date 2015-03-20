@@ -3,64 +3,44 @@
  */
 (function () {
     'use strict';
-    function formDatePicker ($timeout, $log) {
+    function formDatePicker () {
         return{
             restrict: 'EA',
             require: '^form-field',
             replace: true,
             scope: {
+                sdsModel         : '=',
                 dateFormat       : '@',
                 max              : '=?',
                 min              : '=?',
-                style            : '@?',
-                layoutCss        : '@?' //default col-md-6
+                placeholder      : '@?'
             },
             templateUrl: 'sds-angular-controls/form-directives/form-date-picker.html',
 
-            link: function (scope, element, attr, container) {
-                var input = element.find('input');
-                scope.container = container.$scope;
-                
-                switch(container.$scope.layout){
-                    case "horizontal":
-                        scope.layoutCss = scope.layoutCss || "col-md-6";
-                        break;
-                    default: //stacked
-                        scope.layoutCss = scope.layoutCss || "";
-                }
+            link: function ($scope, $element, $attrs, formField) {
+                var input = $element.find('input');
+                $scope.container = formField.$scope;
+                $scope.dateFormat = $scope.dateFormat || "MM-dd-yyyy";
 
-                if (container.$scope.isAutofocus){
-                    $timeout(function (){element.find('input').focus(); });
-                }
-                
-                scope.dateFormat = scope.dateFormat || "MM-dd-yyyy";
-
-                scope.calendar = {opened: false};
-                scope.open = function($event) {
+                $scope.calendar = {opened: false};
+                $scope.open = function($event) {
                     $event.preventDefault();
                     $event.stopPropagation();
-                    scope.calendar.opened = true;
+                    $scope.isOpened = true;
                 };
 
-                scope.$watch('container.record[container.field]', function (val){
+                $scope.$watch('sdsModel', function (val){
                     if (typeof val === 'string'){
-                        container.$scope.record[container.$scope.field] = moment.utc(container.$scope.record[container.$scope.field]).toDate();
+                        $scope.sdsModel = moment.utc(val).toDate();
                     }
                 });
 
-                scope.$watch("container.isReadonly", function(newVal){
-                    if(newVal) {
-                        if(scope.container.record[scope.container.field]) {
-                            scope.readOnlyModel = moment.utc(scope.container.record[scope.container.field]).format(scope.dateFormat.toUpperCase());
-                        }
-                    }
-                });
-
-                if (scope.max) {
-                    container.$scope.max = moment.utc(scope.max).format(scope.dateFormat.toUpperCase());
+                formField.$scope.field = $attrs.name || $attrs.sdsModel.substr($attrs.sdsModel.lastIndexOf('.')+1);
+                if ($scope.max) {
+                    formField.$scope.max = moment.utc($scope.max).format($scope.dateFormat.toUpperCase());
                 }
-                if (scope.min) {
-                    container.$scope.min = moment.utc(scope.min).format(scope.dateFormat.toUpperCase());
+                if ($scope.min) {
+                    formField.$scope.min = moment.utc($scope.min).format($scope.dateFormat.toUpperCase());
                 }
             }
         }
@@ -70,7 +50,7 @@
         return {
             restrict: 'EAC',
             require: 'ngModel',
-            link: function(scope, element, attr, controller) {
+            link: function($scope, $element, $attrs, controller) {
                 //remove the default formatter from the input directive to prevent conflict
                 controller.$formatters.shift();
             }
