@@ -1,8 +1,0 @@
-<div class="{{::container.layout === 'horizontal' ? layoutCss : '' }}">
-    <textarea class="form-control inputField {{::container.layout !== 'horizontal' ? layoutCss : ''}}"
-           ng-model='container.record[container.field]'
-           name='{{::container.field}}'
-           ng-required='container.isRequired'
-           ng-disabled="container.isReadonly"
-           style="{{::style}}"></textarea>
-</div>

@@ -1,12 +1,11 @@
 <div>
     <div ng-if="layout === 'stacked'" class="row">
-         <div class='form-group clearfix' ng-form="{{field}}"
-         ng-class="{ 'has-error': showError({{field}}) }">
+         <div class='form-group clearfix' ng-class="{ 'has-error': showError() }">
 
-        <div class="{{::layoutCss}}">
-            <label ng-if="showLabel" class='control-label {{labelCss}}'> {{ label }} <span ng-if='isRequired && !isReadonly'>*</span></label>
+        <div class="{{layoutCss}}">
+            <label ng-if="showLabel" class='control-label {{labelCss}}'> {{ label || (field | labelCase) }} <span ng-if='isRequired && !isReadonly'>*</span></label>
 
-            <span ng-if="!valueFormatter || !isReadonly"><ng-transclude></ng-transclude></span>
+            <div ng-if="!valueFormatter || !isReadonly"><ng-transclude></ng-transclude></div>
             <input ng-if="valueFormatter && isReadonly" class="form-control" type="text" ng-value="valueFormatter()" name="{{field}}" readonly="readonly" />
 
             <!-- validation -->
@@ -16,18 +15,17 @@
     </div>
 
     <div ng-if="layout === 'horizontal'" class="row inline-control">
-        <div class='form-group clearfix' ng-form="{{field}}"
-         ng-class="{ 'has-error': showError({{field}}) }">
+        <div class='form-group clearfix' ng-class="{ 'has-error': showError() }">
 
-        <label ng-if="showLabel" class='control-label {{labelCss}}'> {{ label }} <span ng-if='isRequired && !isReadonly'>*</span></label>
+        <label ng-if="showLabel" class='control-label {{labelCss}}'> {{ label || (field | labelCase) }} <span ng-if='isRequired && !isReadonly'>*</span></label>
 
-            <div class="{{childLayoutCss}} || 'col-md-6'">
-                <span ng-if="!valueFormatter && !isReadonly"><ng-transclude></ng-transclude></span>
+            <div class="{{childLayoutCss || 'col-md-6'}}">
+                <span ng-if="!valueFormatter || !isReadonly"><ng-transclude></ng-transclude></span>
                 <input ng-if="valueFormatter && isReadonly" class="form-control" type="text" ng-value="valueFormatter()" name="{{field}}" readonly="readonly" />
             </div>
 
         <!-- validation -->
-            <div ng-if="!hideValidationMessage" ng-show='showError({{field}})' class="popover validation right alert-danger"
+            <div ng-if="!hideValidationMessage" ng-show='showError()' class="popover validation right alert-danger"
                  style="display:inline-block; top:auto; left:auto; margin-top:-4px; min-width:240px;">
                 <div class="arrow" style="top: 20px"></div>
                 <div class="popover-content" ng-include="'sds-angular-controls/form-directives/form-field-validation.html'" >
@@ -36,11 +34,9 @@
         </div>
     </div>
 
-    <div ng-if="layout !== 'stacked' && layout !== 'horizontal'" ng-form="{{field}}"
-         ng-class="{ 'has-error': showError({{field}}) }" class="grid-control {{::layoutCss}}">
+    <div ng-if="layout !== 'stacked' && layout !== 'horizontal'" ng-class="{ 'has-error': showError() }" class="grid-control {{::layoutCss}}">
 
         <span ng-if="!valueFormatter || !isReadonly"><ng-transclude></ng-transclude></span>
-
         <input ng-if="valueFormatter && isReadonly" class="form-control" type="text" ng-value="valueFormatter()" name="{{field}}" readonly="readonly" />
 
     </div>
