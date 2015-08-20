@@ -59,13 +59,14 @@
 
           <form-field is-readonly="true">
               <form-date-picker sds-model="vm.testForm.DateOfBirth" date-format="MM/dd/yyyy"></form-date-picker>
-              <timepicker ng-model="vm.testForm.DateOfBirth" minute-step="1"></timepicker>
+              <!--<timepicker ng-model="vm.testForm.DateOfBirth" minute-step="1"></timepicker>-->
           </form-field>
 
           <form-field>
-              <form-date-picker sds-model="vm.testForm.DateOfBirth" date-format="MM/dd/yyyy"></form-date-picker>
+              <!--<form-date-picker sds-model="vm.testForm.DateOfBirth" date-format="MM/dd/yyyy"></form-date-picker>-->
               <timepicker ng-model="vm.testForm.DateOfBirth" minute-step="1"></timepicker>
           </form-field>
+          <input type="submit" value="Submit" class="btn btn-primary">
       </form>
 
         <hr>
@@ -119,7 +120,7 @@
                 <timepicker ng-model="vm.testForm.DateOfBirth" minute-step="1"></timepicker>
             </form-field>
 
-            <input type="submit" value="Submit" class="btn btn-primary" ng-disabled="testHorizontalFrm.$invalid">
+            <input type="submit" value="Submit" class="btn btn-primary">
         </form>
         <hr>
         {{vm.testForm | json}}
