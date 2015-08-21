@@ -10,6 +10,9 @@
             link:  function ($scope, $element, $attrs, containers) {
                 var formField = containers[0];
                 var name = $attrs.name || $attrs.ngModel.substr($attrs.ngModel.lastIndexOf('.')+1);
+                if(formField.$scope.validationFieldName){
+                    name = formField.$scope.validationFieldName;
+                }
                 $element.attr('name', name);
                 $element.attr('ng-required', $attrs.ngRequired || '{{container.isRequired}}');
                 $element.removeAttr('form-control');
