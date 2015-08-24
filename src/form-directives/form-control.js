@@ -8,11 +8,14 @@
             priority: 1000,
             require: ['^formField'],
             link:  function ($scope, $element, $attrs, containers) {
-                var formField = containers[0];
-                var name = $attrs.name || $attrs.ngModel.substr($attrs.ngModel.lastIndexOf('.')+1);
-                if(formField.$scope.validationFieldName){
+                var formField = containers[0], name;
+
+                if (formField.$scope.validationFieldName){
                     name = formField.$scope.validationFieldName;
+                } else {
+                    name = $attrs.name || $attrs.ngModel.substr($attrs.ngModel.lastIndexOf('.')+1);
                 }
+
                 $element.attr('name', name);
                 $element.attr('ng-required', $attrs.ngRequired || '{{container.isRequired}}');
                 $element.removeAttr('form-control');

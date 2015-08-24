@@ -17,7 +17,7 @@
     <div ng-if="layout === 'horizontal'" class="row inline-control">
         <div class='form-group clearfix' ng-class="{ 'has-error': showError() }">
 
-        <label ng-if="showLabel" class='control-label {{labelCss}}'> {{ label || (field | labelCase) }} <span ng-if='isRequired && !isReadonly'>*</span></label>
+            <label ng-if="showLabel" class='control-label {{labelCss}}'> {{ label || (field | labelCase) }} <span ng-if='isRequired && !isReadonly'>*</span></label>
 
             <div class="{{childLayoutCss || 'col-md-6'}}">
                 <span ng-if="!valueFormatter || !isReadonly"><ng-transclude></ng-transclude></span>

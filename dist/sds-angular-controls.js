@@ -1,7 +1,7 @@
 /*! 
  * sds-angular-controls
  * Angular Directives used with sds-angular generator
- * @version 1.0.0 
+ * @version 1.0.2 
  * 
  * Copyright (c) 2015 Steve Gentile, David Benson 
  * @link https://github.com/SMARTDATASYSTEMSLLC/sds-angular-controls 
@@ -126,11 +126,14 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
             priority: 1000,
             require: ['^formField'],
             link:  function ($scope, $element, $attrs, containers) {
-                var formField = containers[0];
-                var name = $attrs.name || $attrs.ngModel.substr($attrs.ngModel.lastIndexOf('.')+1);
-                if(formField.$scope.validationFieldName){
+                var formField = containers[0], name;
+
+                if (formField.$scope.validationFieldName){
                     name = formField.$scope.validationFieldName;
+                } else {
+                    name = $attrs.name || $attrs.ngModel.substr($attrs.ngModel.lastIndexOf('.')+1);
                 }
+
                 $element.attr('name', name);
                 $element.attr('ng-required', $attrs.ngRequired || '{{container.isRequired}}');
                 $element.removeAttr('form-control');
