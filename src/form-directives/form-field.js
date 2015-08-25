@@ -43,10 +43,8 @@
 
                 element.on('focus', '[name]', function (){
                     $scope.isFocused = true;
-                    $scope.$apply();
                 }).on('blur', '[name]', function (){
                     $scope.isFocused = false;
-                    $scope.$apply();
                 });
 
                 //validation ie. on submit

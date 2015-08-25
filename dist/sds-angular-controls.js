@@ -1,7 +1,7 @@
 /*! 
  * sds-angular-controls
  * Angular Directives used with sds-angular generator
- * @version 1.0.2 
+ * @version 1.0.3 
  * 
  * Copyright (c) 2015 Steve Gentile, David Benson 
  * @link https://github.com/SMARTDATASYSTEMSLLC/sds-angular-controls 
@@ -326,10 +326,8 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
 
                 element.on('focus', '[name]', function (){
                     $scope.isFocused = true;
-                    $scope.$apply();
                 }).on('blur', '[name]', function (){
                     $scope.isFocused = false;
-                    $scope.$apply();
                 });
 
                 //validation ie. on submit
