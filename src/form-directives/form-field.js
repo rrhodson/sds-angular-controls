@@ -23,7 +23,8 @@
                 showLabel               : '=?',
                 errorLayoutCss          : '@?',
                 hideValidationMessage   : '=?',  //default is false
-                validationFieldName     : '@?'  //to override the default label   '[validationFieldName]' is required
+                validationFieldName     : '@?',  //to override the default field   '[validationFieldName]' is required
+                validationFieldLabel    : '@?'  //to override the default validation label - you can use label
             },
             templateUrl: 'sds-angular-controls/form-directives/form-field.html',
             require: '^form',
