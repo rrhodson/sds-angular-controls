@@ -13,7 +13,11 @@
                 if (formField.$scope.validationFieldName){
                     name = formField.$scope.validationFieldName;
                 } else {
-                    name = $attrs.name || $attrs.ngModel.substr($attrs.ngModel.lastIndexOf('.')+1);
+                    name = $attrs.name || ($attrs.ngModel && $attrs.ngModel.substr($attrs.ngModel.lastIndexOf('.')+1)) || ($attrs.sdsModel && $attrs.sdsModel.substr($attrs.sdsModel.lastIndexOf('.')+1));
+                }
+
+                if(!name){
+                    alert('control must have a name via validationFieldName or model(ng/sds)');
                 }
 
                 $element.attr('name', name);
