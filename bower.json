@@ -41,13 +41,12 @@
     "blockUI": "*",
     "bootstrap": "~3",
     "jquery": "~2",
-    "lodash": ">=2",
+    "lodash": "~3",
     "moment": "~2",
     "pnotify": "~2.0.1",
     "selectize": "~0.11"
   },
   "resolutions": {
-    "angular": ">=1.4.4 <2.0",
-    "jquery": "~2"
+    "angular": ">=1.4.4 <2.0"
   }
 }
