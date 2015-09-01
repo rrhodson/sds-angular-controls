@@ -1,7 +1,7 @@
 /*! 
  * sds-angular-controls
  * Angular Directives used with sds-angular generator
- * @version 1.0.6 
+ * @version 1.0.7 
  * 
  * Copyright (c) 2015 Steve Gentile, David Benson 
  * @link https://github.com/SMARTDATASYSTEMSLLC/sds-angular-controls 
@@ -355,31 +355,57 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
     angular.module('sds-angular-controls').directive('formField', formField);
 })();
 
+(function () {
+    'use strict';
+
+    function UnsavedConfirmationModalCtrl($scope) {
+
+    }
+    UnsavedConfirmationModalCtrl.$inject = ["$scope"];
+
+    angular.module('sds-angular-controls').controller('UnsavedConfirmationModalCtrl',UnsavedConfirmationModalCtrl);
+})();
 (function(){
     'use strict';
-    function formUnsaved ($rootScope, $window) {
+    function formUnsaved ($rootScope, $location, $modal, progressLoader) {
         return {
             restrict: 'A',
             require: '^form',
             link: function($scope, element, attrs, form){
 
+                //element.on("submit", function(event) {
+                //    if (form && form.$valid) {
+                //        progressLoader.start();
+                //    }
+                //});
+
+
                 function routeChange(event) {
                     if(form.$dirty){
-                        var confirm = $window.confirm('You have unsaved changes');
-                        if(!confirm) {
-                            $rootScope.$broadcast("cancelProgressLoader");
-                            event.preventDefault();
-                        }
-                        console.log(confirm, event);
+                        //var confirm = $window.confirm('You have unsaved changes');
+                        //if(!confirm) {
+                        progressLoader.endAll();
+                        event.preventDefault();
+                        //}
+                        var targetPath = $location.path();
+
+                        $modal.open({
+                            templateUrl: 'sds-angular-controls/form-directives/form-unsaved-modal.html',
+                            scope: $scope
+                        }).result.then(function(result){
+                            if(result === 'CONTINUE'){
+                                form.$setPristine();
+                                $location.path(targetPath);
+                            }
+                        });
                     }
                 }
 
                 $scope.$on('$routeChangeStart', routeChange);
-
             }
         }
     }
-    formUnsaved.$inject = ["$rootScope", "$window"];
+    formUnsaved.$inject = ["$rootScope", "$location", "$modal", "progressLoader"];
 
     angular.module('sds-angular-controls').directive('formUnsaved', formUnsaved);
 })();
@@ -534,6 +560,11 @@ angular.module('sds-angular-controls').run(['$templateCache', function($template
 
   $templateCache.put('sds-angular-controls/form-directives/form-field.html',
     "<div> <div ng-if=\"layout === 'stacked'\" class=\"row\"> <div class=\"form-group clearfix\" ng-class=\"{ 'has-error': showError() }\"> <div class=\"{{layoutCss}}\"> <label ng-if=\"showLabel\" class=\"control-label {{labelCss}}\"> {{ label || (field | labelCase) }} <span ng-if=\"isRequired && !isReadonly\">*</span></label> <div ng-if=\"!valueFormatter || !isReadonly\"><ng-transclude></ng-transclude></div> <input ng-if=\"valueFormatter && isReadonly\" class=\"form-control\" type=\"text\" ng-value=\"valueFormatter()\" name=\"{{field}}\" readonly> <!-- validation --> <div class=\"pull-left\" ng-include=\"'sds-angular-controls/form-directives/form-field-validation.html'\"></div> </div> </div> </div> <div ng-if=\"layout === 'horizontal'\" class=\"row inline-control\"> <div class=\"form-group clearfix\" ng-class=\"{ 'has-error': showError() }\"> <label ng-if=\"showLabel\" class=\"control-label {{labelCss}}\"> {{ label || (field | labelCase) }} <span ng-if=\"isRequired && !isReadonly\">*</span></label> <div class=\"{{childLayoutCss || 'col-md-6'}}\"> <span ng-if=\"!valueFormatter || !isReadonly\"><ng-transclude></ng-transclude></span> <input ng-if=\"valueFormatter && isReadonly\" class=\"form-control\" type=\"text\" ng-value=\"valueFormatter()\" name=\"{{field}}\" readonly> </div> <!-- validation --> <div ng-if=\"!hideValidationMessage\" ng-show=\"showError()\" class=\"popover validation right alert-danger\" style=\"display:inline-block; top:auto; left:auto; margin-top:-4px; min-width:240px\"> <div class=\"arrow\" style=\"top: 20px\"></div> <div class=\"popover-content\" ng-include=\"'sds-angular-controls/form-directives/form-field-validation.html'\"> </div> </div> </div> </div> <div ng-if=\"layout !== 'stacked' && layout !== 'horizontal'\" ng-class=\"{ 'has-error': showError() }\" class=\"grid-control {{::layoutCss}}\"> <span ng-if=\"!valueFormatter || !isReadonly\"><ng-transclude></ng-transclude></span> <input ng-if=\"valueFormatter && isReadonly\" class=\"form-control\" type=\"text\" ng-value=\"valueFormatter()\" name=\"{{field}}\" readonly> </div> </div>"
+  );
+
+
+  $templateCache.put('sds-angular-controls/form-directives/form-unsaved-modal.html',
+    "<div id=\"add-control-modal\"> <div class=\"modal-header\"> <h4 class=\"modal-title\">Unsaved Changes</h4> </div> <div class=\"modal-body\"> <strong>You have unsaved changes. Continue will lose your changes!</strong> </div> <div class=\"modal-footer\"> <button type=\"button\" class=\"btn btn-primary\" ng-click=\"$dismiss()\">Cancel</button> <button type=\"button\" class=\"btn btn-secondary\" ng-click=\"$close('CONTINUE')\">Continue</button> </div> </div>"
   );
 
 }]);
