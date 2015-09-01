@@ -24,8 +24,7 @@
     "test",
     "tests"
   ],
-  "devDependencies": {
-  },
+  "devDependencies": {},
   "overrides": {
     "angular-bootstrap": {
       "dependencies": {
@@ -35,15 +34,17 @@
   },
   "dependencies": {
     "angular": ">=1.3 <2.0",
-    "angular-toggle-switch": "https://github.com/SMARTDATASYSTEMSLLC/angular-toggle-switch.git#84521e882bd431881d85032d0e40fca58f6e729e",
-    "lodash": ">=2",
-    "bootstrap": "~3",
-    "angular-sanitize": ">=1.3 <2.0",
+    "angular-bootstrap": "~0.11",
     "angular-messages": ">=1.3 <2.0",
+    "angular-sanitize": ">=1.3 <2.0",
+    "angular-toggle-switch": "https://github.com/SMARTDATASYSTEMSLLC/angular-toggle-switch.git#84521e882bd431881d85032d0e40fca58f6e729e",
+    "blockUI": "*",
+    "bootstrap": "~3",
     "jquery": "~2",
+    "lodash": ">=2",
     "moment": "~2",
-    "selectize": "~0.11",
-    "angular-bootstrap": "~0.11"
+    "pnotify": "~2.0.1",
+    "selectize": "~0.11"
   },
   "resolutions": {
     "angular": ">=1.4.0 <2.0",
