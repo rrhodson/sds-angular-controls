@@ -1,7 +1,7 @@
 /*! 
  * sds-angular-controls
  * Angular Directives used with sds-angular generator
- * @version 1.0.7 
+ * @version 1.0.8 
  * 
  * Copyright (c) 2015 Steve Gentile, David Benson 
  * @link https://github.com/SMARTDATASYSTEMSLLC/sds-angular-controls 
@@ -564,7 +564,7 @@ angular.module('sds-angular-controls').run(['$templateCache', function($template
 
 
   $templateCache.put('sds-angular-controls/form-directives/form-unsaved-modal.html',
-    "<div id=\"add-control-modal\"> <div class=\"modal-header\"> <h4 class=\"modal-title\">Unsaved Changes</h4> </div> <div class=\"modal-body\"> <strong>You have unsaved changes. Continue will lose your changes!</strong> </div> <div class=\"modal-footer\"> <button type=\"button\" class=\"btn btn-primary\" ng-click=\"$dismiss()\">Cancel</button> <button type=\"button\" class=\"btn btn-secondary\" ng-click=\"$close('CONTINUE')\">Continue</button> </div> </div>"
+    "<div id=\"add-control-modal\"> <div class=\"modal-header\"> <h4 class=\"modal-title\">Leave Page?</h4> </div> <div class=\"modal-body\"> <strong>You haven't saved your changes. Do you want to leave without finishing ?</strong> </div> <div class=\"modal-footer\"> <button type=\"button\" class=\"btn btn-primary\" ng-click=\"$dismiss()\">Stay on This Page</button> <button type=\"button\" class=\"btn btn-secondary\" ng-click=\"$close('CONTINUE')\">Leave This Page</button> </div> </div>"
   );
 
 }]);
