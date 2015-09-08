@@ -10,6 +10,16 @@
             link:  function ($scope, $element, $attrs, containers) {
                 var formField = containers[0], name;
 
+                if(!$element.attr('maxLength')) {
+                    if ($element.is("input")) {
+                        $element.attr('maxLength', 255);
+                    }
+
+                    if ($element.is("textarea")) {
+                        $element.attr('maxLength', 5000);
+                    }
+                }
+
                 if (formField.$scope.validationFieldName){
                     name = formField.$scope.validationFieldName;
                 } else {

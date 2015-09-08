@@ -1,7 +1,7 @@
 /*! 
  * sds-angular-controls
  * Angular Directives used with sds-angular generator
- * @version 1.0.8 
+ * @version 1.0.9 
  * 
  * Copyright (c) 2015 Steve Gentile, David Benson 
  * @link https://github.com/SMARTDATASYSTEMSLLC/sds-angular-controls 
@@ -127,6 +127,16 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
             require: ['^formField'],
             link:  function ($scope, $element, $attrs, containers) {
                 var formField = containers[0], name;
+
+                if(!$element.attr('maxLength')) {
+                    if ($element.is("input")) {
+                        $element.attr('maxLength', 255);
+                    }
+
+                    if ($element.is("textarea")) {
+                        $element.attr('maxLength', 5000);
+                    }
+                }
 
                 if (formField.$scope.validationFieldName){
                     name = formField.$scope.validationFieldName;
