@@ -20,7 +20,7 @@ See the wiki for more information on these controls
 git commit -am "Made some awesome new changes, now its even awesomer"
 
 ### tag the commit
-git tag -a v1.1.1 -m "Release version 1.1.1"
+git tag -a v1.1.2 -m "Release version 1.1.2"
 
 ### push to GitHub
 git push origin master --tags

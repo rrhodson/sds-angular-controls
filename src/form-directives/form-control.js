@@ -43,7 +43,7 @@
 
                 formField.$scope.tel = false;
 
-                if($element.attr('type', 'tel')){
+                if($element.attr('type') === 'tel'){
                     formField.$scope.tel = true;
                     $element.attr('ng-pattern', /^\(?[0-9]{3}(\-|\)) ?[0-9]{3}-[0-9]{4}$/);
                 }
