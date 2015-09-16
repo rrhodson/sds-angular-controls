@@ -20,6 +20,7 @@
                 layout                  : '@?',
                 labelCss                : '@?',
                 layoutCss               : '@?',
+                tel                     : '=?',
                 showLabel               : '=?',
                 errorLayoutCss          : '@?',
                 hideValidationMessage   : '=?',  //default is false
@@ -36,6 +37,8 @@
                 $scope.hideValidationMessage = $scope.hideValidationMessage || false;
                 $scope.layoutCss = $scope.layoutCss || "col-md-12";
                 $scope.errorLayoutCss = $scope.errorLayoutCss || "col-md-12";
+
+
 
                 $scope.layout = $scope.layout || "stacked";
                 if($scope.layout === "horizontal"){
