@@ -1,7 +1,7 @@
 /*! 
  * sds-angular-controls
  * Angular Directives used with sds-angular generator
- * @version 1.1.3 
+ * @version 1.1.4 
  * 
  * Copyright (c) 2015 Steve Gentile, David Benson 
  * @link https://github.com/SMARTDATASYSTEMSLLC/sds-angular-controls 
@@ -432,7 +432,7 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
 (function (){
     'use strict';
 
-    function progressLoader($window, $q, $rootScope, $location) {
+    function progressLoader($timeout, $window, $q, $rootScope, $location) {
         var active = 0;
         var notice = null;
 
@@ -481,9 +481,11 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
             },
             start: function (arg) {
                 if ( ++active < 2) {
-                    $.blockUI({
+                    var settings = {
                         message: '<i class="fa fa-spinner fa-spin"></i>',
-                        baseZ:1500,
+                        //baseZ:1500,
+                        baseZ: 9999,
+                        ignoreIfBlocked: true,
                         css: {
                             border: 'none',
                             padding: '15px',
@@ -497,7 +499,9 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
                             left:'50%',
                             'margin-left': '-50px'
                         }
-                    });
+                    };
+                    angular.extend(settings, arg);
+                    $.blockUI(settings);
                 }
                 return arg;
             },
@@ -559,7 +563,7 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'toggle-switch', 'ngSani
             }
         };
     }
-    progressLoader.$inject = ["$window", "$q", "$rootScope", "$location"];
+    progressLoader.$inject = ["$timeout", "$window", "$q", "$rootScope", "$location"];
 
     angular.module('sds-angular-controls').factory('progressLoader',progressLoader);
 

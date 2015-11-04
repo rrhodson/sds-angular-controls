@@ -4,7 +4,7 @@
 (function (){
     'use strict';
 
-    function progressLoader($window, $q, $rootScope, $location) {
+    function progressLoader($timeout, $window, $q, $rootScope, $location) {
         var active = 0;
         var notice = null;
 
@@ -53,9 +53,11 @@
             },
             start: function (arg) {
                 if ( ++active < 2) {
-                    $.blockUI({
+                    var settings = {
                         message: '<i class="fa fa-spinner fa-spin"></i>',
-                        baseZ:1500,
+                        //baseZ:1500,
+                        baseZ: 9999,
+                        ignoreIfBlocked: true,
                         css: {
                             border: 'none',
                             padding: '15px',
@@ -69,7 +71,9 @@
                             left:'50%',
                             'margin-left': '-50px'
                         }
-                    });
+                    };
+                    angular.extend(settings, arg);
+                    $.blockUI(settings);
                 }
                 return arg;
             },
