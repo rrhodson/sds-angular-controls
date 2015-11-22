@@ -1,7 +1,8 @@
 {
   "name": "sds-angular-controls",
-  "version": "1.1.5",
+  "version": "1.1.6",
   "homepage": "https://github.com/SMARTDATASYSTEMSLLC/sds-angular-controls",
+  "main": "index.js",
   "authors": [
     {
       "name": "Steve Gentile",
@@ -40,5 +41,8 @@
   ],
   "pre-push": [
     "grunt"
-  ]
+  ],
+  "dependencies": {
+    "angular": "~1"
+  }
 }
