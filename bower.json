@@ -1,6 +1,6 @@
 {
   "name": "sds-angular-controls",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "homepage": "https://github.com/SMARTDATASYSTEMSLLC/sds-angular-controls",
   "authors": [
     "Steve Gentile <steven.gentile@gmail.com>",
@@ -43,8 +43,7 @@
     "jquery": "~2",
     "lodash": "~3",
     "moment": "~2",
-    "pnotify": "~2.0.1",
-    "selectize": "~0.11"
+    "pnotify": "~2.0.1"
   },
   "resolutions": {
     "angular": ">=1.4.4 <2.0"
