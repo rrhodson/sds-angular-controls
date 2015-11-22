@@ -1,6 +1,6 @@
 {
   "name": "sds-angular-controls",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "homepage": "https://github.com/SMARTDATASYSTEMSLLC/sds-angular-controls",
   "main": "index.js",
   "authors": [
@@ -43,11 +43,11 @@
     "grunt"
   ],
   "dependencies": {
-    "angular": ">=1.3 <2.0",
-    "angular-bootstrap": "~0.12.2",
+    "angular": "^1.4.8",
     "angular-messages": ">=1.3 <2.0",
     "angular-sanitize": ">=1.3 <2.0",
     "angular-toggle-switch": "https://github.com/SMARTDATASYSTEMSLLC/angular-toggle-switch.git#84521e882bd431881d85032d0e40fca58f6e729e",
+    "angular-ui-bootstrap": "^0.14.3",
     "block-ui": "^2.70.1",
     "bootstrap": "^3.3.5",
     "jquery": "^2.1.4",
