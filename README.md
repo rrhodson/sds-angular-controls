@@ -20,10 +20,13 @@ See the wiki for more information on these controls
 git commit -am "Made some awesome new changes, now its even awesomer"
 
 ### tag the commit
-git tag -a v1.1.5 -m "Release version 1.1.6"
+git tag -a v1.1.7 -m "Release version 1.1.7"
 
 ### push to GitHub
 git push origin master --tags
+
+### npm publish
+npm publish
 
 -------------
 
