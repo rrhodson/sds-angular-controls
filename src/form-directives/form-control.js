@@ -1,7 +1,7 @@
 
 (function () {
     'use strict';
-    function formControl ($injector, $compile, formControlFormatters) {
+    function formControl ($injector, $compile, formControlFormatters, _) {
         return{
             restrict: 'A',
             terminal: true,

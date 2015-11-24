@@ -119,7 +119,7 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'ngSanitize', 'currencyM
 
 (function () {
     'use strict';
-    function formControl ($injector, $compile, formControlFormatters) {
+    function formControl ($injector, $compile, formControlFormatters, _) {
         return{
             restrict: 'A',
             terminal: true,
@@ -195,7 +195,7 @@ angular.module('sds-angular-controls', ['ui.bootstrap', 'ngSanitize', 'currencyM
             }
         }
     }
-    formControl.$inject = ["$injector", "$compile", "formControlFormatters"];
+    formControl.$inject = ["$injector", "$compile", "formControlFormatters", "_"];
 
     var formControlFormatters = {
         'select[ng-options]': function (ngModel, $attrs, $parse, $scope){
