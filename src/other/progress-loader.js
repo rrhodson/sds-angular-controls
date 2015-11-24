@@ -12,44 +12,11 @@
             wait: function (promise, isBlocking){
                 if (isBlocking){
                     this.start();
-                }else{
-                    this.startNonblocking();
                 }
+
                 return promise.then(this.end, function (arg){
                     return $q.reject(this.end(arg));
                 });
-            },
-            startNonblocking:function (arg){
-                if ( ++active < 2) {
-                    if (notice){
-                        notice.update({
-                            delay: 0,
-                            hide: true
-                        });
-                    }
-                    notice = new $window.PNotify({
-                        title: "Please Wait",
-                        type: 'info',
-                        icon: 'fa fa-spinner fa-spin',
-                        hide: false,
-                        buttons: {
-                            closer: false,
-                            sticker: false
-                        },
-                        opacity: 0.75,
-                        shadow: false,
-                        width: "170px",
-                        stack: {
-                            dir1: "down",
-                            dir2: "left",
-                            push: "bottom",
-                            spacing1: 5,
-                            spacing2: 5,
-                            context: $("body")
-                        }
-                    });
-                }
-                return arg;
             },
             start: function (arg) {
                 if ( ++active < 2) {
