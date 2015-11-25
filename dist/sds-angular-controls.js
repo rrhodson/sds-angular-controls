@@ -1,13 +1,15 @@
 /*! 
  * sds-angular-controls
  * Angular Directives used with sds-angular generator
- * @version 1.2.5 
+ * @version 1.2.6 
  * 
  * Copyright (c) 2015 Steve Gentile, David Benson 
  * @link https://github.com/SMARTDATASYSTEMSLLC/sds-angular-controls 
  * @license  MIT 
  */ 
-angular.module('sds-angular-controls', ['ui.bootstrap', 'ngSanitize', 'currencyMask']);
+angular.module('sds-angular-controls', ['ui.bootstrap', 'ngSanitize', 'currencyMask'])
+    .constant('_', window._)
+    .constant('moment', window.moment);
 
 (function (){
   'use strict';
